@@ -18,7 +18,7 @@ using namespace std;
 
 GLFWwindow *window;
 
-vector<glm::vec2> vertices;
+vector<glm::vec3> vertices;
 
 unsigned int VBO;
 unsigned int EBO;

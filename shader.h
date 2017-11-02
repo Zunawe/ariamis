@@ -19,10 +19,12 @@ class Shader{
 		~Shader();
 
 		unsigned int getID();
+		GLenum getShaderType();
 		bool compile();
 	
 	private:
 		unsigned int id;
+		GLenum shaderType;
 		std::string source;
 		bool checkCompileErrors();
 };

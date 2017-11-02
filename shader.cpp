@@ -3,6 +3,7 @@
 using namespace std;
 
 Shader::Shader(const char *filePath, GLenum shaderType){
+	this->shaderType = shaderType;
 	this->id = glCreateShader(shaderType);
 
 	ifstream fileStream;
@@ -27,6 +28,10 @@ Shader::~Shader(){
 
 unsigned int Shader::getID(){
 	return this->id;
+}
+
+GLenum Shader::getShaderType(){
+	return this->shaderType;
 }
 
 bool Shader::compile(){

@@ -1,9 +1,14 @@
 #include "graphic.h"
 
 void initVertices(){
-	vertices.push_back(glm::vec2(-0.5f, -0.5f));
-	vertices.push_back(glm::vec2(0.5f, -0.5f));
-	vertices.push_back(glm::vec2(0.0f, 0.5f));
+	vertices.push_back(glm::vec3(-0.5f, -0.5f, 0.0f));
+	vertices.push_back(glm::vec3(1.0f, 0.0f, 0.0f));
+
+	vertices.push_back(glm::vec3(0.5f, -0.5f, 0.0f));
+	vertices.push_back(glm::vec3(0.0f, 1.0f, 0.0f));
+
+	vertices.push_back(glm::vec3(0.0f, 0.5f, 0.0f));
+	vertices.push_back(glm::vec3(0.0f, 0.0f, 1.0f));
 }
 
 void display(){
@@ -16,7 +21,7 @@ void display(){
 
 	shader_program.use();
 	glBindVertexArray(VAO);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec2) * vertices.size(), &vertices[0].x, GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * vertices.size(), &vertices[0].x, GL_STATIC_DRAW);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * indices.size(), &indices[0], GL_STATIC_DRAW);
 		glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
 
@@ -88,8 +93,10 @@ bool init(){
 	glBindVertexArray(VAO);
 		glBindBuffer(GL_ARRAY_BUFFER, VBO);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-		glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void *)0);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)0);
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)(3 * sizeof(float)));
 		glEnableVertexAttribArray(0);
+		glEnableVertexAttribArray(1);
 	glBindVertexArray(0);
 
 	checkErrorAt("init");

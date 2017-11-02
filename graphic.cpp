@@ -11,8 +11,51 @@ void initVertices(){
 	vertices.push_back(glm::vec3(0.0f, 0.0f, 1.0f));
 }
 
+void updateVertices(){
+	vertices[1].x += 0.05f;
+	if(vertices[1].x > 1.0f){
+		vertices[1].x -= 1.0f;
+	}
+	vertices[1].y += 0.07f;
+	if(vertices[1].y > 1.0f){
+		vertices[1].y -= 1.0f;
+	}
+	vertices[1].z += 0.02f;
+	if(vertices[1].z > 1.0f){
+		vertices[1].z -= 1.0f;
+	}
+
+	vertices[3].x += 0.01f;
+	if(vertices[3].x > 1.0f){
+		vertices[3].x -= 1.0f;
+	}
+	vertices[3].y += 0.06f;
+	if(vertices[3].y > 1.0f){
+		vertices[3].y -= 1.0f;
+	}
+	vertices[3].z += 0.02f;
+	if(vertices[3].z > 1.0f){
+		vertices[3].z -= 1.0f;
+	}
+
+	vertices[5].x += 0.04f;
+	if(vertices[5].x > 1.0f){
+		vertices[5].x -= 1.0f;
+	}
+	vertices[5].y += 0.01f;
+	if(vertices[5].y > 1.0f){
+		vertices[5].y -= 1.0f;
+	}
+	vertices[5].z += 0.01f;
+	if(vertices[5].z > 1.0f){
+		vertices[5].z -= 1.0f;
+	}
+}
+
 void display(){
 	glClear(GL_COLOR_BUFFER_BIT);
+
+	updateVertices();
 
 	vector<unsigned int> indices;
 	indices.push_back(0);
@@ -21,8 +64,8 @@ void display(){
 
 	shader_program.use();
 	glBindVertexArray(VAO);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * vertices.size(), &vertices[0].x, GL_STATIC_DRAW);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * indices.size(), &indices[0], GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * vertices.size(), &vertices[0].x, GL_DYNAMIC_DRAW);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * indices.size(), &indices[0], GL_DYNAMIC_DRAW);
 		glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
 
 	glfwSwapBuffers(window);

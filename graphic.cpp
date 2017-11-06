@@ -1,72 +1,13 @@
 #include "graphic.h"
 
-void initVertices(){
-	vertices.push_back(glm::vec3(-0.5f, -0.5f, 0.0f));
-	vertices.push_back(glm::vec3(1.0f, 0.0f, 0.0f));
-
-	vertices.push_back(glm::vec3(0.5f, -0.5f, 0.0f));
-	vertices.push_back(glm::vec3(0.0f, 1.0f, 0.0f));
-
-	vertices.push_back(glm::vec3(0.0f, 0.5f, 0.0f));
-	vertices.push_back(glm::vec3(0.0f, 0.0f, 1.0f));
-}
-
-void updateVertices(){
-	vertices[1].x += 0.05f;
-	if(vertices[1].x > 1.0f){
-		vertices[1].x -= 1.0f;
-	}
-	vertices[1].y += 0.07f;
-	if(vertices[1].y > 1.0f){
-		vertices[1].y -= 1.0f;
-	}
-	vertices[1].z += 0.02f;
-	if(vertices[1].z > 1.0f){
-		vertices[1].z -= 1.0f;
-	}
-
-	vertices[3].x += 0.01f;
-	if(vertices[3].x > 1.0f){
-		vertices[3].x -= 1.0f;
-	}
-	vertices[3].y += 0.06f;
-	if(vertices[3].y > 1.0f){
-		vertices[3].y -= 1.0f;
-	}
-	vertices[3].z += 0.02f;
-	if(vertices[3].z > 1.0f){
-		vertices[3].z -= 1.0f;
-	}
-
-	vertices[5].x += 0.04f;
-	if(vertices[5].x > 1.0f){
-		vertices[5].x -= 1.0f;
-	}
-	vertices[5].y += 0.01f;
-	if(vertices[5].y > 1.0f){
-		vertices[5].y -= 1.0f;
-	}
-	vertices[5].z += 0.01f;
-	if(vertices[5].z > 1.0f){
-		vertices[5].z -= 1.0f;
-	}
-}
-
 void display(){
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	updateVertices();
-
-	vector<unsigned int> indices;
-	indices.push_back(0);
-	indices.push_back(1);
-	indices.push_back(2);
-
 	shader_program.use();
 	glBindVertexArray(VAO);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * vertices.size(), &vertices[0].x, GL_DYNAMIC_DRAW);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * indices.size(), &indices[0], GL_DYNAMIC_DRAW);
-		glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(float) * squareMesh->getNumVertices() * 8, squareMesh->getVertexData(), GL_DYNAMIC_DRAW);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * squareMesh->getNumTriangles() * 3, squareMesh->getIndexData(), GL_DYNAMIC_DRAW);
+		glDrawElements(GL_TRIANGLES, squareMesh->getNumTriangles() * 3, GL_UNSIGNED_INT, 0);
 
 	glfwSwapBuffers(window);
 }
@@ -102,7 +43,7 @@ bool init(){
 		return false;
 	}
 
-	window = glfwCreateWindow(1024, 1024, "Meaningless UI Component", NULL, NULL);
+	window = glfwCreateWindow(1024, 1024, "Graphic", NULL, NULL);
 	if(window == NULL){
 		cout << "Failed to create GLFW window" << endl;
 		return false;
@@ -132,14 +73,24 @@ bool init(){
 		return false;
 	}
 
-	initVertices();
+	squareMesh = new Mesh();
+	squareMesh->addVertex(glm::vec2(-0.5, -0.5));
+	squareMesh->addVertex(glm::vec2(0.5, -0.5));
+	squareMesh->addVertex(glm::vec2(0.5, 0.5));
+	squareMesh->addVertex(glm::vec2(-0.5, 0.5));
+	squareMesh->addTriangle(0, 1, 2);
+	squareMesh->addTriangle(0, 2, 3);
+	printf("%f\n", squareMesh->getVertexData()[0]);
+	
 	glBindVertexArray(VAO);
 		glBindBuffer(GL_ARRAY_BUFFER, VBO);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)0);
-		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)(3 * sizeof(float)));
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)0);
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(3 * sizeof(float)));
+		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(6 * sizeof(float)));
 		glEnableVertexAttribArray(0);
 		glEnableVertexAttribArray(1);
+		glEnableVertexAttribArray(2);
 	glBindVertexArray(0);
 
 	checkErrorAt("init");

@@ -13,12 +13,14 @@
 
 #include "shader.h"
 #include "shader_program.h"
+#include "mesh.h"
 
 using namespace std;
 
 GLFWwindow *window;
 
 vector<glm::vec3> vertices;
+Mesh *squareMesh;
 
 unsigned int VBO;
 unsigned int EBO;

@@ -18,6 +18,7 @@ class ShaderProgram{
 		void attachShader(Shader shader);
 		bool link();
 		void use();
+		unsigned int getID();
 	
 	private:
 		unsigned int id;

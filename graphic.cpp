@@ -3,11 +3,13 @@
 void display(){
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	shader_program.use();
+	glBindTexture(GL_TEXTURE_2D, texture->getID());
 	glBindVertexArray(VAO);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(float) * squareMesh->getNumVertices() * 8, squareMesh->getVertexData(), GL_DYNAMIC_DRAW);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * squareMesh->getNumTriangles() * 3, squareMesh->getIndexData(), GL_DYNAMIC_DRAW);
-		glDrawElements(GL_TRIANGLES, squareMesh->getNumTriangles() * 3, GL_UNSIGNED_INT, 0);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(float) * mesh->getNumVertices() * 8, mesh->getVertexData(), GL_DYNAMIC_DRAW);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * mesh->getNumTriangles() * 3, mesh->getIndexData(), GL_DYNAMIC_DRAW);
+		glDrawElements(GL_TRIANGLES, mesh->getNumTriangles() * 3, GL_UNSIGNED_INT, 0);
+	glBindVertexArray(0);
+	glBindTexture(GL_TEXTURE_2D, 0);
 
 	glfwSwapBuffers(window);
 }
@@ -35,6 +37,24 @@ void mainLoop(){
 		processInputs();
 		display();
 	}
+}
+
+Mesh* getRectangleMesh(float width, float height){
+	Mesh *rectMesh = new Mesh();
+
+	rectMesh->addVertex(glm::vec2(-width / 2, -height / 2));
+	rectMesh->addVertex(glm::vec2(width / 2, -height / 2));
+	rectMesh->addVertex(glm::vec2(width / 2, height / 2));
+	rectMesh->addVertex(glm::vec2(-width / 2, height / 2));
+
+	rectMesh->addTriangle(0, 1, 2);
+	rectMesh->addTriangle(0, 2, 3);
+	rectMesh->setTextureCoordinate(0, glm::vec2(0.0f, 0.0f));
+	rectMesh->setTextureCoordinate(1, glm::vec2(1.0f, 0.0f));
+	rectMesh->setTextureCoordinate(2, glm::vec2(1.0f, 1.0f));
+	rectMesh->setTextureCoordinate(3, glm::vec2(0.0f, 1.0f));
+
+	return rectMesh;
 }
 
 bool init(){
@@ -72,14 +92,10 @@ bool init(){
 	if(!shader_program.link()){
 		return false;
 	}
+	shader_program.use();
 
-	squareMesh = new Mesh();
-	squareMesh->addVertex(glm::vec2(-0.5, -0.5));
-	squareMesh->addVertex(glm::vec2(0.5, -0.5));
-	squareMesh->addVertex(glm::vec2(0.5, 0.5));
-	squareMesh->addVertex(glm::vec2(-0.5, 0.5));
-	squareMesh->addTriangle(0, 1, 2);
-	squareMesh->addTriangle(0, 2, 3);
+	mesh = getRectangleMesh(1.0f, 1.0f);
+	mesh->setColor(2, glm::vec3(1.0f, 0.0f, 0.0f));
 
 	texture = new Texture("./texture.png");
 	
@@ -93,6 +109,7 @@ bool init(){
 		glEnableVertexAttribArray(1);
 		glEnableVertexAttribArray(2);
 	glBindVertexArray(0);
+	glUniform1i(glGetUniformLocation(shader_program.getID(), "texture1"), 0);
 
 	checkErrorAt("init");
 	return true;

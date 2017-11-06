@@ -21,7 +21,7 @@ using namespace std;
 GLFWwindow *window;
 
 vector<glm::vec3> vertices;
-Mesh *squareMesh;
+Mesh *mesh;
 Texture *texture;
 
 unsigned int VBO;

@@ -29,3 +29,7 @@ bool ShaderProgram::checkLinkErrors(){
 void ShaderProgram::use(){
 	glUseProgram(this->id);
 }
+
+unsigned int ShaderProgram::getID(){
+	return id;
+}

@@ -14,6 +14,7 @@
 #include "shader.h"
 #include "shader_program.h"
 #include "mesh.h"
+#include "texture.h"
 
 using namespace std;
 
@@ -21,6 +22,7 @@ GLFWwindow *window;
 
 vector<glm::vec3> vertices;
 Mesh *squareMesh;
+Texture *texture;
 
 unsigned int VBO;
 unsigned int EBO;

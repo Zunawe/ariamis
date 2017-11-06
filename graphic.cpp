@@ -80,7 +80,8 @@ bool init(){
 	squareMesh->addVertex(glm::vec2(-0.5, 0.5));
 	squareMesh->addTriangle(0, 1, 2);
 	squareMesh->addTriangle(0, 2, 3);
-	printf("%f\n", squareMesh->getVertexData()[0]);
+
+	texture = new Texture("./texture.png");
 	
 	glBindVertexArray(VAO);
 		glBindBuffer(GL_ARRAY_BUFFER, VBO);

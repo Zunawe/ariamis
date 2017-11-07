@@ -15,6 +15,7 @@
 #include "shader_program.h"
 #include "mesh.h"
 #include "texture.h"
+#include "model_view_matrix.h"
 
 using namespace std;
 
@@ -23,6 +24,7 @@ GLFWwindow *window;
 vector<glm::vec3> vertices;
 Mesh *mesh;
 Texture *texture;
+ModelViewMatrix *model;
 
 unsigned int VBO;
 unsigned int EBO;

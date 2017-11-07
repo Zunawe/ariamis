@@ -2,7 +2,15 @@
 
 void display(){
 	glClear(GL_COLOR_BUFFER_BIT);
+	model->loadIdentity();
 
+	model->scale(0.5f);
+	model->translate(glm::vec2(1.0f, 0.0f));
+	model->rotate(45.0f, glm::vec3(0.0f, 0.0f, 1.0f));
+	model->push();
+	model->pop();
+	
+	glUniformMatrix4fv(glGetUniformLocation(shader_program.getID(), "model"), 1, GL_FALSE, &(*(model->getModel()))[0][0]);
 	glBindTexture(GL_TEXTURE_2D, texture->getID());
 	glBindVertexArray(VAO);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(float) * mesh->getNumVertices() * 8, mesh->getVertexData(), GL_DYNAMIC_DRAW);
@@ -98,6 +106,8 @@ bool init(){
 	mesh->setColor(2, glm::vec3(1.0f, 0.0f, 0.0f));
 
 	texture = new Texture("./texture.png");
+
+	model = new ModelViewMatrix();
 	
 	glBindVertexArray(VAO);
 		glBindBuffer(GL_ARRAY_BUFFER, VBO);
@@ -110,7 +120,8 @@ bool init(){
 		glEnableVertexAttribArray(2);
 	glBindVertexArray(0);
 	glUniform1i(glGetUniformLocation(shader_program.getID(), "texture1"), 0);
-
+	glUniformMatrix4fv(glGetUniformLocation(shader_program.getID(), "model"), 1, GL_FALSE, &(*(model->getModel()))[0][0]);
+	
 	checkErrorAt("init");
 	return true;
 }

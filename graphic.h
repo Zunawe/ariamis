@@ -11,7 +11,6 @@
 #include <glm/glm.hpp>
 #endif
 
-#include "shader.h"
 #include "shader_program.h"
 #include "mesh.h"
 #include "texture.h"
@@ -19,15 +18,25 @@
 
 using namespace std;
 
-GLFWwindow *window;
+class Graphic{
+	public:
+		Graphic();
+		void run();
+	
+	private:
+		GLFWwindow *window;		
+		ShaderProgram shaderProgram;
+		Mesh *mesh;
+		Texture *texture;
+		ModelViewMatrix *model;
+		
+		unsigned int VBO;
+		unsigned int EBO;
+		unsigned int VAO;
 
-vector<glm::vec3> vertices;
-Mesh *mesh;
-Texture *texture;
-ModelViewMatrix *model;
-
-unsigned int VBO;
-unsigned int EBO;
-unsigned int VAO;
-
-ShaderProgram shader_program;
+		void display();
+		void checkErrorAt(const char *location);
+		static void resizeWindow(GLFWwindow *window, int width, int height);
+		Mesh* createCubeMesh();
+		void processInputs();
+};

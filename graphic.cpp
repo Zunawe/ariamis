@@ -1,12 +1,54 @@
 #include "graphic.h"
 
-void display(){
+Graphic::Graphic(){
+	if(!glfwInit()){
+		cout << "Failed to initialize GLFW" << endl;
+	}
+
+	window = glfwCreateWindow(1024, 1024, "Graphic", NULL, NULL);
+	if(window == NULL){
+		cout << "Failed to create GLFW window" << endl;
+	}
+	glfwMakeContextCurrent(window);
+	glfwSetFramebufferSizeCallback(window, resizeWindow);
+
+	glEnable(GL_PROGRAM_POINT_SIZE);
+
+	glGenBuffers(1, &VBO);
+	glGenBuffers(1, &EBO);
+	glGenVertexArrays(1, &VAO);
+
+	mesh = createCubeMesh();
+	mesh->setColor(2, glm::vec3(1.0f, 1.0f, 0.0f));
+	texture = new Texture("./texture.png");
+	model = new ModelViewMatrix();
+	
+	shaderProgram.init("./vertex_shader.glsl", "./fragment_shader.glsl");
+	shaderProgram.use();
+	glBindVertexArray(VAO);
+		glBindBuffer(GL_ARRAY_BUFFER, VBO);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)0);
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(3 * sizeof(float)));
+		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(6 * sizeof(float)));
+		glEnableVertexAttribArray(0);
+		glEnableVertexAttribArray(1);
+		glEnableVertexAttribArray(2);
+	glBindVertexArray(0);
+	glUniform1i(glGetUniformLocation(shaderProgram.getID(), "texture1"), 0);
+	glUniformMatrix4fv(glGetUniformLocation(shaderProgram.getID(), "model"), 1, GL_FALSE, &(*(model->getModel()))[0][0]);
+	
+	checkErrorAt("Graphic Constructor");
+}
+
+void Graphic::display(){
 	glClear(GL_COLOR_BUFFER_BIT);
 	model->loadIdentity();
 	model->push();
 	model->pop();
 	
-	glUniformMatrix4fv(glGetUniformLocation(shader_program.getID(), "model"), 1, GL_FALSE, &(*(model->getModel()))[0][0]);
+	shaderProgram.use();
+	glUniformMatrix4fv(glGetUniformLocation(shaderProgram.getID(), "model"), 1, GL_FALSE, &(*(model->getModel()))[0][0]);
 	glBindTexture(GL_TEXTURE_2D, texture->getID());
 	glBindVertexArray(VAO);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(float) * mesh->getNumVertices() * 8, mesh->getVertexData(), GL_DYNAMIC_DRAW);
@@ -18,35 +60,32 @@ void display(){
 	glfwSwapBuffers(window);
 }
 
-void resizeWindow(GLFWwindow *window, int width, int height){
-	glViewport(0, 0, width, height);
-}
-
-void checkErrorAt(const char *location){
+void Graphic::checkErrorAt(const char *location){
 	GLenum err;
 	if((err = glGetError()) != GL_NO_ERROR){
 		cout << "Error at " << location << ": " << (err == GL_INVALID_VALUE) << endl;
 	}
 }
 
-void processInputs(){
+void Graphic::processInputs(){
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS){
 		glfwSetWindowShouldClose(window, true);
 	}
 }
 
-void mainLoop(){
+void Graphic::run(){
 	while(!glfwWindowShouldClose(window)){
 		glfwPollEvents();
 		processInputs();
 		display();
 	}
+	glfwTerminate();	
 }
 
-Mesh* createCubeMesh(){
+Mesh* Graphic::createCubeMesh(){
 	Mesh *cube = new Mesh();
 
-	cube->setDefaultColor(glm::vec3(1.0f, 0.0f, 1.0f));
+	// cube->setDefaultColor(glm::vec3(1.0f, 0.0f, 1.0f));
 
 	// Front
 	cube->addVertex(glm::vec3(-0.5, -0.5, 0.5));
@@ -123,76 +162,12 @@ Mesh* createCubeMesh(){
 	return cube;
 }
 
-bool init(){
-	if(!glfwInit()){
-		cout << "Failed to initialize GLFW" << endl;
-		return false;
-	}
-
-	window = glfwCreateWindow(1024, 1024, "Graphic", NULL, NULL);
-	if(window == NULL){
-		cout << "Failed to create GLFW window" << endl;
-		return false;
-	}
-	glfwMakeContextCurrent(window);
-	glfwSetFramebufferSizeCallback(window, resizeWindow);
-
-	glEnable(GL_PROGRAM_POINT_SIZE);
-
-	glGenBuffers(1, &VBO);
-	glGenBuffers(1, &EBO);
-	glGenVertexArrays(1, &VAO);
-
-	Shader vertexShader("vertex_shader.glsl", GL_VERTEX_SHADER);
-	if(!vertexShader.compile()){
-		return false;
-	}
-	Shader fragmentShader("fragment_shader.glsl", GL_FRAGMENT_SHADER);
-	if(!fragmentShader.compile()){
-		return false;
-	}
-
-	shader_program = ShaderProgram();
-	shader_program.attachShader(vertexShader);
-	shader_program.attachShader(fragmentShader);
-	if(!shader_program.link()){
-		return false;
-	}
-	shader_program.use();
-
-	mesh = createCubeMesh();
-	mesh->setColor(2, glm::vec3(1.0f, 1.0f, 0.0f));
-
-	texture = new Texture("./texture.png");
-
-	model = new ModelViewMatrix();
-	
-	glBindVertexArray(VAO);
-		glBindBuffer(GL_ARRAY_BUFFER, VBO);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)0);
-		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(3 * sizeof(float)));
-		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(6 * sizeof(float)));
-		glEnableVertexAttribArray(0);
-		glEnableVertexAttribArray(1);
-		glEnableVertexAttribArray(2);
-	glBindVertexArray(0);
-	glUniform1i(glGetUniformLocation(shader_program.getID(), "texture1"), 0);
-	glUniformMatrix4fv(glGetUniformLocation(shader_program.getID(), "model"), 1, GL_FALSE, &(*(model->getModel()))[0][0]);
-	
-	checkErrorAt("init");
-	return true;
+void Graphic::resizeWindow(GLFWwindow *window, int width, int height){
+	glViewport(0, 0, width, height);
 }
 
 int main(){
-	if(!init()){
-		return -1;
-	}
-	mainLoop();
-
-	delete texture;
-	delete model;
-	delete mesh;
-	glfwTerminate();
+	Graphic graphic;
+	graphic.run();
 	return 0;
 }

@@ -1,3 +1,6 @@
+#include <string>
+#include <fstream>
+#include <sstream>
 #include <iostream>
 
 #ifndef SHADER_PROGRAM_H
@@ -10,18 +13,15 @@
 #include <glm/glm.hpp>
 #endif
 
-#include "shader.h"
-
 class ShaderProgram{
 	public:
-		ShaderProgram();
-		void attachShader(Shader shader);
-		bool link();
+		bool init(const GLchar *vertexShaderPath, const GLchar *fragmentShaderPath);
 		void use();
 		unsigned int getID();
 	
 	private:
 		unsigned int id;
-		bool checkLinkErrors();
+		bool hasCompileErrors(unsigned int shaderID);
+		bool hasLinkErrors();
 };
 #endif

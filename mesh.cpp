@@ -1,7 +1,7 @@
 #include "mesh.h"
 
 Mesh::Mesh(){
-	"nothing";
+	defaultColor = glm::vec3(1.0f, 1.0f, 1.0f);
 }
 
 int Mesh::addVertex(glm::vec3 vertex){
@@ -45,6 +45,10 @@ int Mesh::addTriangle(unsigned int index1, unsigned int index2, unsigned int ind
 
 void Mesh::removeTriangle(unsigned int index){
 	triangles.erase(triangles.begin() + (index * 3), triangles.begin() + ((index + 1) * 3));
+}
+
+void Mesh::setDefaultColor(glm::vec3 color){
+	defaultColor = color;
 }
 
 void Mesh::setColor(unsigned int index, glm::vec3 color){

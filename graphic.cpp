@@ -13,6 +13,7 @@ Graphic::Graphic(){
 	glfwSetFramebufferSizeCallback(window, resizeWindow);
 
 	glEnable(GL_PROGRAM_POINT_SIZE);
+	glEnable(GL_DEPTH_TEST);
 
 	glGenBuffers(1, &VBO);
 	glGenBuffers(1, &EBO);
@@ -23,7 +24,7 @@ Graphic::Graphic(){
 	texture = new Texture("./texture.png");
 	model = new ModelViewMatrix();
 	
-	shaderProgram.init("./vertex_shader.glsl", "./fragment_shader.glsl");
+	shaderProgram.init("vertex_shader.glsl", "fragment_shader.glsl");
 	shaderProgram.use();
 	glBindVertexArray(VAO);
 		glBindBuffer(GL_ARRAY_BUFFER, VBO);
@@ -43,7 +44,12 @@ Graphic::Graphic(){
 
 void Graphic::display(){
 	glClear(GL_COLOR_BUFFER_BIT);
+	glClear(GL_DEPTH_BUFFER_BIT);
 	model->loadIdentity();
+
+	model->rotate(45, glm::vec3(1, 0, 0));
+	model->rotate(45, glm::vec3(0, 0, 1));
+	model->rotate(45, glm::vec3(0, 1, 0));
 	model->push();
 	model->pop();
 	
@@ -100,64 +106,64 @@ Mesh* Graphic::createCubeMesh(){
 	cube->setTextureCoordinate(3, glm::vec2(0.0f, 1.0f));
 	
 	// Back
-	// cube->addVertex(glm::vec3(0.5, -0.5, -0.5));
-	// cube->addVertex(glm::vec3(-0.5, -0.5, -0.5));
-	// cube->addVertex(glm::vec3(-0.5, 0.5, -0.5));
-	// cube->addVertex(glm::vec3(0.5, 0.5, -0.5));
-	// cube->addTriangle(4, 5, 6);
-	// cube->addTriangle(4, 6, 7);
-	// cube->setTextureCoordinate(4, glm::vec2(0.0f, 0.0f));
-	// cube->setTextureCoordinate(5, glm::vec2(1.0f, 0.0f));
-	// cube->setTextureCoordinate(6, glm::vec2(1.0f, 1.0f));
-	// cube->setTextureCoordinate(7, glm::vec2(0.0f, 1.0f));
+	cube->addVertex(glm::vec3(0.5, -0.5, -0.5));
+	cube->addVertex(glm::vec3(-0.5, -0.5, -0.5));
+	cube->addVertex(glm::vec3(-0.5, 0.5, -0.5));
+	cube->addVertex(glm::vec3(0.5, 0.5, -0.5));
+	cube->addTriangle(4, 5, 6);
+	cube->addTriangle(4, 6, 7);
+	cube->setTextureCoordinate(4, glm::vec2(0.0f, 0.0f));
+	cube->setTextureCoordinate(5, glm::vec2(1.0f, 0.0f));
+	cube->setTextureCoordinate(6, glm::vec2(1.0f, 1.0f));
+	cube->setTextureCoordinate(7, glm::vec2(0.0f, 1.0f));
 
-	// // Left
-	// cube->addVertex(glm::vec3(-0.5, -0.5, -0.5));
-	// cube->addVertex(glm::vec3(-0.5, -0.5, 0.5));
-	// cube->addVertex(glm::vec3(-0.5, 0.5, 0.5));
-	// cube->addVertex(glm::vec3(-0.5, 0.5, -0.5));
-	// cube->addTriangle(8, 9, 10);
-	// cube->addTriangle(8, 10, 11);
-	// cube->setTextureCoordinate(8, glm::vec2(0.0f, 0.0f));
-	// cube->setTextureCoordinate(9, glm::vec2(1.0f, 0.0f));
-	// cube->setTextureCoordinate(10, glm::vec2(1.0f, 1.0f));
-	// cube->setTextureCoordinate(11, glm::vec2(0.0f, 1.0f));
+	// Left
+	cube->addVertex(glm::vec3(-0.5, -0.5, -0.5));
+	cube->addVertex(glm::vec3(-0.5, -0.5, 0.5));
+	cube->addVertex(glm::vec3(-0.5, 0.5, 0.5));
+	cube->addVertex(glm::vec3(-0.5, 0.5, -0.5));
+	cube->addTriangle(8, 9, 10);
+	cube->addTriangle(8, 10, 11);
+	cube->setTextureCoordinate(8, glm::vec2(0.0f, 0.0f));
+	cube->setTextureCoordinate(9, glm::vec2(1.0f, 0.0f));
+	cube->setTextureCoordinate(10, glm::vec2(1.0f, 1.0f));
+	cube->setTextureCoordinate(11, glm::vec2(0.0f, 1.0f));
 
-	// // Right
-	// cube->addVertex(glm::vec3(0.5, -0.5, 0.5));
-	// cube->addVertex(glm::vec3(0.5, -0.5, -0.5));
-	// cube->addVertex(glm::vec3(0.5, 0.5, -0.5));
-	// cube->addVertex(glm::vec3(0.5, 0.5, 0.5));
-	// cube->addTriangle(12, 14, 14);
-	// cube->addTriangle(12, 15, 15);
-	// cube->setTextureCoordinate(12, glm::vec2(0.0f, 0.0f));
-	// cube->setTextureCoordinate(13, glm::vec2(1.0f, 0.0f));
-	// cube->setTextureCoordinate(14, glm::vec2(1.0f, 1.0f));
-	// cube->setTextureCoordinate(15, glm::vec2(0.0f, 1.0f));
+	// Right
+	cube->addVertex(glm::vec3(0.5, -0.5, 0.5));
+	cube->addVertex(glm::vec3(0.5, -0.5, -0.5));
+	cube->addVertex(glm::vec3(0.5, 0.5, -0.5));
+	cube->addVertex(glm::vec3(0.5, 0.5, 0.5));
+	cube->addTriangle(12, 13, 14);
+	cube->addTriangle(12, 14, 15);
+	cube->setTextureCoordinate(12, glm::vec2(0.0f, 0.0f));
+	cube->setTextureCoordinate(13, glm::vec2(1.0f, 0.0f));
+	cube->setTextureCoordinate(14, glm::vec2(1.0f, 1.0f));
+	cube->setTextureCoordinate(15, glm::vec2(0.0f, 1.0f));
 
-	// // Top
-	// cube->addVertex(glm::vec3(-0.5, 0.5, 0.5));
-	// cube->addVertex(glm::vec3(0.5, 0.5, 0.5));
-	// cube->addVertex(glm::vec3(0.5, 0.5, -0.5));
-	// cube->addVertex(glm::vec3(-0.5, 0.5, -0.5));
-	// cube->addTriangle(16, 18, 18);
-	// cube->addTriangle(16, 19, 19);
-	// cube->setTextureCoordinate(16, glm::vec2(0.0f, 0.0f));
-	// cube->setTextureCoordinate(17, glm::vec2(1.0f, 0.0f));
-	// cube->setTextureCoordinate(18, glm::vec2(1.0f, 1.0f));
-	// cube->setTextureCoordinate(19, glm::vec2(0.0f, 1.0f));
+	// Top
+	cube->addVertex(glm::vec3(-0.5, 0.5, 0.5));
+	cube->addVertex(glm::vec3(0.5, 0.5, 0.5));
+	cube->addVertex(glm::vec3(0.5, 0.5, -0.5));
+	cube->addVertex(glm::vec3(-0.5, 0.5, -0.5));
+	cube->addTriangle(16, 17, 18);
+	cube->addTriangle(16, 18, 19);
+	cube->setTextureCoordinate(16, glm::vec2(0.0f, 0.0f));
+	cube->setTextureCoordinate(17, glm::vec2(1.0f, 0.0f));
+	cube->setTextureCoordinate(18, glm::vec2(1.0f, 1.0f));
+	cube->setTextureCoordinate(19, glm::vec2(0.0f, 1.0f));
 
-	// // Bottom
-	// cube->addVertex(glm::vec3(0.5, -0.5, 0.5));
-	// cube->addVertex(glm::vec3(-0.5, -0.5, 0.5));
-	// cube->addVertex(glm::vec3(-0.5, -0.5, -0.5));
-	// cube->addVertex(glm::vec3(0.5, -0.5, -0.5));
-	// cube->addTriangle(20, 22, 22);
-	// cube->addTriangle(20, 23, 23);
-	// cube->setTextureCoordinate(20, glm::vec2(0.0f, 0.0f));
-	// cube->setTextureCoordinate(21, glm::vec2(1.0f, 0.0f));
-	// cube->setTextureCoordinate(22, glm::vec2(1.0f, 1.0f));
-	// cube->setTextureCoordinate(23, glm::vec2(0.0f, 1.0f));
+	// Bottom
+	cube->addVertex(glm::vec3(0.5, -0.5, 0.5));
+	cube->addVertex(glm::vec3(-0.5, -0.5, 0.5));
+	cube->addVertex(glm::vec3(-0.5, -0.5, -0.5));
+	cube->addVertex(glm::vec3(0.5, -0.5, -0.5));
+	cube->addTriangle(20, 21, 22);
+	cube->addTriangle(20, 22, 23);
+	cube->setTextureCoordinate(20, glm::vec2(0.0f, 0.0f));
+	cube->setTextureCoordinate(21, glm::vec2(1.0f, 0.0f));
+	cube->setTextureCoordinate(22, glm::vec2(1.0f, 1.0f));
+	cube->setTextureCoordinate(23, glm::vec2(0.0f, 1.0f));
 
 	return cube;
 }

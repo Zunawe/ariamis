@@ -9,12 +9,12 @@
 #define GL_GLEXT_PROTOTYPES
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 #endif
 
 #include "shader_program.h"
 #include "mesh.h"
 #include "texture.h"
-#include "model_view_matrix.h"
 
 using namespace std;
 
@@ -28,7 +28,12 @@ class Graphic{
 		ShaderProgram shaderProgram;
 		Mesh *mesh;
 		Texture *texture;
-		ModelViewMatrix *model;
+		glm::mat4 model;
+		glm::mat4 view;
+		glm::mat4 projection;
+
+		int theta;
+		int phi;
 		
 		unsigned int VBO;
 		unsigned int EBO;

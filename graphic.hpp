@@ -8,14 +8,12 @@
 #define OPENGL_HEADERS
 #define GL_GLEXT_PROTOTYPES
 #include <GLFW/glfw3.h>
+#endif
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#endif
 
-#include "shader_program.hpp"
-#include "mesh.hpp"
-#include "texture.hpp"
 #include "camera.hpp"
+#include "object_renderer.hpp"
 
 using namespace std;
 
@@ -25,10 +23,8 @@ class Graphic{
 		void run();
 	
 	private:
-		GLFWwindow *window;		
-		ShaderProgram shaderProgram;
-		Mesh *mesh;
-		Texture *texture;
+		GLFWwindow *window;
+		ObjectRenderer *cube;
 		Camera camera;
 		glm::mat4 model;
 		glm::mat4 view;
@@ -36,10 +32,6 @@ class Graphic{
 
 		int theta;
 		int phi;
-		
-		unsigned int VBO;
-		unsigned int EBO;
-		unsigned int VAO;
 
 		void display();
 		void checkErrorAt(const char *location);

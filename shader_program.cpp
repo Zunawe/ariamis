@@ -1,6 +1,6 @@
 #include "shader_program.hpp"
 
-bool ShaderProgram::init(const GLchar *vertexShaderPath, const GLchar *fragmentShaderPath){
+ShaderProgram::ShaderProgram(const GLchar *vertexShaderPath, const GLchar *fragmentShaderPath){
 	// Read source code
 	std::ifstream fileStream;
 	fileStream.exceptions(std::ifstream::failbit | std::ifstream::badbit);
@@ -18,7 +18,6 @@ bool ShaderProgram::init(const GLchar *vertexShaderPath, const GLchar *fragmentS
 		vertexShaderSource = ss.str();
 	}catch(std::ifstream::failure e){
 		std::cout << "Failed to open file at " << vertexShaderPath << std::endl;
-		return false;
 	}
 
 	try{
@@ -31,7 +30,6 @@ bool ShaderProgram::init(const GLchar *vertexShaderPath, const GLchar *fragmentS
 		fragmentShaderSource = ss.str();
 	}catch(std::ifstream::failure e){
 		std::cout << "Failed to open file at " << fragmentShaderPath << std::endl;
-		return false;
 	}
 
 	const char *vertexShaderSourceCStr = vertexShaderSource.c_str();
@@ -46,13 +44,13 @@ bool ShaderProgram::init(const GLchar *vertexShaderPath, const GLchar *fragmentS
 	glShaderSource(vertexShaderID, 1, &vertexShaderSourceCStr, NULL);
 	glCompileShader(vertexShaderID);
 	if(hasCompileErrors(vertexShaderID)){
-		return false;
+		std::cout << "Failed to compile vertex shader" << std::endl;
 	}
 
 	glShaderSource(fragmentShaderID, 1, &fragmentShaderSourceCStr, NULL);
 	glCompileShader(fragmentShaderID);
 	if(hasCompileErrors(fragmentShaderID)){
-		return false;
+		std::cout << "Failed to compile fragment shader" << std::endl;
 	}
 
 	// Link
@@ -60,10 +58,9 @@ bool ShaderProgram::init(const GLchar *vertexShaderPath, const GLchar *fragmentS
 	glAttachShader(this->id, fragmentShaderID);
 	glLinkProgram(this->id);
 	if(hasLinkErrors()){
-		return false;
+		std::cout << "Failed to link shaders" << std::endl;
 	}
 
-	return true;
 }
 
 bool ShaderProgram::hasCompileErrors(unsigned int shaderID){

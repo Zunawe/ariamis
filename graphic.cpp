@@ -15,29 +15,10 @@ Graphic::Graphic(){
 	glEnable(GL_PROGRAM_POINT_SIZE);
 	glEnable(GL_DEPTH_TEST);
 
-	glGenBuffers(1, &VBO);
-	glGenBuffers(1, &EBO);
-	glGenVertexArrays(1, &VAO);
-
-	mesh = createCubeMesh();
-	texture = new Texture("./texture.png");
-	
-	shaderProgram.init("vertex_shader.glsl", "fragment_shader.glsl");
-	shaderProgram.use();
-	glBindVertexArray(VAO);
-		glBindBuffer(GL_ARRAY_BUFFER, VBO);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)0);
-		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(3 * sizeof(float)));
-		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(6 * sizeof(float)));
-		glEnableVertexAttribArray(0);
-		glEnableVertexAttribArray(1);
-		glEnableVertexAttribArray(2);
-	glBindVertexArray(0);
-	glUniform1i(glGetUniformLocation(shaderProgram.getID(), "texture1"), 0);
-	glUniformMatrix4fv(glGetUniformLocation(shaderProgram.getID(), "model"), 1, GL_FALSE, &model[0][0]);
-	glUniformMatrix4fv(glGetUniformLocation(shaderProgram.getID(), "view"), 1, GL_FALSE, &view[0][0]);
-	glUniformMatrix4fv(glGetUniformLocation(shaderProgram.getID(), "projection"), 1, GL_FALSE, &projection[0][0]);
+	cube = new ObjectRenderer();
+	cube->setShader(new ShaderProgram("vertex_shader.glsl", "fragment_shader.glsl"));
+	cube->setMesh(createCubeMesh());
+	cube->setTexture(new Texture("texture.png"));
 
 	theta = 0.0f;
 	phi = 90.0f;
@@ -48,29 +29,19 @@ Graphic::Graphic(){
 void Graphic::display(){
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	model = glm::mat4(1);
+	view = glm::mat4(1);
+
+	projection = glm::perspective(glm::radians(45.0f), 1.0f, 0.1f, 100.0f);
+
+	view = glm::translate(view, glm::vec3(0, 0, -3));
+	view = glm::rotate(view, glm::radians((float)phi + 90), glm::vec3(1, 0, 0));
+	view = glm::rotate(view, glm::radians((float)theta), glm::vec3(0, 1, 0));
 
 	model = glm::rotate(model, glm::radians(45.0f), glm::vec3(1, 0, 0));
 	model = glm::rotate(model, glm::radians(45.0f), glm::vec3(0, 0, 1));
 	model = glm::rotate(model, glm::radians(45.0f), glm::vec3(0, 1, 0));
 
-	view = glm::mat4(1);
-	view = glm::translate(view, glm::vec3(0, 0, -3));
-	view = glm::rotate(view, glm::radians((float)phi + 90), glm::vec3(1, 0, 0));
-	view = glm::rotate(view, glm::radians((float)theta), glm::vec3(0, 1, 0));
-
-	projection = glm::perspective(glm::radians(45.0f), 1.0f, 0.1f, 100.0f);
-	
-	shaderProgram.use();
-	glUniformMatrix4fv(glGetUniformLocation(shaderProgram.getID(), "model"), 1, GL_FALSE, &model[0][0]);
-	glUniformMatrix4fv(glGetUniformLocation(shaderProgram.getID(), "view"), 1, GL_FALSE, &view[0][0]);
-	glUniformMatrix4fv(glGetUniformLocation(shaderProgram.getID(), "projection"), 1, GL_FALSE, &projection[0][0]);
-	glBindTexture(GL_TEXTURE_2D, texture->getID());
-	glBindVertexArray(VAO);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(float) * mesh->getNumVertices() * 8, mesh->getVertexData(), GL_DYNAMIC_DRAW);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * mesh->getNumTriangles() * 3, mesh->getIndexData(), GL_DYNAMIC_DRAW);
-		glDrawElements(GL_TRIANGLES, mesh->getNumTriangles() * 3, GL_UNSIGNED_INT, 0);
-	glBindVertexArray(0);
-	glBindTexture(GL_TEXTURE_2D, 0);
+	cube->draw(&model, &view, &projection);
 
 	glfwSwapBuffers(window);
 }

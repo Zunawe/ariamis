@@ -15,7 +15,7 @@
 
 class ShaderProgram{
 	public:
-		bool init(const GLchar *vertexShaderPath, const GLchar *fragmentShaderPath);
+		ShaderProgram(const GLchar *vertexShaderPath, const GLchar *fragmentShaderPath);
 		void use();
 		unsigned int getID();
 	

@@ -1,6 +1,6 @@
 #include "shader_program.hpp"
 
-ShaderProgram::ShaderProgram(const GLchar *vertexShaderPath, const GLchar *fragmentShaderPath){
+void ShaderProgram::loadSources(const GLchar *vertexShaderPath, const GLchar *fragmentShaderPath){
 	// Read source code
 	std::ifstream fileStream;
 	fileStream.exceptions(std::ifstream::failbit | std::ifstream::badbit);

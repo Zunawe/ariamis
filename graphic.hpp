@@ -13,6 +13,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "camera.hpp"
+#include "texture.hpp"
 #include "object_renderer.hpp"
 
 using namespace std;
@@ -20,6 +21,7 @@ using namespace std;
 class Graphic{
 	public:
 		Graphic();
+		~Graphic();
 		void run();
 	
 	private:
@@ -36,6 +38,6 @@ class Graphic{
 		void display();
 		void checkErrorAt(const char *location);
 		static void resizeWindow(GLFWwindow *window, int width, int height);
-		Mesh* createCubeMesh();
+		Mesh createCubeMesh();
 		void processInputs();
 };

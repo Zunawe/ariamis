@@ -1,3 +1,6 @@
+#ifndef TEXTURE_H
+#define TEXTURE_H
+
 #ifndef OPENGL_HEADERS
 #define OPENGL_HEADERS
 #define GL_GLEXT_PROTOTYPES
@@ -7,7 +10,7 @@
 
 class Texture{
 	public:
-		Texture(const char *filename);
+		void load(const char *filename);
 		unsigned int getID();
 
 	private:
@@ -15,3 +18,5 @@ class Texture{
 		int width, height;
 		int numChannels;
 };
+
+#endif

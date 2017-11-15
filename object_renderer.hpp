@@ -13,14 +13,14 @@ class ObjectRenderer{
 		ObjectRenderer();
 		void draw(const glm::mat4 *model, const glm::mat4 *view, const glm::mat4 *projection);
 		unsigned int getVAO();
-		void setMesh(Mesh *mesh);
-		void setTexture(Texture *texture);
-		void setShader(ShaderProgram *shader);
+		void setMesh(Mesh mesh);
+		void setTexture(Texture texture);
+		void setShader(ShaderProgram shader);
 
 	private:
-		Mesh *mesh;
-		Texture *texture;
-		ShaderProgram *shader;
+		Mesh mesh;
+		Texture texture;
+		ShaderProgram shader;
 		unsigned int VAO;
 		unsigned int VBO;
 		unsigned int EBO;

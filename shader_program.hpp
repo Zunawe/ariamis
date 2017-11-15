@@ -1,10 +1,10 @@
+#ifndef SHADER_PROGRAM_H
+#define SHADER_PROGRAM_H
+
 #include <string>
 #include <fstream>
 #include <sstream>
 #include <iostream>
-
-#ifndef SHADER_PROGRAM_H
-#define SHADER_PROGRAM_H
 
 #ifndef OPENGL_HEADERS
 #define OPENGL_HEADERS
@@ -15,7 +15,7 @@
 
 class ShaderProgram{
 	public:
-		ShaderProgram(const GLchar *vertexShaderPath, const GLchar *fragmentShaderPath);
+		void loadSources(const GLchar *vertexShaderPath, const GLchar *fragmentShaderPath);
 		void use();
 		unsigned int getID();
 	

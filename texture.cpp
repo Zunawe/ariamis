@@ -2,7 +2,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
-Texture::Texture(const char *filename){
+void Texture::load(const char *filename){
 	unsigned char *imageData = stbi_load(filename, &width, &height, &numChannels, 0);
 	glGenTextures(1, &id);
 

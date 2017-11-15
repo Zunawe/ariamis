@@ -8,7 +8,7 @@ $(EXE): $(EXE).o shader_program.o mesh.o texture.o object_renderer.o camera.o
 .cpp.o:
 	g++ -c $(CFLAGS) $<
 
-$(EXE).o: $(EXE).cpp $(EXE).hpp object_renderer.hpp camera.hpp
+$(EXE).o: $(EXE).cpp $(EXE).hpp object_renderer.hpp texture.hpp camera.hpp
 shader_program.o: shader_program.cpp shader_program.hpp
 mesh.o: mesh.cpp mesh.hpp
 texture.o: texture.cpp texture.hpp stb_image.h

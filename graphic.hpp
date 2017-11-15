@@ -12,9 +12,10 @@
 #include <glm/gtc/matrix_transform.hpp>
 #endif
 
-#include "shader_program.h"
-#include "mesh.h"
-#include "texture.h"
+#include "shader_program.hpp"
+#include "mesh.hpp"
+#include "texture.hpp"
+#include "camera.hpp"
 
 using namespace std;
 
@@ -28,6 +29,7 @@ class Graphic{
 		ShaderProgram shaderProgram;
 		Mesh *mesh;
 		Texture *texture;
+		Camera camera;
 		glm::mat4 model;
 		glm::mat4 view;
 		glm::mat4 projection;

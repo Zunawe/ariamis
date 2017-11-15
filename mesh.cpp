@@ -1,4 +1,4 @@
-#include "mesh.h"
+#include "mesh.hpp"
 
 Mesh::Mesh(){
 	defaultColor = glm::vec3(1.0f, 1.0f, 1.0f);

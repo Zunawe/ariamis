@@ -1,4 +1,4 @@
-#include "shader_program.h"
+#include "shader_program.hpp"
 
 bool ShaderProgram::init(const GLchar *vertexShaderPath, const GLchar *fragmentShaderPath){
 	// Read source code

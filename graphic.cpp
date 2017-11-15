@@ -15,16 +15,23 @@ Graphic::Graphic(){
 	glEnable(GL_PROGRAM_POINT_SIZE);
 	glEnable(GL_DEPTH_TEST);
 
-	ShaderProgram shaderProgram;
+	ShaderProgram textureShader;
+	ShaderProgram colorShader;
 	Texture texture;
+	Mesh cubeMesh = createCubeMesh();
 
-	shaderProgram.loadSources("vertex_shader.glsl", "fragment_shader.glsl");
+	textureShader.loadSources("shader.vs", "texture_shader.fs");
+	colorShader.loadSources("shader.vs", "color_shader.fs");
 	texture.load("texture.png");
 
-	cube = new ObjectRenderer();
-	cube->setShader(shaderProgram);
-	cube->setMesh(createCubeMesh());
-	cube->setTexture(texture);
+	texturedCube = new ObjectRenderer();
+	texturedCube->setShader(textureShader);
+	texturedCube->setMesh(cubeMesh);
+	texturedCube->setTexture(texture);
+
+	coloredCube = new ObjectRenderer();
+	coloredCube->setShader(colorShader);
+	coloredCube->setMesh(cubeMesh);
 
 	theta = 0.0f;
 	phi = 90.0f;
@@ -33,7 +40,9 @@ Graphic::Graphic(){
 }
 
 Graphic::~Graphic(){
-	delete cube;
+	delete texturedCube;
+	delete coloredCube;
+	delete lamp;
 }
 
 void Graphic::display(){
@@ -43,17 +52,28 @@ void Graphic::display(){
 
 	projection = glm::perspective(glm::radians(45.0f), 1.0f, 0.1f, 100.0f);
 
-	view = glm::translate(view, glm::vec3(0, 0, -3));
+	view = glm::translate(view, glm::vec3(0, 0, -5));
 	view = glm::rotate(view, glm::radians((float)phi + 90), glm::vec3(1, 0, 0));
 	view = glm::rotate(view, glm::radians((float)theta), glm::vec3(0, 1, 0));
 
-	model = glm::rotate(model, glm::radians(45.0f), glm::vec3(1, 0, 0));
-	model = glm::rotate(model, glm::radians(45.0f), glm::vec3(0, 0, 1));
-	model = glm::rotate(model, glm::radians(45.0f), glm::vec3(0, 1, 0));
+	model = glm::mat4(1);
+		model = glm::translate(model, glm::vec3(-1, 0, 0));
+		model = glm::rotate(model, glm::radians(45.0f), glm::vec3(1, 0, 0));
+		model = glm::rotate(model, glm::radians(45.0f), glm::vec3(0, 0, 1));
+		model = glm::rotate(model, glm::radians(45.0f), glm::vec3(0, 1, 0));
 
-	cube->draw(&model, &view, &projection);
+		texturedCube->draw(&model, &view, &projection);
+
+	model = glm::mat4(1);
+		model = glm::translate(model, glm::vec3(1, 0, 0));
+		model = glm::rotate(model, glm::radians(45.0f), glm::vec3(1, 0, 0));
+		model = glm::rotate(model, glm::radians(45.0f), glm::vec3(0, 0, 1));
+		model = glm::rotate(model, glm::radians(45.0f), glm::vec3(0, 1, 0));
+
+		coloredCube->draw(&model, &view, &projection);
 
 	glfwSwapBuffers(window);
+	checkErrorAt("Display");
 }
 
 void Graphic::checkErrorAt(const char *location){
@@ -100,7 +120,7 @@ void Graphic::run(){
 Mesh Graphic::createCubeMesh(){
 	Mesh cube;
 
-	// cube->setDefaultColor(glm::vec3(1.0f, 0.0f, 1.0f));
+	// cube.setDefaultColor(glm::vec3(1, 0, 0));
 
 	// Front
 	cube.addVertex(glm::vec3(-0.5, -0.5, 0.5));

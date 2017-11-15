@@ -26,7 +26,9 @@ class Graphic{
 	
 	private:
 		GLFWwindow *window;
-		ObjectRenderer *cube;
+		ObjectRenderer *texturedCube;
+		ObjectRenderer *coloredCube;
+		ObjectRenderer *lamp;
 		Camera camera;
 		glm::mat4 model;
 		glm::mat4 view;

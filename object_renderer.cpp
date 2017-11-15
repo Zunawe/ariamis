@@ -14,7 +14,7 @@ ObjectRenderer::ObjectRenderer(){
 		glEnableVertexAttribArray(0);
 		glEnableVertexAttribArray(1);
 		glEnableVertexAttribArray(2);
-	glBindVertexArray(0);
+
 	checkErrorAt("Object Renderer Constructor");
 }
 
@@ -26,10 +26,11 @@ void ObjectRenderer::draw(const glm::mat4 *model, const glm::mat4 *view, const g
 	glUniform1i(glGetUniformLocation(shader.getID(), "texture1"), 0);
 	glBindTexture(GL_TEXTURE_2D, texture.getID());
 	glBindVertexArray(VAO);
+		glBindBuffer(GL_ARRAY_BUFFER, VBO);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(float) * mesh.getNumVertices() * 8, mesh.getVertexData(), GL_DYNAMIC_DRAW);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * mesh.getNumTriangles() * 3, mesh.getIndexData(), GL_DYNAMIC_DRAW);
 		glDrawElements(GL_TRIANGLES, mesh.getNumTriangles() * 3, GL_UNSIGNED_INT, 0);
-	glBindVertexArray(0);
+
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
@@ -47,7 +48,6 @@ void ObjectRenderer::setTexture(Texture texture){
 
 void ObjectRenderer::setShader(ShaderProgram shader){
 	this->shader = shader;
-	checkErrorAt("Setting shader");	
 }
 
 void ObjectRenderer::checkErrorAt(const char *location){

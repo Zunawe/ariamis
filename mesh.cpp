@@ -9,9 +9,9 @@ int Mesh::addVertex(glm::vec3 vertex){
 	vertexData.push_back(vertex.y); // Y
 	vertexData.push_back(vertex.z); // Z
 
-	vertexData.push_back(1.0f); // R
-	vertexData.push_back(1.0f); // G
-	vertexData.push_back(1.0f); // B
+	vertexData.push_back(defaultColor.x); // R
+	vertexData.push_back(defaultColor.y); // G
+	vertexData.push_back(defaultColor.z); // B
 
 	vertexData.push_back(0.0f); // U
 	vertexData.push_back(0.0f); // V

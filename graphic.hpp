@@ -17,6 +17,16 @@
 #include "texture.hpp"
 #include "object_renderer.hpp"
 
+static void handleMouse(GLFWwindow *window, double xPos, double yPos);
+
+float lastMouseX;
+float lastMouseY;
+float sensitivity = 0.1f;
+float pitch;
+float yaw;
+
+glm::vec3 mouseLook;
+
 class Graphic{
 	public:
 		Graphic();
@@ -33,12 +43,15 @@ class Graphic{
 		glm::mat4 view;
 		glm::mat4 projection;
 
-		float cameraVelocity = 0.1;
+		float cameraVelocity = 1;
+
+		float deltaTime;
+		float lastTime;
 
 		void display();
-		void checkErrorAt(const char *location);
+		static void checkErrorAt(const char *location);
 		static void resizeWindow(GLFWwindow *window, int width, int height);
-		Mesh createCubeMesh();
+		static Mesh createCubeMesh();
 		void processInputs();
 };
 

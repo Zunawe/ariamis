@@ -12,7 +12,9 @@ Graphic::Graphic(){
 		cout << "Failed to create GLFW window" << endl;
 	}
 	glfwMakeContextCurrent(window);
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	glfwSetFramebufferSizeCallback(window, resizeWindow);
+	glfwSetCursorPosCallback(window, handleMouse);
 
 	glEnable(GL_PROGRAM_POINT_SIZE);
 	glEnable(GL_DEPTH_TEST);
@@ -35,10 +37,6 @@ Graphic::Graphic(){
 	coloredCube.setShader(colorShader);
 	coloredCube.setMesh(cubeMesh);
 
-	camera.setPosition(glm::vec3(0, 0, -5));
-
-	theta = 0.0f;
-	phi = 90.0f;
 	
 	checkErrorAt("Graphic Constructor");
 }
@@ -57,20 +55,46 @@ void Graphic::display(){
 	view = camera.getViewMatrix();
 
 	model = glm::mat4(1);
-		model = glm::translate(model, glm::vec3(-1, 0, 0));
+		model = glm::translate(model, glm::vec3(3, 0, 3));
 		model = glm::rotate(model, glm::radians(45.0f), glm::vec3(1, 0, 0));
 		model = glm::rotate(model, glm::radians(45.0f), glm::vec3(0, 0, 1));
 		model = glm::rotate(model, glm::radians(45.0f), glm::vec3(0, 1, 0));
-
 		texturedCube.draw(model, view, projection);
 
 	model = glm::mat4(1);
-		model = glm::translate(model, glm::vec3(1, 0, 0));
+		model = glm::translate(model, glm::vec3(-3, 0, 3));
 		model = glm::rotate(model, glm::radians(45.0f), glm::vec3(1, 0, 0));
 		model = glm::rotate(model, glm::radians(45.0f), glm::vec3(0, 0, 1));
 		model = glm::rotate(model, glm::radians(45.0f), glm::vec3(0, 1, 0));
+		texturedCube.draw(model, view, projection);
 
-		coloredCube.draw(model, view, projection);
+	model = glm::mat4(1);
+		model = glm::translate(model, glm::vec3(3, 0, -3));
+		model = glm::rotate(model, glm::radians(45.0f), glm::vec3(1, 0, 0));
+		model = glm::rotate(model, glm::radians(45.0f), glm::vec3(0, 0, 1));
+		model = glm::rotate(model, glm::radians(45.0f), glm::vec3(0, 1, 0));
+		texturedCube.draw(model, view, projection);
+
+	model = glm::mat4(1);
+		model = glm::translate(model, glm::vec3(-3, 0, -3));
+		model = glm::rotate(model, glm::radians(45.0f), glm::vec3(1, 0, 0));
+		model = glm::rotate(model, glm::radians(45.0f), glm::vec3(0, 0, 1));
+		model = glm::rotate(model, glm::radians(45.0f), glm::vec3(0, 1, 0));
+		texturedCube.draw(model, view, projection);
+
+	model = glm::mat4(1);
+		model = glm::translate(model, glm::vec3(0, 3, 0));
+		model = glm::rotate(model, glm::radians(45.0f), glm::vec3(1, 0, 0));
+		model = glm::rotate(model, glm::radians(45.0f), glm::vec3(0, 0, 1));
+		model = glm::rotate(model, glm::radians(45.0f), glm::vec3(0, 1, 0));
+		texturedCube.draw(model, view, projection);
+
+	model = glm::mat4(1);
+		model = glm::translate(model, glm::vec3(0, -3, 0));
+		model = glm::rotate(model, glm::radians(45.0f), glm::vec3(1, 0, 0));
+		model = glm::rotate(model, glm::radians(45.0f), glm::vec3(0, 0, 1));
+		model = glm::rotate(model, glm::radians(45.0f), glm::vec3(0, 1, 0));
+		texturedCube.draw(model, view, projection);
 
 	glfwSwapBuffers(window);
 	checkErrorAt("Display");
@@ -84,21 +108,27 @@ void Graphic::checkErrorAt(const char *location){
 }
 
 void Graphic::processInputs(){
+	float newTime = glfwGetTime();
+	deltaTime = newTime - lastTime;
+	lastTime = newTime;
+
+
 	if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS){
 		glfwSetWindowShouldClose(window, true);
 	}
 	if(glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS){
-		camera.moveRelative(glm::vec3(0, 0, 1), cameraVelocity);
+		camera.moveRelative(glm::vec3(0, 0, 1), cameraVelocity * deltaTime);
 	}
 	if(glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS){
-		camera.moveRelative(glm::vec3(0, 0, -1), cameraVelocity);
+		camera.moveRelative(glm::vec3(0, 0, -1), cameraVelocity * deltaTime);
 	}
 	if(glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS){
-		camera.moveRelative(glm::vec3(-1, 0, 0), cameraVelocity);
+		camera.moveRelative(glm::vec3(-1, 0, 0), cameraVelocity * deltaTime);
 	}
 	if(glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS){
-		camera.moveRelative(glm::vec3(1, 0, 0), cameraVelocity);
+		camera.moveRelative(glm::vec3(1, 0, 0), cameraVelocity * deltaTime);
 	}
+	camera.setForward(mouseLook);
 }
 
 void Graphic::run(){
@@ -192,6 +222,25 @@ Mesh Graphic::createCubeMesh(){
 
 void Graphic::resizeWindow(GLFWwindow *window, int width, int height){
 	glViewport(0, 0, width, height);
+}
+
+static void handleMouse(GLFWwindow *window, double xPos, double yPos){
+	float deltaX = (xPos - lastMouseX) * sensitivity;
+	float deltaY = -(yPos - lastMouseY) * sensitivity;
+
+	lastMouseX = xPos;
+	lastMouseY = yPos;
+
+	yaw += deltaX;
+	pitch += deltaY;
+
+	pitch = pitch > 89.0f ? 89.0f : (pitch < -89.0f ? -89.0f : pitch);
+	yaw = yaw > 360.0f ? yaw - 360.0f : (yaw < 0.0f ? yaw + 360.0f : yaw);
+
+	mouseLook.x = cos(glm::radians(pitch)) * cos(glm::radians(yaw));
+	mouseLook.y = sin(glm::radians(pitch));
+	mouseLook.z = cos(glm::radians(pitch)) * sin(glm::radians(yaw));
+	mouseLook = glm::normalize(mouseLook);
 }
 
 int main(){

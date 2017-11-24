@@ -1,5 +1,7 @@
 #include "graphic.hpp"
 
+using namespace std;
+
 Graphic::Graphic(){
 	if(!glfwInit()){
 		cout << "Failed to initialize GLFW" << endl;
@@ -24,14 +26,14 @@ Graphic::Graphic(){
 	colorShader.loadSources("shader.vs", "color_shader.fs");
 	texture.load("texture.png");
 
-	texturedCube = new ObjectRenderer();
-	texturedCube->setShader(textureShader);
-	texturedCube->setMesh(cubeMesh);
-	texturedCube->setTexture(texture);
+	texturedCube.init();
+	texturedCube.setShader(textureShader);
+	texturedCube.setMesh(cubeMesh);
+	texturedCube.setTexture(texture);
 
-	coloredCube = new ObjectRenderer();
-	coloredCube->setShader(colorShader);
-	coloredCube->setMesh(cubeMesh);
+	coloredCube.init();
+	coloredCube.setShader(colorShader);
+	coloredCube.setMesh(cubeMesh);
 
 	theta = 0.0f;
 	phi = 90.0f;
@@ -40,9 +42,7 @@ Graphic::Graphic(){
 }
 
 Graphic::~Graphic(){
-	delete texturedCube;
-	delete coloredCube;
-	delete lamp;
+	// Destructor
 }
 
 void Graphic::display(){
@@ -62,7 +62,7 @@ void Graphic::display(){
 		model = glm::rotate(model, glm::radians(45.0f), glm::vec3(0, 0, 1));
 		model = glm::rotate(model, glm::radians(45.0f), glm::vec3(0, 1, 0));
 
-		texturedCube->draw(&model, &view, &projection);
+		texturedCube.draw(model, view, projection);
 
 	model = glm::mat4(1);
 		model = glm::translate(model, glm::vec3(1, 0, 0));
@@ -70,7 +70,7 @@ void Graphic::display(){
 		model = glm::rotate(model, glm::radians(45.0f), glm::vec3(0, 0, 1));
 		model = glm::rotate(model, glm::radians(45.0f), glm::vec3(0, 1, 0));
 
-		coloredCube->draw(&model, &view, &projection);
+		coloredCube.draw(model, view, projection);
 
 	glfwSwapBuffers(window);
 	checkErrorAt("Display");

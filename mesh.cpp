@@ -4,7 +4,7 @@ Mesh::Mesh(){
 	defaultColor = glm::vec3(1.0f, 1.0f, 1.0f);
 }
 
-int Mesh::addVertex(glm::vec3 vertex){
+unsigned int Mesh::addVertex(glm::vec3 vertex){
 	vertexData.push_back(vertex.x); // X
 	vertexData.push_back(vertex.y); // Y
 	vertexData.push_back(vertex.z); // Z
@@ -19,8 +19,16 @@ int Mesh::addVertex(glm::vec3 vertex){
 	return (vertexData.size() / 8) - 1;
 }
 
-int Mesh::addVertex(glm::vec2 vertex){
+unsigned int Mesh::addVertex(glm::vec2 vertex){
 	return this->addVertex(glm::vec3(vertex.x, vertex.y, 0.0f));
+}
+
+unsigned int Mesh::addVertices(const std::vector<glm::vec3> &vertices){
+	for(glm::vec3 vertex : vertices){
+		this->addVertex(vertex);
+	}
+
+	return vertices.size();
 }
 
 void Mesh::setVertex(unsigned int index, glm::vec3 vertex){

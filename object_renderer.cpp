@@ -1,6 +1,6 @@
 #include "object_renderer.hpp"
 
-ObjectRenderer::ObjectRenderer(){
+void ObjectRenderer::init(){
 	glGenBuffers(1, &VBO);
 	glGenBuffers(1, &EBO);
 	glGenVertexArrays(1, &VAO);
@@ -15,14 +15,14 @@ ObjectRenderer::ObjectRenderer(){
 		glEnableVertexAttribArray(1);
 		glEnableVertexAttribArray(2);
 
-	checkErrorAt("Object Renderer Constructor");
+	checkErrorAt("Object Renderer Initialization");
 }
 
-void ObjectRenderer::draw(const glm::mat4 *model, const glm::mat4 *view, const glm::mat4 *projection){
+void ObjectRenderer::draw(const glm::mat4 &model, const glm::mat4 &view, const glm::mat4 &projection){
 	shader.use();
-	glUniformMatrix4fv(glGetUniformLocation(shader.getID(), "model"), 1, GL_FALSE, &(*model)[0][0]);
-	glUniformMatrix4fv(glGetUniformLocation(shader.getID(), "view"), 1, GL_FALSE, &(*view)[0][0]);
-	glUniformMatrix4fv(glGetUniformLocation(shader.getID(), "projection"), 1, GL_FALSE, &(*projection)[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(shader.getID(), "model"), 1, GL_FALSE, &model[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(shader.getID(), "view"), 1, GL_FALSE, &view[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(shader.getID(), "projection"), 1, GL_FALSE, &projection[0][0]);
 	glUniform1i(glGetUniformLocation(shader.getID(), "texture1"), 0);
 	glBindTexture(GL_TEXTURE_2D, texture.getID());
 	glBindVertexArray(VAO);
@@ -38,15 +38,15 @@ unsigned int ObjectRenderer::getVAO(){
 	return this->VAO;
 }
 
-void ObjectRenderer::setMesh(Mesh mesh){
+void ObjectRenderer::setMesh(const Mesh &mesh){
 	this->mesh = mesh;
 }
 
-void ObjectRenderer::setTexture(Texture texture){
+void ObjectRenderer::setTexture(const Texture &texture){
 	this->texture = texture;
 }
 
-void ObjectRenderer::setShader(ShaderProgram shader){
+void ObjectRenderer::setShader(const ShaderProgram &shader){
 	this->shader = shader;
 }
 

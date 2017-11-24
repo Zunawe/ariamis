@@ -6,12 +6,9 @@
 #include <sstream>
 #include <iostream>
 
-#ifndef OPENGL_HEADERS
-#define OPENGL_HEADERS
 #define GL_GLEXT_PROTOTYPES
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
-#endif
 
 class ShaderProgram{
 	public:
@@ -24,4 +21,5 @@ class ShaderProgram{
 		bool hasCompileErrors(unsigned int shaderID);
 		bool hasLinkErrors();
 };
+
 #endif

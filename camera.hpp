@@ -1,3 +1,6 @@
+#ifndef CAMERA_H
+#define CAMERA_H
+
 #include <glm/glm.hpp>
 
 class Camera{
@@ -15,3 +18,4 @@ class Camera{
 		glm::vec3 up;
 		glm::vec3 forward;
 };
+#endif

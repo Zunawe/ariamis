@@ -1,8 +1,8 @@
-#ifndef OPENGL_HEADERS
-#define OPENGL_HEADERS
+#ifndef OBJECT_RENDERER_H
+#define OBJECT_RENDERER_H
+
 #define GL_GLEXT_PROTOTYPES
 #include <GLFW/glfw3.h>
-#endif
 
 #include "mesh.hpp"
 #include "shader_program.hpp"
@@ -10,12 +10,12 @@
 
 class ObjectRenderer{
 	public:
-		ObjectRenderer();
-		void draw(const glm::mat4 *model, const glm::mat4 *view, const glm::mat4 *projection);
+		void init();
+		void draw(const glm::mat4 &model, const glm::mat4 &view, const glm::mat4 &projection);
 		unsigned int getVAO();
-		void setMesh(Mesh mesh);
-		void setTexture(Texture texture);
-		void setShader(ShaderProgram shader);
+		void setMesh(const Mesh &mesh);
+		void setTexture(const Texture &texture);
+		void setShader(const ShaderProgram &shader);
 
 	private:
 		Mesh mesh;
@@ -26,3 +26,5 @@ class ObjectRenderer{
 		unsigned int EBO;
 		void checkErrorAt(const char *location);
 };
+
+#endif

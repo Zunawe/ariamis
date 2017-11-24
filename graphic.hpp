@@ -1,22 +1,21 @@
+#ifndef GRAPHIC_H
+#define GRAPHIC_H
+
+#include <time.h>
+
 #include <iostream>
 #include <string>
 #include <cmath>
 #include <vector>
-#include <time.h>
 
-#ifndef OPENGL_HEADERS
-#define OPENGL_HEADERS
 #define GL_GLEXT_PROTOTYPES
 #include <GLFW/glfw3.h>
-#endif
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "camera.hpp"
 #include "texture.hpp"
 #include "object_renderer.hpp"
-
-using namespace std;
 
 class Graphic{
 	public:
@@ -26,9 +25,9 @@ class Graphic{
 	
 	private:
 		GLFWwindow *window;
-		ObjectRenderer *texturedCube;
-		ObjectRenderer *coloredCube;
-		ObjectRenderer *lamp;
+		ObjectRenderer texturedCube;
+		ObjectRenderer coloredCube;
+		ObjectRenderer lamp;
 		Camera camera;
 		glm::mat4 model;
 		glm::mat4 view;
@@ -43,3 +42,5 @@ class Graphic{
 		Mesh createCubeMesh();
 		void processInputs();
 };
+
+#endif

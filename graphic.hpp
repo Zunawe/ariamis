@@ -33,8 +33,7 @@ class Graphic{
 		glm::mat4 view;
 		glm::mat4 projection;
 
-		int theta;
-		int phi;
+		float cameraVelocity = 0.1;
 
 		void display();
 		void checkErrorAt(const char *location);

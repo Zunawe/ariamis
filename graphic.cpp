@@ -35,6 +35,8 @@ Graphic::Graphic(){
 	coloredCube.setShader(colorShader);
 	coloredCube.setMesh(cubeMesh);
 
+	camera.setPosition(glm::vec3(0, 0, -5));
+
 	theta = 0.0f;
 	phi = 90.0f;
 	
@@ -52,9 +54,7 @@ void Graphic::display(){
 
 	projection = glm::perspective(glm::radians(45.0f), 1.0f, 0.1f, 100.0f);
 
-	view = glm::translate(view, glm::vec3(0, 0, -5));
-	view = glm::rotate(view, glm::radians((float)phi + 90), glm::vec3(1, 0, 0));
-	view = glm::rotate(view, glm::radians((float)theta), glm::vec3(0, 1, 0));
+	view = camera.getViewMatrix();
 
 	model = glm::mat4(1);
 		model = glm::translate(model, glm::vec3(-1, 0, 0));
@@ -88,24 +88,17 @@ void Graphic::processInputs(){
 		glfwSetWindowShouldClose(window, true);
 	}
 	if(glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS){
-		phi += 3;
-		if(phi > 180){
-			phi = 180;
-		}
+		camera.moveRelative(glm::vec3(0, 0, 1), cameraVelocity);
 	}
 	if(glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS){
-		phi -= 3;
-		if(phi < 0){
-			phi = 0;
-		}
+		camera.moveRelative(glm::vec3(0, 0, -1), cameraVelocity);
 	}
 	if(glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS){
-		theta -= 3;
+		camera.moveRelative(glm::vec3(-1, 0, 0), cameraVelocity);
 	}
 	if(glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS){
-		theta += 3;
+		camera.moveRelative(glm::vec3(1, 0, 0), cameraVelocity);
 	}
-	theta = theta % 360;
 }
 
 void Graphic::run(){

@@ -67,3 +67,7 @@ glm::mat4 Camera::getViewMatrix(){
 void Camera::recalculateRight(){
 	right = glm::normalize(glm::cross(up, -forward));
 }
+
+glm::vec3 Camera::getRight(){
+	return this->right;
+}

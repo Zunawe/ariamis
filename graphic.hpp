@@ -43,7 +43,7 @@ class Graphic{
 		glm::mat4 view;
 		glm::mat4 projection;
 
-		float cameraVelocity = 1;
+		float cameraVelocity = 2;
 
 		float deltaTime;
 		float lastTime;

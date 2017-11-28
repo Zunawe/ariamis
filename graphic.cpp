@@ -16,26 +16,23 @@ Graphic::Graphic(){
 	glfwSetFramebufferSizeCallback(window, resizeWindow);
 	glfwSetCursorPosCallback(window, handleMouse);
 
-	glEnable(GL_PROGRAM_POINT_SIZE);
 	glEnable(GL_DEPTH_TEST);
 
-	ShaderProgram textureShader;
-	ShaderProgram colorShader;
-	Texture texture;
+	ShaderProgram shader;
 	Mesh cubeMesh = createCubeMesh();
 
-	textureShader.loadSources("shader.vs", "texture_shader.fs");
-	colorShader.loadSources("shader.vs", "color_shader.fs");
-	texture.load("texture.png");
+	Material material;
+	material.ambient = glm::vec3(0.05375f, 0.05f, 0.06625f);
+	material.diffuse = glm::vec3(0.18275f, 0.17f, 0.22525f);
+	material.specular = glm::vec3(0.332741f, 0.328634f, 0.346435f);
+	material.shininess = 38.4f;
 
-	texturedCube.init();
-	texturedCube.setShader(textureShader);
-	texturedCube.setMesh(cubeMesh);
-	texturedCube.setTexture(texture);
+	shader.loadSources("shader.vs", "lighting_shader.fs");
 
-	coloredCube.init();
-	coloredCube.setShader(colorShader);
-	coloredCube.setMesh(cubeMesh);
+	cube.init();
+	cube.setShader(shader);
+	cube.setMesh(cubeMesh);
+	cube.setMaterial(material);
 
 	
 	checkErrorAt("Graphic Constructor");
@@ -55,46 +52,16 @@ void Graphic::display(){
 	view = camera.getViewMatrix();
 
 	model = glm::mat4(1);
-		model = glm::translate(model, glm::vec3(3, 0, 3));
+		model = glm::translate(model, glm::vec3(0, 0, 5));
 		model = glm::rotate(model, glm::radians(45.0f), glm::vec3(1, 0, 0));
 		model = glm::rotate(model, glm::radians(45.0f), glm::vec3(0, 0, 1));
 		model = glm::rotate(model, glm::radians(45.0f), glm::vec3(0, 1, 0));
-		texturedCube.draw(model, view, projection);
+		cube.draw(model, view, projection, camera);
 
 	model = glm::mat4(1);
-		model = glm::translate(model, glm::vec3(-3, 0, 3));
-		model = glm::rotate(model, glm::radians(45.0f), glm::vec3(1, 0, 0));
-		model = glm::rotate(model, glm::radians(45.0f), glm::vec3(0, 0, 1));
-		model = glm::rotate(model, glm::radians(45.0f), glm::vec3(0, 1, 0));
-		texturedCube.draw(model, view, projection);
-
-	model = glm::mat4(1);
-		model = glm::translate(model, glm::vec3(3, 0, -3));
-		model = glm::rotate(model, glm::radians(45.0f), glm::vec3(1, 0, 0));
-		model = glm::rotate(model, glm::radians(45.0f), glm::vec3(0, 0, 1));
-		model = glm::rotate(model, glm::radians(45.0f), glm::vec3(0, 1, 0));
-		texturedCube.draw(model, view, projection);
-
-	model = glm::mat4(1);
-		model = glm::translate(model, glm::vec3(-3, 0, -3));
-		model = glm::rotate(model, glm::radians(45.0f), glm::vec3(1, 0, 0));
-		model = glm::rotate(model, glm::radians(45.0f), glm::vec3(0, 0, 1));
-		model = glm::rotate(model, glm::radians(45.0f), glm::vec3(0, 1, 0));
-		texturedCube.draw(model, view, projection);
-
-	model = glm::mat4(1);
-		model = glm::translate(model, glm::vec3(0, 3, 0));
-		model = glm::rotate(model, glm::radians(45.0f), glm::vec3(1, 0, 0));
-		model = glm::rotate(model, glm::radians(45.0f), glm::vec3(0, 0, 1));
-		model = glm::rotate(model, glm::radians(45.0f), glm::vec3(0, 1, 0));
-		texturedCube.draw(model, view, projection);
-
-	model = glm::mat4(1);
-		model = glm::translate(model, glm::vec3(0, -3, 0));
-		model = glm::rotate(model, glm::radians(45.0f), glm::vec3(1, 0, 0));
-		model = glm::rotate(model, glm::radians(45.0f), glm::vec3(0, 0, 1));
-		model = glm::rotate(model, glm::radians(45.0f), glm::vec3(0, 1, 0));
-		texturedCube.draw(model, view, projection);
+		model = glm::translate(model, glm::vec3(0, -1, 0));
+		model = glm::scale(model, glm::vec3(10, 0.1, 10));
+		cube.draw(model, view, projection, camera);
 
 	glfwSwapBuffers(window);
 	checkErrorAt("Display");
@@ -103,7 +70,7 @@ void Graphic::display(){
 void Graphic::checkErrorAt(const char *location){
 	GLenum err;
 	if((err = glGetError()) != GL_NO_ERROR){
-		cout << "Error at " << location << ": " << (err == GL_INVALID_VALUE) << endl;
+		cout << "Error at " << location << ": " << err << endl;
 	}
 }
 
@@ -149,13 +116,11 @@ void Graphic::run(){
 Mesh Graphic::createCubeMesh(){
 	Mesh cube;
 
-	// cube.setDefaultColor(glm::vec3(1, 0, 0));
-
 	// Front
-	cube.addVertex(glm::vec3(-0.5, -0.5, 0.5));
-	cube.addVertex(glm::vec3(0.5, -0.5, 0.5));
-	cube.addVertex(glm::vec3(0.5, 0.5, 0.5));
-	cube.addVertex(glm::vec3(-0.5, 0.5, 0.5));
+	cube.addVertex(glm::vec3(-0.5, -0.5, 0.5)); cube.setNormal(glm::vec3(0, 0, 1));
+	cube.addVertex(glm::vec3(0.5, -0.5, 0.5)); cube.setNormal(glm::vec3(0, 0, 1));
+	cube.addVertex(glm::vec3(0.5, 0.5, 0.5)); cube.setNormal(glm::vec3(0, 0, 1));
+	cube.addVertex(glm::vec3(-0.5, 0.5, 0.5)); cube.setNormal(glm::vec3(0, 0, 1));
 	cube.addTriangle(0, 1, 2);
 	cube.addTriangle(0, 2, 3);
 	cube.setTextureCoordinate(0, glm::vec2(0.0f, 0.0f));
@@ -164,10 +129,10 @@ Mesh Graphic::createCubeMesh(){
 	cube.setTextureCoordinate(3, glm::vec2(0.0f, 1.0f));
 	
 	// Back
-	cube.addVertex(glm::vec3(0.5, -0.5, -0.5));
-	cube.addVertex(glm::vec3(-0.5, -0.5, -0.5));
-	cube.addVertex(glm::vec3(-0.5, 0.5, -0.5));
-	cube.addVertex(glm::vec3(0.5, 0.5, -0.5));
+	cube.addVertex(glm::vec3(0.5, -0.5, -0.5)); cube.setNormal(glm::vec3(0, 0, -1));
+	cube.addVertex(glm::vec3(-0.5, -0.5, -0.5)); cube.setNormal(glm::vec3(0, 0, -1));
+	cube.addVertex(glm::vec3(-0.5, 0.5, -0.5)); cube.setNormal(glm::vec3(0, 0, -1));
+	cube.addVertex(glm::vec3(0.5, 0.5, -0.5)); cube.setNormal(glm::vec3(0, 0, -1));
 	cube.addTriangle(4, 5, 6);
 	cube.addTriangle(4, 6, 7);
 	cube.setTextureCoordinate(4, glm::vec2(0.0f, 0.0f));
@@ -176,10 +141,10 @@ Mesh Graphic::createCubeMesh(){
 	cube.setTextureCoordinate(7, glm::vec2(0.0f, 1.0f));
 
 	// Left
-	cube.addVertex(glm::vec3(-0.5, -0.5, -0.5));
-	cube.addVertex(glm::vec3(-0.5, -0.5, 0.5));
-	cube.addVertex(glm::vec3(-0.5, 0.5, 0.5));
-	cube.addVertex(glm::vec3(-0.5, 0.5, -0.5));
+	cube.addVertex(glm::vec3(-0.5, -0.5, -0.5)); cube.setNormal(glm::vec3(-1, 0, 0));
+	cube.addVertex(glm::vec3(-0.5, -0.5, 0.5)); cube.setNormal(glm::vec3(-1, 0, 0));
+	cube.addVertex(glm::vec3(-0.5, 0.5, 0.5)); cube.setNormal(glm::vec3(-1, 0, 0));
+	cube.addVertex(glm::vec3(-0.5, 0.5, -0.5)); cube.setNormal(glm::vec3(-1, 0, 0));
 	cube.addTriangle(8, 9, 10);
 	cube.addTriangle(8, 10, 11);
 	cube.setTextureCoordinate(8, glm::vec2(0.0f, 0.0f));
@@ -188,10 +153,10 @@ Mesh Graphic::createCubeMesh(){
 	cube.setTextureCoordinate(11, glm::vec2(0.0f, 1.0f));
 
 	// Right
-	cube.addVertex(glm::vec3(0.5, -0.5, 0.5));
-	cube.addVertex(glm::vec3(0.5, -0.5, -0.5));
-	cube.addVertex(glm::vec3(0.5, 0.5, -0.5));
-	cube.addVertex(glm::vec3(0.5, 0.5, 0.5));
+	cube.addVertex(glm::vec3(0.5, -0.5, 0.5)); cube.setNormal(glm::vec3(1, 0, 0));
+	cube.addVertex(glm::vec3(0.5, -0.5, -0.5)); cube.setNormal(glm::vec3(1, 0, 0));
+	cube.addVertex(glm::vec3(0.5, 0.5, -0.5)); cube.setNormal(glm::vec3(1, 0, 0));
+	cube.addVertex(glm::vec3(0.5, 0.5, 0.5)); cube.setNormal(glm::vec3(1, 0, 0));
 	cube.addTriangle(12, 13, 14);
 	cube.addTriangle(12, 14, 15);
 	cube.setTextureCoordinate(12, glm::vec2(0.0f, 0.0f));
@@ -200,10 +165,10 @@ Mesh Graphic::createCubeMesh(){
 	cube.setTextureCoordinate(15, glm::vec2(0.0f, 1.0f));
 
 	// Top
-	cube.addVertex(glm::vec3(-0.5, 0.5, 0.5));
-	cube.addVertex(glm::vec3(0.5, 0.5, 0.5));
-	cube.addVertex(glm::vec3(0.5, 0.5, -0.5));
-	cube.addVertex(glm::vec3(-0.5, 0.5, -0.5));
+	cube.addVertex(glm::vec3(-0.5, 0.5, 0.5)); cube.setNormal(glm::vec3(0, 1, 0));
+	cube.addVertex(glm::vec3(0.5, 0.5, 0.5)); cube.setNormal(glm::vec3(0, 1, 0));
+	cube.addVertex(glm::vec3(0.5, 0.5, -0.5)); cube.setNormal(glm::vec3(0, 1, 0));
+	cube.addVertex(glm::vec3(-0.5, 0.5, -0.5)); cube.setNormal(glm::vec3(0, 1, 0));
 	cube.addTriangle(16, 17, 18);
 	cube.addTriangle(16, 18, 19);
 	cube.setTextureCoordinate(16, glm::vec2(0.0f, 0.0f));
@@ -212,10 +177,10 @@ Mesh Graphic::createCubeMesh(){
 	cube.setTextureCoordinate(19, glm::vec2(0.0f, 1.0f));
 
 	// Bottom
-	cube.addVertex(glm::vec3(0.5, -0.5, 0.5));
-	cube.addVertex(glm::vec3(-0.5, -0.5, 0.5));
-	cube.addVertex(glm::vec3(-0.5, -0.5, -0.5));
-	cube.addVertex(glm::vec3(0.5, -0.5, -0.5));
+	cube.addVertex(glm::vec3(0.5, -0.5, 0.5)); cube.setNormal(glm::vec3(0, -1, 0));
+	cube.addVertex(glm::vec3(-0.5, -0.5, 0.5)); cube.setNormal(glm::vec3(0, -1, 0));
+	cube.addVertex(glm::vec3(-0.5, -0.5, -0.5)); cube.setNormal(glm::vec3(0, -1, 0));
+	cube.addVertex(glm::vec3(0.5, -0.5, -0.5)); cube.setNormal(glm::vec3(0, -1, 0));
 	cube.addTriangle(20, 21, 22);
 	cube.addTriangle(20, 22, 23);
 	cube.setTextureCoordinate(20, glm::vec2(0.0f, 0.0f));

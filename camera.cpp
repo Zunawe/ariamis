@@ -7,7 +7,7 @@ Camera::Camera(){
 	recalculateRight();
 }
 
-glm::vec3 Camera::getPosition(){
+glm::vec3 Camera::getPosition() const{
 	return this->position;
 }
 

@@ -18,12 +18,37 @@ void ObjectRenderer::init(){
 	checkErrorAt("Object Renderer Initialization");
 }
 
-void ObjectRenderer::draw(const glm::mat4 &model, const glm::mat4 &view, const glm::mat4 &projection){
+void ObjectRenderer::draw(const glm::mat4 &model, const glm::mat4 &view, const glm::mat4 &projection, const Camera &camera){
+	glm::mat3 normalModel(glm::transpose(glm::inverse(model)));
+
+	Light light;
+	light.pos = glm::vec3(0, 2, 0);
+	light.ambient = glm::vec3(0.5f, 0.5f, 0.5f);
+	light.diffuse = glm::vec3(0.5f, 0.5f, 0.5f);
+	light.specular = glm::vec3(0.7f, 0.5f, 0.5f);
+
+	glm::vec3 cameraPos(camera.getPosition());
+
 	shader.use();
 	glUniformMatrix4fv(glGetUniformLocation(shader.getID(), "model"), 1, GL_FALSE, &model[0][0]);
+	glUniformMatrix3fv(glGetUniformLocation(shader.getID(), "normalModel"), 1, GL_FALSE, &normalModel[0][0]);
 	glUniformMatrix4fv(glGetUniformLocation(shader.getID(), "view"), 1, GL_FALSE, &view[0][0]);
 	glUniformMatrix4fv(glGetUniformLocation(shader.getID(), "projection"), 1, GL_FALSE, &projection[0][0]);
+
 	glUniform1i(glGetUniformLocation(shader.getID(), "texture1"), 0);
+
+	glUniform3fv(glGetUniformLocation(shader.getID(), "material.ambient"), 1, &material.ambient[0]);
+	glUniform3fv(glGetUniformLocation(shader.getID(), "material.diffuse"), 1, &material.diffuse[0]);
+	glUniform3fv(glGetUniformLocation(shader.getID(), "material.specular"), 1, &material.specular[0]);
+	glUniform1f(glGetUniformLocation(shader.getID(), "material.shininess"), material.shininess);
+
+	glUniform3fv(glGetUniformLocation(shader.getID(), "light.pos"), 1, &light.pos[0]);
+	glUniform3fv(glGetUniformLocation(shader.getID(), "light.ambient"), 1, &light.ambient[0]);
+	glUniform3fv(glGetUniformLocation(shader.getID(), "light.diffuse"), 1, &light.diffuse[0]);
+	glUniform3fv(glGetUniformLocation(shader.getID(), "light.specular"), 1, &light.specular[0]);
+
+	glUniform3fv(glGetUniformLocation(shader.getID(), "cameraPos"), 1, &cameraPos[0]);
+
 	glBindTexture(GL_TEXTURE_2D, texture.getID());
 	glBindVertexArray(VAO);
 		glBindBuffer(GL_ARRAY_BUFFER, VBO);
@@ -31,6 +56,7 @@ void ObjectRenderer::draw(const glm::mat4 &model, const glm::mat4 &view, const g
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * mesh.getNumTriangles() * 3, mesh.getIndexData(), GL_DYNAMIC_DRAW);
 		glDrawElements(GL_TRIANGLES, mesh.getNumTriangles() * 3, GL_UNSIGNED_INT, 0);
 
+	glBindVertexArray(0);
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
@@ -40,6 +66,10 @@ unsigned int ObjectRenderer::getVAO(){
 
 void ObjectRenderer::setMesh(const Mesh &mesh){
 	this->mesh = mesh;
+}
+
+void ObjectRenderer::setMaterial(const Material &material){
+	this->material = material;
 }
 
 void ObjectRenderer::setTexture(const Texture &texture){

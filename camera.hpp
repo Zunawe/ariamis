@@ -7,7 +7,7 @@
 class Camera{
 	public:
 		Camera();
-		glm::vec3 getPosition();
+		glm::vec3 getPosition() const;
 		void setPosition(glm::vec3 newPosition);
 		void translate(glm::vec3 vector);
 		void translateRelative(glm::vec3 vector);

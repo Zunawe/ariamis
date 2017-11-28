@@ -1,7 +1,7 @@
 #include "mesh.hpp"
 
 Mesh::Mesh(){
-	defaultColor = glm::vec3(1.0f, 1.0f, 1.0f);
+	// Constructor
 }
 
 unsigned int Mesh::addVertex(glm::vec3 vertex){
@@ -9,9 +9,9 @@ unsigned int Mesh::addVertex(glm::vec3 vertex){
 	vertexData.push_back(vertex.y); // Y
 	vertexData.push_back(vertex.z); // Z
 
-	vertexData.push_back(defaultColor.x); // R
-	vertexData.push_back(defaultColor.y); // G
-	vertexData.push_back(defaultColor.z); // B
+	vertexData.push_back(0.0f); // X (Normal)
+	vertexData.push_back(1.0f); // Y (Normal)
+	vertexData.push_back(0.0f); // Z (Normal)
 
 	vertexData.push_back(0.0f); // U
 	vertexData.push_back(0.0f); // V
@@ -55,15 +55,16 @@ void Mesh::removeTriangle(unsigned int index){
 	triangles.erase(triangles.begin() + (index * 3), triangles.begin() + ((index + 1) * 3));
 }
 
-void Mesh::setDefaultColor(glm::vec3 color){
-	defaultColor = color;
+void Mesh::setNormal(unsigned int index, glm::vec3 normal){
+	unsigned int attributeIndex = vertexIndexToAttributeIndex(index);
+	normal = glm::normalize(normal);
+	vertexData[attributeIndex + 3] = normal.x;
+	vertexData[attributeIndex + 4] = normal.y;
+	vertexData[attributeIndex + 5] = normal.z;
 }
 
-void Mesh::setColor(unsigned int index, glm::vec3 color){
-	unsigned int attributeIndex = vertexIndexToAttributeIndex(index);
-	vertexData[attributeIndex + 3] = color.x;
-	vertexData[attributeIndex + 4] = color.y;
-	vertexData[attributeIndex + 5] = color.z;
+void Mesh::setNormal(glm::vec3 normal){
+	setNormal(this->getNumVertices() - 1, normal);
 }
 
 void Mesh::setTextureCoordinate(unsigned int index, glm::vec2 coordinate){

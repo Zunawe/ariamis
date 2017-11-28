@@ -25,7 +25,7 @@ float sensitivity = 0.1f;
 float pitch;
 float yaw;
 
-glm::vec3 mouseLook;
+glm::vec3 mouseLook(0, 0, 1);
 
 class Graphic{
 	public:
@@ -35,8 +35,7 @@ class Graphic{
 	
 	private:
 		GLFWwindow *window;
-		ObjectRenderer texturedCube;
-		ObjectRenderer coloredCube;
+		ObjectRenderer cube;
 		ObjectRenderer lamp;
 		Camera camera;
 		glm::mat4 model;

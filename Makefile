@@ -13,7 +13,7 @@ shader_program.o: shader_program.cpp shader_program.hpp
 mesh.o: mesh.cpp mesh.hpp
 texture.o: texture.cpp texture.hpp picopng.hpp
 camera.o: camera.cpp camera.hpp
-object_renderer.o: object_renderer.cpp object_renderer.hpp mesh.hpp texture.hpp shader_program.hpp
+object_renderer.o: object_renderer.cpp object_renderer.hpp mesh.hpp texture.hpp shader_program.hpp camera.hpp
 
 picopng.o: picopng.cpp picopng.hpp
 

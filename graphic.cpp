@@ -34,6 +34,11 @@ Graphic::Graphic(){
 	cube.setMesh(cubeMesh);
 	cube.setMaterial(material);
 
+	sword.init();
+	sword.setShader(shader);
+	sword.setMesh(cubeMesh);
+	// sword.setMesh(loadMeshFromObj("objects/sword.obj"));
+	sword.setMaterial(material);
 	
 	checkErrorAt("Graphic Constructor");
 }
@@ -59,7 +64,7 @@ void Graphic::display(){
 		model = glm::rotate(model, glm::radians(45.0f), glm::vec3(1, 0, 0));
 		model = glm::rotate(model, glm::radians(45.0f), glm::vec3(0, 0, 1));
 		model = glm::rotate(model, glm::radians(45.0f), glm::vec3(0, 1, 0));
-		cube.draw(model, view, projection, camera);
+		sword.draw(model, view, projection, camera);
 
 	model = glm::mat4(1);
 		model = glm::translate(model, glm::vec3(0, -1, 0));

@@ -7,13 +7,15 @@ Mesh::Mesh(){
 /**
  * Creates a new vertex attribute and sets the vertex position.
  * 
- * @param vertex the vertex position to be added.
+ * @param x the x position of the vertex to be added.
+ * @param y the y position of the vertex to be added.
+ * @param z the z position of the vertex to be added.
  * @return the index of the created vertex.
  */
-unsigned int Mesh::addVertex(glm::vec3 vertex){
-	vertexData.push_back(vertex.x); // X
-	vertexData.push_back(vertex.y); // Y
-	vertexData.push_back(vertex.z); // Z
+unsigned int Mesh::addVertex(float x, float y, float z){
+	vertexData.push_back(x); // X
+	vertexData.push_back(y); // Y
+	vertexData.push_back(z); // Z
 
 	vertexData.push_back(0.0f); // X (Normal)
 	vertexData.push_back(1.0f); // Y (Normal)
@@ -27,6 +29,28 @@ unsigned int Mesh::addVertex(glm::vec3 vertex){
 	vertexData.push_back(0.0f); // V
 	
 	return (vertexData.size() / ATTRIBUTE_SIZE) - 1;
+}
+
+
+/**
+ * Creates a new vertex attribute and sets the vertex position.
+ * 
+ * @param vertex the vertex position to be added.
+ * @return the index of the created vertex.
+ */
+unsigned int Mesh::addVertex(glm::vec3 vertex){
+	return addVertex(vertex.x, vertex.y, vertex.z);
+}
+
+/**
+ * Creates a new vertex attribute and sets the vertex position.
+ * 
+ * @param x the x position of the vertex to be added.
+ * @param y the y position of the vertex to be added.
+ * @return the index of the created vertex.
+ */
+unsigned int Mesh::addVertex(float x, float y){
+	return addVertex(x, y, 0.0f);
 }
 
 /**
@@ -186,12 +210,33 @@ void Mesh::setColor(glm::vec3 color){
  * Sets the texture coordinate of a vertex.
  * 
  * @param index the index of the vertex to set the texture coordinate of.
+ * @param u the x position of the new texture coordinate
+ * @param v the y position of the new texture coordinate
+ */
+void Mesh::setTextureCoordinate(unsigned int index, float u, float v){
+	unsigned int attributeIndex = vertexIndexToAttributeIndex(index);
+	vertexData[attributeIndex +  9] = u;
+	vertexData[attributeIndex + 10] = v;
+}
+
+/**
+ * Sets the texture coordinate of a vertex.
+ * 
+ * @param index the index of the vertex to set the texture coordinate of.
  * @param coordinate the new texture coordinate.
  */
 void Mesh::setTextureCoordinate(unsigned int index, glm::vec2 coordinate){
-	unsigned int attributeIndex = vertexIndexToAttributeIndex(index);
-	vertexData[attributeIndex +  9] = coordinate.x;
-	vertexData[attributeIndex + 10] = coordinate.y;
+	setTextureCoordinate(index, coordinate.x, coordinate.y);
+}
+
+/**
+ * Sets the texture coordinate of the last vertex. Useful for sequential calls to addVertex and setTextureCoordinate.
+ * 
+ * @param u the x position of the new texture coordinate
+ * @param v the y position of the new texture coordinate
+ */
+void Mesh::setTextureCoordinate(float u, float v){
+	setTextureCoordinate(getNumVertices() - 1, u, v);
 }
 
 /**

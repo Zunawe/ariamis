@@ -16,6 +16,7 @@
 #include "camera.hpp"
 #include "texture.hpp"
 #include "object_renderer.hpp"
+#include "obj_loader.hpp"
 
 static void handleMouse(GLFWwindow *window, double xPos, double yPos);
 
@@ -36,6 +37,7 @@ class Graphic{
 	private:
 		GLFWwindow *window;
 		ObjectRenderer cube;
+		ObjectRenderer sword;
 		ObjectRenderer lamp;
 		Camera camera;
 		glm::mat4 model;

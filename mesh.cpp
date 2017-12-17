@@ -13,10 +13,14 @@ unsigned int Mesh::addVertex(glm::vec3 vertex){
 	vertexData.push_back(1.0f); // Y (Normal)
 	vertexData.push_back(0.0f); // Z (Normal)
 
+	vertexData.push_back(1.0f); // R
+	vertexData.push_back(1.0f); // G
+	vertexData.push_back(1.0f); // B
+
 	vertexData.push_back(0.0f); // U
 	vertexData.push_back(0.0f); // V
 	
-	return (vertexData.size() / 8) - 1;
+	return (vertexData.size() / ATTRIBUTE_SIZE) - 1;
 }
 
 unsigned int Mesh::addVertex(glm::vec2 vertex){
@@ -40,7 +44,7 @@ void Mesh::setVertex(unsigned int index, glm::vec3 vertex){
 
 glm::vec3 Mesh::removeVertex(unsigned int index){
 	unsigned int attributeIndex = vertexIndexToAttributeIndex(index);
-	vertexData.erase(vertexData.begin() + attributeIndex, vertexData.begin() + attributeIndex + 8);
+	vertexData.erase(vertexData.begin() + attributeIndex, vertexData.begin() + attributeIndex + ATTRIBUTE_SIZE);
 }
 
 int Mesh::addTriangle(unsigned int index1, unsigned int index2, unsigned int index3){
@@ -67,10 +71,21 @@ void Mesh::setNormal(glm::vec3 normal){
 	setNormal(this->getNumVertices() - 1, normal);
 }
 
+void Mesh::setColor(unsigned int index, glm::vec3 color){
+	unsigned int attributeIndex = vertexIndexToAttributeIndex(index);
+	vertexData[attributeIndex + 6] = color.r;
+	vertexData[attributeIndex + 7] = color.b;
+	vertexData[attributeIndex + 8] = color.g;
+}
+
+void Mesh::setColor(glm::vec3 color){
+	setNormal(this->getNumVertices() - 1, color);
+}
+
 void Mesh::setTextureCoordinate(unsigned int index, glm::vec2 coordinate){
 	unsigned int attributeIndex = vertexIndexToAttributeIndex(index);
-	vertexData[attributeIndex + 6] = coordinate.x;
-	vertexData[attributeIndex + 7] = coordinate.y;
+	vertexData[attributeIndex +  9] = coordinate.x;
+	vertexData[attributeIndex + 10] = coordinate.y;
 }
 
 float* Mesh::getVertexData(){
@@ -82,7 +97,7 @@ unsigned int* Mesh::getIndexData(){
 }
 
 unsigned int Mesh::getNumVertices(){
-	return vertexData.size() / 8;
+	return vertexData.size() / ATTRIBUTE_SIZE;
 }
 
 unsigned int Mesh::getNumTriangles(){
@@ -90,5 +105,5 @@ unsigned int Mesh::getNumTriangles(){
 }
 
 unsigned int Mesh::vertexIndexToAttributeIndex(unsigned int index){
-	return index * 8;
+	return index * ATTRIBUTE_SIZE;
 }

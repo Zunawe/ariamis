@@ -22,10 +22,10 @@ Graphic::Graphic(){
 	Mesh cubeMesh = createCubeMesh();
 
 	Material material;
-	material.ambient = glm::vec3(0.05375f, 0.05f, 0.06625f);
-	material.diffuse = glm::vec3(0.18275f, 0.17f, 0.22525f);
-	material.specular = glm::vec3(0.332741f, 0.328634f, 0.346435f);
-	material.shininess = 38.4f;
+	material.ambient = glm::vec3(0.0f, 0.0f, 0.0f);
+	material.diffuse = glm::vec3(0.5f, 0.0f, 0.0f);
+	material.specular = glm::vec3(0.7f, 0.6f, 0.6f);
+	material.shininess = 32.0f;
 
 	shader.loadSources("shader.vs", "lighting_shader.fs");
 

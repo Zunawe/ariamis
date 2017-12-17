@@ -6,6 +6,8 @@
 
 class Mesh{
 	public:
+		static const unsigned int ATTRIBUTE_SIZE = 11;
+
 		Mesh();
 		unsigned int addVertex(glm::vec3 vertex);
 		unsigned int addVertex(glm::vec2 vertex);
@@ -16,6 +18,8 @@ class Mesh{
 		void removeTriangle(unsigned int index);
 		void setNormal(unsigned int index, glm::vec3 normal);
 		void setNormal(glm::vec3 normal);
+		void setColor(unsigned int index, glm::vec3 color);
+		void setColor(glm::vec3 color);
 		void setTextureCoordinate(unsigned int index, glm::vec2 coordinate);
 	
 		float* getVertexData();

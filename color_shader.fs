@@ -1,7 +1,6 @@
 #version 450 core
 
 in vec3 vertexColor;
-in vec2 vertexTextureCoordinate;
 
 uniform sampler2D texture1;
 

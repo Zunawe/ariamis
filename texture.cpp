@@ -1,5 +1,10 @@
 #include "texture.hpp"
 
+/**
+ * Loads an RGB PNG file into memory as a texture.
+ * 
+ * @param filename the path to an RGB PNG file with 24-bit colors.
+ */
 void Texture::load(const char *filename){
 	std::vector<unsigned char> imageData;
 	std::vector<unsigned char> fileBuffer;

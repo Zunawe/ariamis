@@ -1,5 +1,11 @@
 #include "shader_program.hpp"
 
+/**
+ * Loads the source code for the vertex shader and fragment shader, compiles them, and links them.
+ * 
+ * @param vertexShaderPath the path to the vertex shader.
+ * @param fragmentShaderPath the path to the fragment shader.
+ */
 void ShaderProgram::loadSources(const GLchar *vertexShaderPath, const GLchar *fragmentShaderPath){
 	// Read source code
 	std::ifstream fileStream;
@@ -53,6 +59,7 @@ void ShaderProgram::loadSources(const GLchar *vertexShaderPath, const GLchar *fr
 		std::cout << "Failed to compile fragment shader" << std::endl;
 	}
 
+
 	// Link
 	glAttachShader(this->id, vertexShaderID);
 	glAttachShader(this->id, fragmentShaderID);
@@ -60,9 +67,14 @@ void ShaderProgram::loadSources(const GLchar *vertexShaderPath, const GLchar *fr
 	if(hasLinkErrors()){
 		std::cout << "Failed to link shaders" << std::endl;
 	}
-
 }
 
+/**
+ * Checks whether a shader compiled correctly. Prints the log if not.
+ * 
+ * @param shaderID the OpenGL id of the shader in question.
+ * @return true if the shader had no compilation errors.
+ */
 bool ShaderProgram::hasCompileErrors(unsigned int shaderID){
 	int success;
 	char log[512];
@@ -76,6 +88,11 @@ bool ShaderProgram::hasCompileErrors(unsigned int shaderID){
 	return false;
 }
 
+/**
+ * Checks whether this shader program linked correctly. Prints the log if not.
+ * 
+ * @return true if this shader program had no compilation errors.
+ */
 bool ShaderProgram::hasLinkErrors(){
 	int success;
 	char log[512];
@@ -89,6 +106,9 @@ bool ShaderProgram::hasLinkErrors(){
 	return false;
 }
 
+/**
+ * Tells OpenGL to use this shader program from now on.
+ */
 void ShaderProgram::use(){
 	glUseProgram(this->id);
 }

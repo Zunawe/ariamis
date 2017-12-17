@@ -20,6 +20,14 @@ void ObjectRenderer::init(){
 	checkErrorAt("Object Renderer Initialization");
 }
 
+/**
+ * Draws this object. Assumes it is only called within some sort of display function.
+ * 
+ * @param model the model matrix at the time of drawing the object.
+ * @param view the view matrix at the time of drawing the object.
+ * @param projection the projection matrix at the time of drawing the object.
+ * @param camera the Camera the object is being viewed by.
+ */
 void ObjectRenderer::draw(const glm::mat4 &model, const glm::mat4 &view, const glm::mat4 &projection, const Camera &camera){
 	glm::mat3 normalModel(glm::transpose(glm::inverse(model)));
 

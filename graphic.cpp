@@ -42,6 +42,9 @@ Graphic::~Graphic(){
 	// Destructor
 }
 
+/**
+ * Draws a single frame.
+ */
 void Graphic::display(){
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	model = glm::mat4(1);
@@ -67,6 +70,11 @@ void Graphic::display(){
 	checkErrorAt("Display");
 }
 
+/**
+ * Checks for an OpenGL error and prints the error code and location.
+ * 
+ * @param location a string for use in identifying where in the code the error occurs.
+ */
 void Graphic::checkErrorAt(const char *location){
 	GLenum err;
 	if((err = glGetError()) != GL_NO_ERROR){
@@ -74,11 +82,13 @@ void Graphic::checkErrorAt(const char *location){
 	}
 }
 
+/**
+ * Handles user input. Called before every frame.
+ */
 void Graphic::processInputs(){
 	float newTime = glfwGetTime();
 	deltaTime = newTime - lastTime;
 	lastTime = newTime;
-
 
 	if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS){
 		glfwSetWindowShouldClose(window, true);
@@ -104,6 +114,9 @@ void Graphic::processInputs(){
 	camera.setForward(mouseLook);
 }
 
+/**
+ * Main loop.
+ */
 void Graphic::run(){
 	while(!glfwWindowShouldClose(window)){
 		glfwPollEvents();
@@ -113,6 +126,11 @@ void Graphic::run(){
 	glfwTerminate();	
 }
 
+/**
+ * Creates a basic cube mesh.
+ * 
+ * @return a new mesh object representing a cube.
+ */
 Mesh Graphic::createCubeMesh(){
 	Mesh cube;
 
@@ -191,6 +209,9 @@ Mesh Graphic::createCubeMesh(){
 	return cube;
 }
 
+/**
+ * Callback for GLFW defining the behavior for resizing a window.
+ */
 void Graphic::resizeWindow(GLFWwindow *window, int width, int height){
 	glViewport(0, 0, width, height);
 }

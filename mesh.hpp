@@ -13,14 +13,18 @@ class Mesh{
 		unsigned int addVertex(glm::vec2 vertex);
 		unsigned int addVertices(const std::vector<glm::vec3> &vertices);
 		void setVertex(unsigned int index, glm::vec3 vertex);
-		glm::vec3 removeVertex(unsigned int index);
+		void removeVertex(unsigned int index);
+		int addTriangle(glm::vec3 indices);
 		int addTriangle(unsigned int index1, unsigned int index2, unsigned int index3);
+		int addTriangles(std::vector<glm::vec3> indices);
+		int addTriangles(std::vector<unsigned int> indices);
 		void removeTriangle(unsigned int index);
 		void setNormal(unsigned int index, glm::vec3 normal);
 		void setNormal(glm::vec3 normal);
 		void setColor(unsigned int index, glm::vec3 color);
 		void setColor(glm::vec3 color);
 		void setTextureCoordinate(unsigned int index, glm::vec2 coordinate);
+		void setTextureCoordinate(glm::vec2 coordinate);
 	
 		float* getVertexData();
 		unsigned int* getIndexData();

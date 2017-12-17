@@ -11,8 +11,8 @@ class Camera{
 		void setPosition(glm::vec3 newPosition);
 		void translate(glm::vec3 vector);
 		void translateRelative(glm::vec3 vector);
-		void move(glm::vec3 vector, float velocity);
-		void moveRelative(glm::vec3 vector, float velocity);
+		void move(glm::vec3 vector, float speed);
+		void moveRelative(glm::vec3 vector, float speed);
 		glm::vec3 getForward();
 		void setForward(glm::vec3 newForward);
 		glm::vec3 getUp();

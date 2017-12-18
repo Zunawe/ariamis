@@ -16,6 +16,7 @@ void ObjectRenderer::init(){
 		glEnableVertexAttribArray(1);
 		glEnableVertexAttribArray(2);
 		glEnableVertexAttribArray(3);
+	glBindVertexArray(0);
 
 	checkErrorAt("Object Renderer Initialization");
 }
@@ -29,8 +30,6 @@ void ObjectRenderer::init(){
  * @param camera the Camera the object is being viewed by.
  */
 void ObjectRenderer::draw(const glm::mat4 &model, const glm::mat4 &view, const glm::mat4 &projection, const Camera &camera){
-	glm::mat3 normalModel(glm::transpose(glm::inverse(model)));
-
 	Light light;
 	light.pos = glm::vec3(0, 2, 0);
 	light.ambient = glm::vec3(0.5f, 0.5f, 0.5f);
@@ -40,6 +39,8 @@ void ObjectRenderer::draw(const glm::mat4 &model, const glm::mat4 &view, const g
 	glm::vec3 cameraPos(camera.getPosition());
 
 	shader.use();
+
+	glm::mat3 normalModel(glm::transpose(glm::inverse(model)));
 	glUniformMatrix4fv(glGetUniformLocation(shader.getID(), "model"), 1, GL_FALSE, &model[0][0]);
 	glUniformMatrix3fv(glGetUniformLocation(shader.getID(), "normalModel"), 1, GL_FALSE, &normalModel[0][0]);
 	glUniformMatrix4fv(glGetUniformLocation(shader.getID(), "view"), 1, GL_FALSE, &view[0][0]);
@@ -63,10 +64,8 @@ void ObjectRenderer::draw(const glm::mat4 &model, const glm::mat4 &view, const g
 	glUniform3fv(glGetUniformLocation(shader.getID(), "cameraPos"), 1, &cameraPos[0]);
 
 	glBindTexture(GL_TEXTURE_2D, texture.getID());
+
 	glBindVertexArray(VAO);
-		glBindBuffer(GL_ARRAY_BUFFER, VBO);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(float) * mesh.getNumVertices() * mesh.ATTRIBUTE_SIZE, mesh.getVertexData(), GL_DYNAMIC_DRAW);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * mesh.getNumTriangles() * 3, mesh.getIndexData(), GL_DYNAMIC_DRAW);
 		glDrawElements(GL_TRIANGLES, mesh.getNumTriangles() * 3, GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);
 	glBindTexture(GL_TEXTURE_2D, 0);
@@ -74,12 +73,28 @@ void ObjectRenderer::draw(const glm::mat4 &model, const glm::mat4 &view, const g
 	checkErrorAt("ObjectRenderer draw");
 }
 
+/**
+ * Copies the current mesh into the buffer. If this object's currently set mesh object is changed after it is set,
+ * this function must be called before changes take effect. (Note: Using setMesh to set the mesh to a new Mesh object
+ * calls this method by default.)
+ */
+void ObjectRenderer::reloadMesh(){
+	glBindVertexArray(VAO);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(float) * mesh.getNumVertices() * mesh.ATTRIBUTE_SIZE, mesh.getVertexData(), GL_STATIC_DRAW);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * mesh.getNumTriangles() * 3, mesh.getIndexData(), GL_STATIC_DRAW);
+	glBindVertexArray(0);
+}
+
 unsigned int ObjectRenderer::getVAO(){
 	return this->VAO;
 }
 
+/**
+ * Sets the mesh of the object renderer and loads the data into the buffers.
+ */
 void ObjectRenderer::setMesh(const Mesh &mesh){
 	this->mesh = mesh;
+	reloadMesh();
 }
 
 void ObjectRenderer::setMaterial(const Material &material){

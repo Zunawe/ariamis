@@ -32,6 +32,7 @@ class ObjectRenderer{
 		void setMaterial(const Material &material);
 		void setTexture(const Texture &texture);
 		void setShader(const ShaderProgram &shader);
+		void reloadMesh();
 
 	private:
 		Mesh mesh;

@@ -14,7 +14,6 @@ Mesh loadMeshFromObj(const char *filepath){
 
 	file.open(filepath);
 
-
 	while(getline(file, line)){
 		vector<string> tokens = split(line, ' ');
 
@@ -81,6 +80,39 @@ Mesh loadMeshFromObj(const char *filepath){
 	file.close();
 
 	return mesh;
+}
+
+map<string, Material> loadMaterialsFromMtl(const char *filepath){
+	map<string, Material> materials;
+
+	ifstream file;
+	string line;
+
+	file.open(filepath);
+
+	while(getline(file, line)){
+		vector<string> tokens = split(line, ' ');
+		string currentMaterialName;
+
+		if(!tokens.size() || !tokens[0].length() || tokens[0][0] == '#'){
+			continue;
+		}
+		else if(tokens[0] == "newmtl"){
+			currentMaterialName = tokens[1];
+			materials.insert(pair<string, Material>(currentMaterialName, Material()));
+		}
+		else if(tokens[0] == "Ka"){
+			materials[currentMaterialName].ambient = glm::vec3(stof(tokens[1]), stof(tokens[2]), stof(tokens[3]));
+		}
+		else if(tokens[0] == "Kd"){
+			materials[currentMaterialName].diffuse = glm::vec3(stof(tokens[1]), stof(tokens[2]), stof(tokens[3]));
+		}
+		else if(tokens[0] == "Ns"){
+			materials[currentMaterialName].shininess = stof(tokens[1]);
+		}
+	}
+
+	return materials;
 }
 
 template<typename Out>

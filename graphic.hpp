@@ -52,7 +52,6 @@ class Graphic{
 		void display();
 		static void checkErrorAt(const char *location);
 		static void resizeWindow(GLFWwindow *window, int width, int height);
-		static Mesh createCubeMesh();
 		void processInputs();
 };
 

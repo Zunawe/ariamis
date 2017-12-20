@@ -1,7 +1,7 @@
 #include "mesh.hpp"
 
 Mesh::Mesh(){
-	// Constructor
+	submeshBounds.push_back(0);
 }
 
 /**
@@ -18,7 +18,7 @@ unsigned int Mesh::addVertex(float x, float y, float z){
 	vertexData.push_back(z); // Z
 
 	vertexData.push_back(0.0f); // X (Normal)
-	vertexData.push_back(1.0f); // Y (Normal)
+	vertexData.push_back(0.0f); // Y (Normal)
 	vertexData.push_back(0.0f); // Z (Normal)
 
 	vertexData.push_back(1.0f); // R
@@ -30,7 +30,6 @@ unsigned int Mesh::addVertex(float x, float y, float z){
 	
 	return (vertexData.size() / ATTRIBUTE_SIZE) - 1;
 }
-
 
 /**
  * Creates a new vertex attribute and sets the vertex position.
@@ -248,6 +247,17 @@ void Mesh::setTextureCoordinate(glm::vec2 coordinate){
 	setTextureCoordinate(getNumVertices() - 1, coordinate);
 }
 
+void Mesh::startNewSubmeshAt(unsigned int i){
+	auto it = submeshBounds.begin();
+	while(it != submeshBounds.end() && *it < i){
+		++it;
+	}
+	if(*it == i){
+		return;
+	}
+	submeshBounds.insert(it, i);
+}
+
 /**
  * Returns the pointer to the data to be sent to the GPU.
  * 
@@ -272,6 +282,10 @@ unsigned int Mesh::getNumVertices(){
 
 unsigned int Mesh::getNumTriangles(){
 	return triangles.size() / 3;
+}
+
+std::vector<unsigned int> Mesh::getSubmeshBounds(){
+	return submeshBounds;
 }
 
 /**

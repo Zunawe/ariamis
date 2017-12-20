@@ -22,7 +22,7 @@ Graphic::Graphic(){
 	Mesh cubeMesh = loadMeshFromObj("objects/cube.obj");
 
 	Material material;
-	material.ambient = glm::vec3(0.0f, 0.0f, 0.0f);
+	material.ambient = glm::vec3(0.1f, 0.1f, 0.1f);
 	material.diffuse = glm::vec3(0.5f, 0.0f, 0.0f);
 	material.specular = glm::vec3(0.7f, 0.6f, 0.6f);
 	material.shininess = 32.0f;
@@ -36,8 +36,8 @@ Graphic::Graphic(){
 
 	sword.init();
 	sword.setShader(shader);
-	sword.setMesh(cubeMesh);
-	// sword.setMesh(loadMeshFromObj("objects/sword.obj"));
+	// sword.setMesh(cubeMesh);
+	sword.setMesh(loadMeshFromObj("objects/sword.obj"));
 	sword.setMaterial(material);
 	
 	checkErrorAt("Graphic Constructor");

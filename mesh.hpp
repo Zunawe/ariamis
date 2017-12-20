@@ -29,16 +29,19 @@ class Mesh{
 		void setTextureCoordinate(unsigned int index, glm::vec2 coordinate);
 		void setTextureCoordinate(float u, float v);
 		void setTextureCoordinate(glm::vec2 coordinate);
+		void startNewSubmeshAt(unsigned int i);
 	
 		float* getVertexData();
 		unsigned int* getIndexData();
 		unsigned int getNumVertices();
 		unsigned int getNumTriangles();
+		std::vector<unsigned int> getSubmeshBounds();
 		
 	private:
 		std::vector<float> vertexData;
 		std::vector<unsigned int> triangles;
 		glm::vec3 defaultColor;
+		std::vector<unsigned int> submeshBounds;
 
 		unsigned int vertexIndexToAttributeIndex(unsigned int index);
 };

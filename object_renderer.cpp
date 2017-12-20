@@ -65,8 +65,16 @@ void ObjectRenderer::draw(const glm::mat4 &model, const glm::mat4 &view, const g
 
 	glBindTexture(GL_TEXTURE_2D, texture.getID());
 
+	unsigned int submesh = 0;
+
+	std::vector<unsigned int> submeshes = mesh.getSubmeshBounds();
+	unsigned int submeshStart, submeshNumTriangles;
 	glBindVertexArray(VAO);
-		glDrawElements(GL_TRIANGLES, mesh.getNumTriangles() * 3, GL_UNSIGNED_INT, 0);
+		for(unsigned int i = 0; i < submeshes.size(); ++i){
+			submeshStart = submeshes[i];
+			submeshNumTriangles = (i + 1 < submeshes.size() ? submeshes[i + 1] : mesh.getNumTriangles()) - submeshStart;
+			glDrawElements(GL_TRIANGLES, submeshNumTriangles * 3, GL_UNSIGNED_INT, (GLvoid *)(submeshStart * 3 * sizeof(GLuint)));
+		}
 	glBindVertexArray(0);
 	glBindTexture(GL_TEXTURE_2D, 0);
 

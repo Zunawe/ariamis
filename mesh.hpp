@@ -30,11 +30,13 @@ class Mesh{
 		void setTextureCoordinate(float u, float v);
 		void setTextureCoordinate(glm::vec2 coordinate);
 		void startNewSubmeshAt(unsigned int i);
+		void startNewSubmesh();
 	
 		float* getVertexData();
 		unsigned int* getIndexData();
 		unsigned int getNumVertices();
 		unsigned int getNumTriangles();
+		unsigned int getNumSubmeshes();
 		std::vector<unsigned int> getSubmeshBounds();
 		
 	private:

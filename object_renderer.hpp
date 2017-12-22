@@ -1,6 +1,8 @@
 #ifndef OBJECT_RENDERER_H
 #define OBJECT_RENDERER_H
 
+#include <algorithm>
+
 #define GL_GLEXT_PROTOTYPES
 #include <GLFW/glfw3.h>
 
@@ -15,6 +17,14 @@ struct Material{
 	glm::vec3 specular;
 	float shininess;
 };
+bool operator==(const Material &lhs, const Material &rhs);
+
+const Material DEFAULT_MATERIAL{
+	glm::vec3(0.7f, 0.7f, 0.7f),
+	glm::vec3(0.7f, 0.7f, 0.7f),
+	glm::vec3(0.4f, 0.4f, 0.4f),
+	32.0f
+};
 
 struct Light{
 	glm::vec3 pos;
@@ -25,18 +35,21 @@ struct Light{
 
 class ObjectRenderer{
 	public:
-		void init();
+		ObjectRenderer();
 		void draw(const glm::mat4 &model, const glm::mat4 &view, const glm::mat4 &projection, const Camera &camera);
 		unsigned int getVAO();
+		Mesh* getMesh();
 		void setMesh(const Mesh &mesh);
 		void setMaterial(const Material &material);
+		void setMaterial(unsigned int submeshIndex, const Material &material);
 		void setTexture(const Texture &texture);
 		void setShader(const ShaderProgram &shader);
 		void reloadMesh();
 
 	private:
 		Mesh mesh;
-		Material material;
+		std::vector<unsigned int> materialIndices;
+		std::vector<Material> materials;
 		Texture texture;
 		ShaderProgram shader;
 		unsigned int VAO;

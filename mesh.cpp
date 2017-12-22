@@ -258,6 +258,10 @@ void Mesh::startNewSubmeshAt(unsigned int i){
 	submeshBounds.insert(it, i);
 }
 
+void Mesh::startNewSubmesh(){
+	startNewSubmeshAt(getNumTriangles());
+}
+
 /**
  * Returns the pointer to the data to be sent to the GPU.
  * 
@@ -282,6 +286,10 @@ unsigned int Mesh::getNumVertices(){
 
 unsigned int Mesh::getNumTriangles(){
 	return triangles.size() / 3;
+}
+
+unsigned int Mesh::getNumSubmeshes(){
+	return submeshBounds.size();
 }
 
 std::vector<unsigned int> Mesh::getSubmeshBounds(){

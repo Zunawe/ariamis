@@ -1,6 +1,13 @@
 #include "object_renderer.hpp"
 
-void ObjectRenderer::init(){
+bool operator==(const Material &lhs, const Material &rhs){
+	return lhs.ambient == rhs.ambient &&
+	       lhs.diffuse == rhs.diffuse &&
+		   lhs.specular == rhs.specular &&
+		   lhs.shininess == rhs.shininess;
+}
+
+ObjectRenderer::ObjectRenderer(){
 	glGenBuffers(1, &VBO);
 	glGenBuffers(1, &EBO);
 	glGenVertexArrays(1, &VAO);
@@ -32,9 +39,9 @@ void ObjectRenderer::init(){
 void ObjectRenderer::draw(const glm::mat4 &model, const glm::mat4 &view, const glm::mat4 &projection, const Camera &camera){
 	Light light;
 	light.pos = glm::vec3(0, 2, 0);
-	light.ambient = glm::vec3(0.5f, 0.5f, 0.5f);
-	light.diffuse = glm::vec3(0.5f, 0.5f, 0.5f);
-	light.specular = glm::vec3(0.7f, 0.5f, 0.5f);
+	light.ambient = glm::vec3(0.7f, 0.7f, 0.7f);
+	light.diffuse = glm::vec3(0.7f, 0.7f, 0.7f);
+	light.specular = glm::vec3(0.7f, 0.7f, 0.7f);
 
 	glm::vec3 cameraPos(camera.getPosition());
 
@@ -51,11 +58,6 @@ void ObjectRenderer::draw(const glm::mat4 &model, const glm::mat4 &view, const g
 
 	glUniform1i(glGetUniformLocation(shader.getID(), "texture1"), 0);
 
-	glUniform3fv(glGetUniformLocation(shader.getID(), "material.ambient"), 1, &material.ambient[0]);
-	glUniform3fv(glGetUniformLocation(shader.getID(), "material.diffuse"), 1, &material.diffuse[0]);
-	glUniform3fv(glGetUniformLocation(shader.getID(), "material.specular"), 1, &material.specular[0]);
-	glUniform1f(glGetUniformLocation(shader.getID(), "material.shininess"), material.shininess);
-
 	glUniform3fv(glGetUniformLocation(shader.getID(), "light.pos"), 1, &light.pos[0]);
 	glUniform3fv(glGetUniformLocation(shader.getID(), "light.ambient"), 1, &light.ambient[0]);
 	glUniform3fv(glGetUniformLocation(shader.getID(), "light.diffuse"), 1, &light.diffuse[0]);
@@ -71,6 +73,12 @@ void ObjectRenderer::draw(const glm::mat4 &model, const glm::mat4 &view, const g
 	unsigned int submeshStart, submeshNumTriangles;
 	glBindVertexArray(VAO);
 		for(unsigned int i = 0; i < submeshes.size(); ++i){
+			// std::cout << materialIndices[i] << std::endl;
+			glUniform3fv(glGetUniformLocation(shader.getID(), "material.ambient"), 1, &materials[materialIndices[i]].ambient[0]);
+			glUniform3fv(glGetUniformLocation(shader.getID(), "material.diffuse"), 1, &materials[materialIndices[i]].diffuse[0]);
+			glUniform3fv(glGetUniformLocation(shader.getID(), "material.specular"), 1, &materials[materialIndices[i]].specular[0]);
+			glUniform1f(glGetUniformLocation(shader.getID(), "material.shininess"), materials[materialIndices[i]].shininess);
+
 			submeshStart = submeshes[i];
 			submeshNumTriangles = (i + 1 < submeshes.size() ? submeshes[i + 1] : mesh.getNumTriangles()) - submeshStart;
 			glDrawElements(GL_TRIANGLES, submeshNumTriangles * 3, GL_UNSIGNED_INT, (GLvoid *)(submeshStart * 3 * sizeof(GLuint)));
@@ -97,16 +105,41 @@ unsigned int ObjectRenderer::getVAO(){
 	return this->VAO;
 }
 
+Mesh* ObjectRenderer::getMesh(){
+	return &(this->mesh);
+}
+
 /**
  * Sets the mesh of the object renderer and loads the data into the buffers.
  */
 void ObjectRenderer::setMesh(const Mesh &mesh){
 	this->mesh = mesh;
+
+	this->materialIndices.clear();
+	this->materialIndices.resize(this->mesh.getNumSubmeshes());
+
 	reloadMesh();
 }
 
 void ObjectRenderer::setMaterial(const Material &material){
-	this->material = material;
+	this->materials.clear();
+	this->materials.push_back(material);
+
+	this->materialIndices.clear();
+	this->materialIndices.resize(mesh.getNumSubmeshes());
+	for(int i = 0; i < this->mesh.getNumSubmeshes(); ++i){
+		materialIndices.push_back(0);
+	}
+}
+
+void ObjectRenderer::setMaterial(unsigned int submeshIndex, const Material &material){
+	auto materialPosition = std::find(materials.begin(), materials.end(), material);
+	if(materialPosition == materials.end()){
+		materials.push_back(material);
+		materialPosition = materials.end() - 1;
+	}
+
+	materialIndices[submeshIndex] = std::distance(materials.begin(), materialPosition);
 }
 
 void ObjectRenderer::setTexture(const Texture &texture){

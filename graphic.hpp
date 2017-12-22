@@ -36,8 +36,7 @@ class Graphic{
 	
 	private:
 		GLFWwindow *window;
-		ObjectRenderer cube;
-		ObjectRenderer sword;
+		std::vector<ObjectRenderer> objects;
 		ObjectRenderer lamp;
 		Camera camera;
 		glm::mat4 model;

@@ -29,16 +29,14 @@ Graphic::Graphic(){
 
 	shader.loadSources("shader.vs", "lighting_shader.fs");
 
-	cube.init();
-	cube.setShader(shader);
-	cube.setMesh(cubeMesh);
-	cube.setMaterial(material);
+	objects.push_back(ObjectRenderer());
+	objects[0].setShader(shader);
+	objects[0].setMesh(cubeMesh);
+	objects[0].setMaterial(material);
 
-	sword.init();
-	sword.setShader(shader);
-	// sword.setMesh(cubeMesh);
-	sword.setMesh(loadMeshFromObj("objects/sword.obj"));
-	sword.setMaterial(material);
+	objects.push_back(ObjectRenderer());
+	objects[1] = loadObj("objects/cube.obj");
+	objects[1].setShader(shader);
 	
 	checkErrorAt("Graphic Constructor");
 }
@@ -64,12 +62,12 @@ void Graphic::display(){
 		model = glm::rotate(model, glm::radians(45.0f), glm::vec3(1, 0, 0));
 		model = glm::rotate(model, glm::radians(45.0f), glm::vec3(0, 0, 1));
 		model = glm::rotate(model, glm::radians(45.0f), glm::vec3(0, 1, 0));
-		sword.draw(model, view, projection, camera);
+		objects[1].draw(model, view, projection, camera);
 
 	model = glm::mat4(1);
 		model = glm::translate(model, glm::vec3(0, -1, 0));
 		model = glm::scale(model, glm::vec3(10, 0.1, 10));
-		cube.draw(model, view, projection, camera);
+		objects[0].draw(model, view, projection, camera);
 
 	glfwSwapBuffers(window);
 	checkErrorAt("Display");

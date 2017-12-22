@@ -18,7 +18,7 @@ in vec3 vertexNormal;
 in vec2 vertexTextureCoordinate;
 in vec3 fragPos;
 
-uniform sampler2D texture1;
+uniform sampler2D texture0;
 uniform Material material;
 uniform Light light;
 uniform vec3 cameraPos;
@@ -38,5 +38,5 @@ void main(){
 	float shinyMultiplier = pow(max(dot(toCamera, reflected), 0), material.shininess);
 	vec3 specular = (light.specular * material.specular) * shinyMultiplier;
 
-	fragColor = vec4(ambient + diffuse + specular, 1.0);
+	fragColor = texture(texture0, vertexTextureCoordinate) * vec4(ambient + diffuse + specular, 1.0);
 }

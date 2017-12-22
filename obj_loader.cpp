@@ -177,6 +177,9 @@ map<string, Material> loadMaterialsFromMtl(const char *filepath){
 						case 's':
 							materials[currentMaterialName].specular = color;
 							break;
+						default:
+							cout << "Encountered unsupported instruction \"" << line << "\"" << endl;
+							break;
 					}
 				}
 			case 'N':
@@ -187,6 +190,9 @@ map<string, Material> loadMaterialsFromMtl(const char *filepath){
 					switch(line.c_str()[1]){
 						case 's':
 							materials[currentMaterialName].shininess = value;
+							break;
+						default:
+							cout << "Encountered unsupported instruction \"" << line << "\"" << endl;
 							break;
 					}
 				}

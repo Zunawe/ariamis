@@ -1,11 +1,23 @@
 #include "texture.hpp"
 
+Texture::Texture(){
+	this->filePath = "textures/default.png";
+}
+
+Texture::Texture(const char *filePath){
+	this->filePath = std::string(filePath);
+}
+
+void Texture::load(){
+	load(filePath.c_str());
+}
+
 /**
  * Loads an RGB PNG file into memory as a texture.
  * 
- * @param filename the path to an RGB PNG file with 24-bit colors.
+ * @param filePath the path to an RGB PNG file with 24-bit colors.
  */
-void Texture::load(const char *filename){
+void Texture::load(const char *filePath){
 	std::vector<unsigned char> imageData;
 	std::vector<unsigned char> fileBuffer;
 
@@ -13,7 +25,7 @@ void Texture::load(const char *filename){
 	std::streamsize size = 0;
 	file.exceptions(std::ifstream::failbit | std::ifstream::badbit);
 	try{
-		file.open(filename);
+		file.open(filePath);
 
 		if(file.seekg(0, std::ios::end).good()){
 			size = file.tellg();
@@ -27,7 +39,7 @@ void Texture::load(const char *filename){
 
 		file.close();
 	}catch(std::ifstream::failure e){
-		std::cout << "Failed to open file at " << filename << std::endl;
+		std::cout << "Failed to open file at " << filePath << std::endl;
 	}
 
 	unsigned long w, h;

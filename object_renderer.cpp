@@ -25,6 +25,10 @@ ObjectRenderer::ObjectRenderer(){
 		glEnableVertexAttribArray(3);
 	glBindVertexArray(0);
 
+	setMaterial(DEFAULT_MATERIAL);
+	setTexture(DEFAULT_TEXTURE);
+	texture.load();
+
 	checkErrorAt("Object Renderer Initialization");
 }
 
@@ -56,7 +60,8 @@ void ObjectRenderer::draw(const glm::mat4 &model, const glm::mat4 &view, const g
 	glm::mat4 coordinateTransform = projection * view * model;
 	glUniformMatrix4fv(glGetUniformLocation(shader.getID(), "coordinateTransform"), 1, GL_FALSE, &coordinateTransform[0][0]);
 
-	glUniform1i(glGetUniformLocation(shader.getID(), "texture1"), 0);
+	glBindTexture(GL_TEXTURE_2D, texture.getID());
+	glUniform1i(glGetUniformLocation(shader.getID(), "texture0"), 0);
 
 	glUniform3fv(glGetUniformLocation(shader.getID(), "light.pos"), 1, &light.pos[0]);
 	glUniform3fv(glGetUniformLocation(shader.getID(), "light.ambient"), 1, &light.ambient[0]);
@@ -65,15 +70,10 @@ void ObjectRenderer::draw(const glm::mat4 &model, const glm::mat4 &view, const g
 
 	glUniform3fv(glGetUniformLocation(shader.getID(), "cameraPos"), 1, &cameraPos[0]);
 
-	glBindTexture(GL_TEXTURE_2D, texture.getID());
-
-	unsigned int submesh = 0;
-
 	std::vector<unsigned int> submeshes = mesh.getSubmeshBounds();
 	unsigned int submeshStart, submeshNumTriangles;
 	glBindVertexArray(VAO);
 		for(unsigned int i = 0; i < submeshes.size(); ++i){
-			// std::cout << materialIndices[i] << std::endl;
 			glUniform3fv(glGetUniformLocation(shader.getID(), "material.ambient"), 1, &materials[materialIndices[i]].ambient[0]);
 			glUniform3fv(glGetUniformLocation(shader.getID(), "material.diffuse"), 1, &materials[materialIndices[i]].diffuse[0]);
 			glUniform3fv(glGetUniformLocation(shader.getID(), "material.specular"), 1, &materials[materialIndices[i]].specular[0]);

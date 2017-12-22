@@ -3,6 +3,8 @@
 using namespace std;
 
 Graphic::Graphic(){
+	// Initializations
+
 	if(!glfwInit()){
 		cout << "Failed to initialize GLFW" << endl;
 	}
@@ -17,6 +19,8 @@ Graphic::Graphic(){
 	glfwSetCursorPosCallback(window, handleMouse);
 
 	glEnable(GL_DEPTH_TEST);
+
+	// Create objects
 
 	ShaderProgram shader;
 	Mesh cubeMesh = loadMeshFromObj("objects/cube.obj");

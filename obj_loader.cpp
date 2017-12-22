@@ -146,26 +146,54 @@ map<string, Material> loadMaterialsFromMtl(const char *filepath){
 	file.open(filepath);
 
 	while(getline(file, line)){
-		vector<string> tokens = split(line, ' ');
-
-		if(!tokens.size() || !tokens[0].length() || tokens[0][0] == '#'){
+		if(line.size() == 0)
 			continue;
-		}
-		else if(tokens[0] == "newmtl"){
-			currentMaterialName = tokens[1];
-			materials.insert(pair<string, Material>(currentMaterialName, Material()));
-		}
-		else if(tokens[0] == "Ka"){
-			materials[currentMaterialName].ambient = glm::vec3(stof(tokens[1]), stof(tokens[2]), stof(tokens[3]));
-		}
-		else if(tokens[0] == "Kd"){
-			materials[currentMaterialName].diffuse = glm::vec3(stof(tokens[1]), stof(tokens[2]), stof(tokens[3]));
-		}
-		else if(tokens[0] == "Ks"){
-			materials[currentMaterialName].specular = glm::vec3(stof(tokens[1]), stof(tokens[2]), stof(tokens[3]));
-		}
-		else if(tokens[0] == "Ns"){
-			materials[currentMaterialName].shininess = stof(tokens[1]);
+
+		switch(line.c_str()[0]){
+			case '#':
+				continue;
+			case 'n':
+				{
+					char mtlNameBuffer[128];
+					sscanf(line.c_str(), "newmtl %s", mtlNameBuffer);
+
+					currentMaterialName = string(mtlNameBuffer);
+					materials.insert(pair<string, Material>(currentMaterialName, Material()));
+				}
+				break;
+			case 'K':
+				{
+					float r, g, b;
+					sscanf(line.c_str(), "K%*[ads] %f %f %f", &r, &g, &b);
+					glm::vec3 color(r, g, b);
+
+					switch(line.c_str()[1]){
+						case 'a':
+							materials[currentMaterialName].ambient = color;
+							break;
+						case 'd':
+							materials[currentMaterialName].diffuse = color;
+							break;
+						case 's':
+							materials[currentMaterialName].specular = color;
+							break;
+					}
+				}
+			case 'N':
+				{
+					float value;
+					sscanf(line.c_str(), "N%*[s] %f", &value);
+
+					switch(line.c_str()[1]){
+						case 's':
+							materials[currentMaterialName].shininess = value;
+							break;
+					}
+				}
+				break;
+			default:
+				cout << "Encountered unsupported instruction \"" << line << "\"" << endl;
+				break;
 		}
 	}
 

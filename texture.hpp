@@ -10,7 +10,7 @@
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 
-#include "picopng.hpp"
+#include "stb_image.h"
 
 class Texture{
 	public:

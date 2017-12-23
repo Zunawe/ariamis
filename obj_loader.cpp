@@ -146,6 +146,7 @@ map<string, Material> loadMaterialsFromMtl(const char *filepath){
 	file.open(filepath);
 
 	while(getline(file, line)){
+		trim(line);
 		if(line.size() == 0)
 			continue;
 
@@ -222,4 +223,14 @@ vector<string> split(const string &s, char delim){
 	vector<string> elems;
 	split(s, delim, back_inserter(elems));
 	return elems;
+}
+
+
+void trim(std::string &s){
+   size_t p = s.find_first_not_of(" \t");
+   s.erase(0, p);
+
+   p = s.find_last_not_of(" \t");
+   if (string::npos != p)
+      s.erase(p+1);
 }

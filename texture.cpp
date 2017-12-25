@@ -1,15 +1,11 @@
 #include "texture.hpp"
 
-Texture::Texture(){
-	this->filePath = "textures/default.png";
+Texture::Texture() : Texture("textures/default.png"){
+	// Empty
 }
 
 Texture::Texture(const char *filePath){
-	this->filePath = std::string(filePath);
-}
-
-void Texture::load(){
-	load(filePath.c_str());
+	load(filePath);
 }
 
 /**

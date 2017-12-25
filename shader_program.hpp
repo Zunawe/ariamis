@@ -12,6 +12,8 @@
 
 class ShaderProgram{
 	public:
+		static ShaderProgram DEFAULT_SHADER;
+
 		void loadSources(const GLchar *vertexShaderPath, const GLchar *fragmentShaderPath);
 		void use();
 		unsigned int getID();

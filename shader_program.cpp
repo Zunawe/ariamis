@@ -1,5 +1,7 @@
 #include "shader_program.hpp"
 
+ShaderProgram ShaderProgram::DEFAULT_SHADER;
+
 /**
  * Loads the source code for the vertex shader and fragment shader, compiles them, and links them.
  * 

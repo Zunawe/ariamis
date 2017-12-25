@@ -25,9 +25,8 @@ ObjectRenderer::ObjectRenderer(){
 		glEnableVertexAttribArray(3);
 	glBindVertexArray(0);
 
+	setShader(ShaderProgram::DEFAULT_SHADER);
 	setMaterial(DEFAULT_MATERIAL);
-	setTexture(DEFAULT_TEXTURE);
-	texture.load();
 
 	checkErrorAt("Object Renderer Initialization");
 }

@@ -127,7 +127,7 @@ Mesh loadMeshFromObj(const char *filepath, vector<unsigned int> &materialIndices
 		materials.push_back(usedMaterials[*it]);
 	}
 	if(materials.size() == 0){
-		materials.push_back(DEFAULT_MATERIAL);
+		materials.push_back(Material::DEFAULT_MATERIAL);
 	}
 	materialIndices.resize(mesh.getNumSubmeshes());
 

@@ -17,7 +17,7 @@ class Texture{
 		Texture();
 		Texture(const char *filePath);
 		void load(const char *filename);
-		unsigned int getID();
+		unsigned int getID() const;
 
 	private:
 		unsigned int id;

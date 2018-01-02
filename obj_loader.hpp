@@ -11,6 +11,7 @@
 
 #include "mesh.hpp"
 #include "object_renderer.hpp"
+#include "material.hpp"
 
 ObjectRenderer loadObj(const char *filepath);
 Mesh loadMeshFromObj(const char *filepath);

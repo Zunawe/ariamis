@@ -26,6 +26,6 @@ void Texture::load(const char *filePath){
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-unsigned int Texture::getID(){
+unsigned int Texture::getID() const{
 	return id;
 }

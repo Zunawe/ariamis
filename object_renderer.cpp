@@ -1,12 +1,5 @@
 #include "object_renderer.hpp"
 
-bool operator==(const Material &lhs, const Material &rhs){
-	return lhs.ambient == rhs.ambient &&
-	       lhs.diffuse == rhs.diffuse &&
-		   lhs.specular == rhs.specular &&
-		   lhs.shininess == rhs.shininess;
-}
-
 ObjectRenderer::ObjectRenderer(){
 	glGenBuffers(1, &VBO);
 	glGenBuffers(1, &EBO);
@@ -26,7 +19,7 @@ ObjectRenderer::ObjectRenderer(){
 	glBindVertexArray(0);
 
 	setShader(ShaderProgram::DEFAULT_SHADER);
-	setMaterial(DEFAULT_MATERIAL);
+	setMaterial(Material::DEFAULT_MATERIAL);
 
 	checkErrorAt("Object Renderer Initialization");
 }

@@ -10,21 +10,7 @@
 #include "shader_program.hpp"
 #include "texture.hpp"
 #include "camera.hpp"
-
-struct Material{
-	glm::vec3 ambient;
-	glm::vec3 diffuse;
-	glm::vec3 specular;
-	float shininess;
-};
-bool operator==(const Material &lhs, const Material &rhs);
-
-const Material DEFAULT_MATERIAL{
-	glm::vec3(0.7f, 0.7f, 0.7f),
-	glm::vec3(0.7f, 0.7f, 0.7f),
-	glm::vec3(0.4f, 0.4f, 0.4f),
-	32.0f
-};
+#include "material.hpp"
 
 struct Light{
 	glm::vec3 pos;

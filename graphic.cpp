@@ -20,6 +20,3 @@ int main(){
 	ContextManager contextManager(window);
 	contextManager.run();
 }
-
-void initGraphics(){
-}

@@ -2,12 +2,27 @@
 
 using namespace std;
 
+/**
+ * Creates a new ObjectRenderer and loads a mesh and the corresponding materials
+ * into it from a Wavefront OBJ file (and optional MTL file if the OBJ specifies one).
+ * 
+ * @param filepath the location of the file to read.
+ * @return a newly constructed ObjectRenderer with a mesh and materials loaded from
+ * the provided filepath.
+ */
 ObjectRenderer loadObj(const char *filepath){
 	ObjectRenderer renderer;
 	loadObj(filepath, renderer);
 	return renderer;
 }
 
+/**
+ * Loads a mesh and corresponding materials into an existing ObjectRenderer from
+ * a Wavefront OBJ file (and optional MTL file if the OBJ specifies one).
+ * 
+ * @param filepath the location of the file to read.
+ * @param renderer the renderer to load the mesh into.
+ */
 void loadObj(const char *filepath, ObjectRenderer &renderer){
 	vector<Material> materials;
 	vector<unsigned int> materialIndices;
@@ -17,12 +32,47 @@ void loadObj(const char *filepath, ObjectRenderer &renderer){
 	}
 }
 
+/**
+ * Loads a mesh from a Wavefront OBJ file. Includes submeshes specified by
+ * 'usemtl' lines, but does not save materials.
+ * 
+ * @param filepath the location of the file to read.
+ * @return a newly constructed Mesh object loaded from the provided filepath
+ */
 Mesh loadMeshFromObj(const char *filepath){
 	vector<unsigned int> throwaway;
 	vector<Material> throwaway2;
 	return loadMeshFromObj(filepath, throwaway, throwaway2);
 }
 
+/**
+ * Loads a mesh from a Wavefront OBJ file. Includes submeshes specified by
+ * 'usemtl' lines as well as indices for materials, but does not save materials.
+ * Material indices are for multiple disjoint submeshes with the same material.
+ * 
+ * @param filepath the location of the file to read.
+ * @param materialIndices an output parameter that is cleared and populated with
+ * material indices.
+ * @return a newly constructed Mesh object loaded from the provided filepath
+ */
+Mesh loadMeshFromObj(const char *filepath, vector<unsigned int> &materialIndices){
+	vector<Material> throwaway;
+	return loadMeshFromObj(filepath, materialIndices, throwaway);
+}
+
+/**
+ * Loads a mesh from a Wavefront OBJ file. Includes submeshes specified by
+ * 'usemtl' lines as well as indices for materials and materials themselves (if
+ * there is a valid MTL file). Material indices are for multiple disjoint
+ * submeshes with the same material.
+ * 
+ * @param filepath the location of the file to read.
+ * @param materialIndices an output parameter that is cleared and populated with
+ * material indices.
+ * @param materials an output parameter that is cleared and populated with
+ * materials. The material indices refer to the order of this list.
+ * @return a newly constructed Mesh object loaded from the provided filepath
+ */
 Mesh loadMeshFromObj(const char *filepath, vector<unsigned int> &materialIndices, vector<Material> &materials){
 	ifstream file;
 	string line;
@@ -138,6 +188,13 @@ Mesh loadMeshFromObj(const char *filepath, vector<unsigned int> &materialIndices
 	return mesh;
 }
 
+/**
+ * Loads a set of materials from a Wavefront MTL file.
+ * 
+ * @param filepath the location of the file to read.
+ * @return the loaded materials. The key is the name specified in the MTL file
+ * and the value is the corresponding Material object.
+ */
 map<string, Material> loadMaterialsFromMtl(const char *filepath){
 	map<string, Material> materials;
 
@@ -210,6 +267,13 @@ map<string, Material> loadMaterialsFromMtl(const char *filepath){
 	return materials;
 }
 
+/**
+ * Splits a string by a delimiting character.
+ * 
+ * @param s the string to split.
+ * @param delim the delimiting character.
+ * @param result an iterable object in which the tokens are stored.
+ */
 template<typename Out>
 void split(const string &s, char delim, Out result){
 	if(s.find(delim) == string::npos){
@@ -222,14 +286,25 @@ void split(const string &s, char delim, Out result){
     }
 }
 
+/**
+ * Splits a string by a delimiting character.
+ * 
+ * @param s the string to split.
+ * @param delim the delimiting character.
+ * @return a vector containing the tokens.
+ */
 vector<string> split(const string &s, char delim){
 	vector<string> elems;
 	split(s, delim, back_inserter(elems));
 	return elems;
 }
 
-
-void trim(std::string &s){
+/**
+ * Removes all leading and trailing spaces and tabs from a string;
+ * 
+ * @param s the string to modify.
+ */
+void trim(string &s){
    size_t p = s.find_first_not_of(" \t");
    s.erase(0, p);
 

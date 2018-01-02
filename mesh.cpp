@@ -247,6 +247,18 @@ void Mesh::setTextureCoordinate(glm::vec2 coordinate){
 	setTextureCoordinate(getNumVertices() - 1, coordinate);
 }
 
+/**
+ * Designates the start of a new submesh at the specified triangle's index.
+ * The new submesh runs from the provided start until the start of the next submesh
+ * or the end of the mesh.
+ * 
+ * Each submesh is designated a different material, allowing for multiple
+ * textures and materials on a single mesh. The data itself is kept contiguously
+ * as if it were a single mesh, but the bounds are stored so they can be accessed
+ * while drawing the mesh.
+ * 
+ * @param i the index of the triangle that begins the new submesh
+ */
 void Mesh::startNewSubmeshAt(unsigned int i){
 	auto it = submeshBounds.begin();
 	while(it != submeshBounds.end() && *it < i){
@@ -258,6 +270,15 @@ void Mesh::startNewSubmeshAt(unsigned int i){
 	submeshBounds.insert(it, i);
 }
 
+/**
+ * Designates the start of a new submesh at the end of the mesh as it is.
+ * New triangles are added to the new submesh.
+ * 
+ * Each submesh is designated a different material, allowing for multiple
+ * textures and materials on a single mesh. The data itself is kept contiguously
+ * as if it were a single mesh, but the bounds are stored so they can be accessed
+ * while drawing the mesh.
+ */
 void Mesh::startNewSubmesh(){
 	startNewSubmeshAt(getNumTriangles());
 }
@@ -280,18 +301,48 @@ unsigned int* Mesh::getIndexData(){
 	return &triangles[0];
 }
 
+/**
+ * Returns the number of unique vertices in the mesh. One vertex includes
+ * data for position, normal, color, and texture coordinates.
+ * 
+ * @return the number of vertices in the mesh.
+ */
 unsigned int Mesh::getNumVertices(){
 	return vertexData.size() / ATTRIBUTE_SIZE;
 }
 
+/**
+ * Returns the number of triangles in the mesh. This is NOT equivalent to
+ * getNumVertices() / 3. Any number of triangles may use the same unique vertex.
+ * 
+ * @return the number of triangles in the mesh.
+ */
 unsigned int Mesh::getNumTriangles(){
 	return triangles.size() / 3;
 }
 
+/**
+ * Returns the number of submeshes this mesh has. Each submesh is designated a
+ * different material.
+ * 
+ * @return the number of submeshes in the mesh
+ */
 unsigned int Mesh::getNumSubmeshes(){
 	return submeshBounds.size();
 }
 
+/**
+ * Returns a vector containing the indices of the triangles that start new submeshes.
+ * Each entry is the beginning of a submesh, and a submesh ends when the next one begins.
+ * The last submesh ends after the last triangle in the mesh.
+ * 
+ * Each submesh is designated a different material, allowing for multiple
+ * textures and materials on a single mesh. The data itself is kept contiguously
+ * as if it were a single mesh, but the bounds are stored so they can be accessed
+ * while drawing the mesh.
+ * 
+ * @return a vector of triangle indices that begin new submeshes.
+ */
 std::vector<unsigned int> Mesh::getSubmeshBounds(){
 	return submeshBounds;
 }

@@ -109,6 +109,9 @@ void ContextManager::resizeWindow(GLFWwindow *window, int width, int height){
 	glViewport(0, 0, width, height);
 }
 
+/**
+ * Callback for GLFW defining the behavior for mouse movement.
+ */
 void ContextManager::handleMouse(GLFWwindow *window, double xPos, double yPos){
 	float deltaX = (xPos - lastMouseX) * sensitivity;
 	float deltaY = -(yPos - lastMouseY) * sensitivity;

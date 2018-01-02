@@ -2,6 +2,10 @@
 
 Material Material::DEFAULT_MATERIAL;
 
+/**
+ * Sets the default material properties.
+ * Diffuse and specular maps are set to the default texture on their construction.
+ */
 Material::Material(){
 	ambient = glm::vec3(0.7f, 0.7f, 0.7f);
 	diffuse = glm::vec3(0.7f, 0.7f, 0.7f);

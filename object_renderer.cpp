@@ -102,16 +102,30 @@ void ObjectRenderer::reloadMesh(){
 	glBindVertexArray(0);
 }
 
+/**
+ * Returns the OpenGL-provided ID of the VAO for this renderer.
+ * 
+ * @return the ID of the VAO for this renderer.
+ */
 unsigned int ObjectRenderer::getVAO(){
 	return this->VAO;
 }
 
+/**
+ * Returns a reference to the mesh for this renderer. If the mesh is modified,
+ * reloadMesh must be called before the modified data is copied back into the GPU's
+ * buffers.
+ * 
+ * @return a reference to the mesh for this renderer.
+ */
 Mesh& ObjectRenderer::getMesh(){
 	return this->mesh;
 }
 
 /**
  * Sets the mesh of the object renderer and loads the data into the buffers.
+ * 
+ * @param mesh the new mesh to be used in this renderer.
  */
 void ObjectRenderer::setMesh(const Mesh &mesh){
 	this->mesh = mesh;
@@ -122,14 +136,30 @@ void ObjectRenderer::setMesh(const Mesh &mesh){
 	reloadMesh();
 }
 
+/**
+ * Returns a reference to the first material for this renderer.
+ * 
+ * @return a reference to the first material for this renderer.
+ */
 Material& ObjectRenderer::getMaterial(){
 	return materials[0];
 }
 
+/**
+ * Returns a reference to the material for a specified submesh.
+ * 
+ * @param submeshIndex the index of the submesh to get the material for.
+ * @return a reference to the material.
+ */
 Material& ObjectRenderer::getMaterial(unsigned int submeshIndex){
 	return materials[materialIndices[submeshIndex]];
 }
 
+/**
+ * Sets the material for all submeshes in this renderer's mesh.
+ * 
+ * @param material the new material.
+ */
 void ObjectRenderer::setMaterial(const Material &material){
 	this->materials.clear();
 	this->materials.push_back(material);
@@ -141,6 +171,12 @@ void ObjectRenderer::setMaterial(const Material &material){
 	}
 }
 
+/**
+ * Sets the material for the specified submesh in this renderer's mesh.
+ * 
+ * @param submeshIndex the index of the submesh to set the material for.
+ * @param material the new material.
+ */
 void ObjectRenderer::setMaterial(unsigned int submeshIndex, const Material &material){
 	auto materialPosition = std::find(materials.begin(), materials.end(), material);
 	if(materialPosition == materials.end()){
@@ -151,10 +187,20 @@ void ObjectRenderer::setMaterial(unsigned int submeshIndex, const Material &mate
 	materialIndices[submeshIndex] = std::distance(materials.begin(), materialPosition);
 }
 
+/**
+ * Sets the shader for this renderer. By default it is ShaderProgram::DEFAULT_SHADER.
+ * 
+ * @param shader the new shader to use.
+ */
 void ObjectRenderer::setShader(const ShaderProgram &shader){
 	this->shader = shader;
 }
 
+/**
+ * Checks for an OpenGL error and prints the error code and location.
+ * 
+ * @param location a string for use in identifying where in the code the error occurs.
+ */
 void ObjectRenderer::checkErrorAt(const char *location){
 	GLenum err;
 	if((err = glGetError()) != GL_NO_ERROR){

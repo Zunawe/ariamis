@@ -14,6 +14,7 @@
 #include "material.hpp"
 
 ObjectRenderer loadObj(const char *filepath);
+void loadObj(const char *filepath, ObjectRenderer &renderer);
 Mesh loadMeshFromObj(const char *filepath);
 Mesh loadMeshFromObj(const char *filepath, std::vector<unsigned int> &materialIndices);
 Mesh loadMeshFromObj(const char *filepath, std::vector<unsigned int> &materialIndices, std::vector<Material> &materials);

@@ -24,11 +24,12 @@ class ObjectRenderer{
 		ObjectRenderer();
 		void draw(const glm::mat4 &model, const glm::mat4 &view, const glm::mat4 &projection, const Camera &camera);
 		unsigned int getVAO();
-		Mesh* getMesh();
+		Mesh& getMesh();
 		void setMesh(const Mesh &mesh);
+		Material& getMaterial();
+		Material& getMaterial(unsigned int submeshIndex);
 		void setMaterial(const Material &material);
 		void setMaterial(unsigned int submeshIndex, const Material &material);
-		void setTexture(const Texture &texture);
 		void setShader(const ShaderProgram &shader);
 		void reloadMesh();
 
@@ -36,7 +37,6 @@ class ObjectRenderer{
 		Mesh mesh;
 		std::vector<unsigned int> materialIndices;
 		std::vector<Material> materials;
-		Texture texture;
 		ShaderProgram shader;
 		unsigned int VAO;
 		unsigned int VBO;

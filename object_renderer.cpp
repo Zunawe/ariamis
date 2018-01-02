@@ -52,8 +52,6 @@ void ObjectRenderer::draw(const glm::mat4 &model, const glm::mat4 &view, const g
 	glm::mat4 coordinateTransform = projection * view * model;
 	glUniformMatrix4fv(glGetUniformLocation(shader.getID(), "coordinateTransform"), 1, GL_FALSE, &coordinateTransform[0][0]);
 
-	glBindTexture(GL_TEXTURE_2D, texture.getID());
-	glUniform1i(glGetUniformLocation(shader.getID(), "texture0"), 0);
 
 	glUniform3fv(glGetUniformLocation(shader.getID(), "light.pos"), 1, &light.pos[0]);
 	glUniform3fv(glGetUniformLocation(shader.getID(), "light.ambient"), 1, &light.ambient[0]);
@@ -66,10 +64,21 @@ void ObjectRenderer::draw(const glm::mat4 &model, const glm::mat4 &view, const g
 	unsigned int submeshStart, submeshNumTriangles;
 	glBindVertexArray(VAO);
 		for(unsigned int i = 0; i < submeshes.size(); ++i){
-			glUniform3fv(glGetUniformLocation(shader.getID(), "material.ambient"), 1, &materials[materialIndices[i]].ambient[0]);
-			glUniform3fv(glGetUniformLocation(shader.getID(), "material.diffuse"), 1, &materials[materialIndices[i]].diffuse[0]);
-			glUniform3fv(glGetUniformLocation(shader.getID(), "material.specular"), 1, &materials[materialIndices[i]].specular[0]);
-			glUniform1f(glGetUniformLocation(shader.getID(), "material.shininess"), materials[materialIndices[i]].shininess);
+			Material &material = materials[materialIndices[i]];
+
+			glUniform3fv(glGetUniformLocation(shader.getID(), "material.ambient"), 1, &material.ambient[0]);
+
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, material.diffuseMap.getID());
+			glUniform1i(glGetUniformLocation(shader.getID(), "material.diffuseMap"), 0);
+			glUniform3fv(glGetUniformLocation(shader.getID(), "material.diffuse"), 1, &material.diffuse[0]);
+
+			glActiveTexture(GL_TEXTURE1);
+			glBindTexture(GL_TEXTURE_2D, material.specularMap.getID());
+			glUniform1i(glGetUniformLocation(shader.getID(), "material.specularMap"), 1);
+			glUniform3fv(glGetUniformLocation(shader.getID(), "material.specular"), 1, &material.specular[0]);
+
+			glUniform1f(glGetUniformLocation(shader.getID(), "material.shininess"), material.shininess);
 
 			submeshStart = submeshes[i];
 			submeshNumTriangles = (i + 1 < submeshes.size() ? submeshes[i + 1] : mesh.getNumTriangles()) - submeshStart;
@@ -97,8 +106,8 @@ unsigned int ObjectRenderer::getVAO(){
 	return this->VAO;
 }
 
-Mesh* ObjectRenderer::getMesh(){
-	return &(this->mesh);
+Mesh& ObjectRenderer::getMesh(){
+	return this->mesh;
 }
 
 /**
@@ -111,6 +120,14 @@ void ObjectRenderer::setMesh(const Mesh &mesh){
 	this->materialIndices.resize(this->mesh.getNumSubmeshes());
 
 	reloadMesh();
+}
+
+Material& ObjectRenderer::getMaterial(){
+	return materials[0];
+}
+
+Material& ObjectRenderer::getMaterial(unsigned int submeshIndex){
+	return materials[materialIndices[submeshIndex]];
 }
 
 void ObjectRenderer::setMaterial(const Material &material){
@@ -132,10 +149,6 @@ void ObjectRenderer::setMaterial(unsigned int submeshIndex, const Material &mate
 	}
 
 	materialIndices[submeshIndex] = std::distance(materials.begin(), materialPosition);
-}
-
-void ObjectRenderer::setTexture(const Texture &texture){
-	this->texture = texture;
 }
 
 void ObjectRenderer::setShader(const ShaderProgram &shader){

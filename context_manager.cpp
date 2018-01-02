@@ -15,11 +15,10 @@ ContextManager::ContextManager(GLFWwindow *window){
 	glfwSetCursorPosCallback(window, handleMouse);
 
 	ShaderProgram::DEFAULT_SHADER.loadSources("default.vs", "default.fs");
+	Material::DEFAULT_MATERIAL = Material();
 
 	objects.push_back(loadObj("objects/cube.obj"));
-
 	objects.push_back(loadObj("objects/cube.obj"));
-	objects[1].setTexture(Texture("textures/stone_wall.png"));
 	
 	checkErrorAt("ContextManager Constructor");
 }
@@ -36,9 +35,6 @@ void ContextManager::display(){
 
 	model = glm::mat4(1);
 		model = glm::translate(model, glm::vec3(0, 0, 5));
-		model = glm::rotate(model, glm::radians(45.0f), glm::vec3(1, 0, 0));
-		model = glm::rotate(model, glm::radians(45.0f), glm::vec3(0, 0, 1));
-		model = glm::rotate(model, glm::radians(45.0f), glm::vec3(0, 1, 0));
 		objects[1].draw(model, view, projection, camera);
 
 	model = glm::mat4(1);

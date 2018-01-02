@@ -11,7 +11,6 @@ Material::Material(){
 
 bool operator==(const Material &lhs, const Material &rhs){
 	return lhs.ambient == rhs.ambient &&
-	       lhs.ambientMap.getID() == rhs.ambientMap.getID() &&
 	       lhs.diffuse == rhs.diffuse &&
 	       lhs.diffuseMap.getID() == rhs.diffuseMap.getID() &&
 		   lhs.specular == rhs.specular &&

@@ -12,7 +12,6 @@ class Material{
 		Material();
 
 		glm::vec3 ambient;
-		Texture ambientMap;
 		glm::vec3 diffuse;
 		Texture diffuseMap;
 		glm::vec3 specular;

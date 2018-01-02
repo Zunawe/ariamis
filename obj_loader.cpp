@@ -4,15 +4,17 @@ using namespace std;
 
 ObjectRenderer loadObj(const char *filepath){
 	ObjectRenderer renderer;
+	loadObj(filepath, renderer);
+	return renderer;
+}
 
+void loadObj(const char *filepath, ObjectRenderer &renderer){
 	vector<Material> materials;
 	vector<unsigned int> materialIndices;
 	renderer.setMesh(loadMeshFromObj(filepath, materialIndices, materials));
 	for(unsigned int i = 0; i < materialIndices.size(); ++i){
 		renderer.setMaterial(i, materials[materialIndices[i]]);
 	}
-
-	return renderer;
 }
 
 Mesh loadMeshFromObj(const char *filepath){
@@ -165,7 +167,7 @@ map<string, Material> loadMaterialsFromMtl(const char *filepath){
 			case 'K':
 				{
 					float r, g, b;
-					sscanf(line.c_str(), "K%*[ads] %f %f %f", &r, &g, &b);
+					sscanf(line.c_str(), "K%*1c%*[ \t]%f%*[ \t]%f%*[ \t]%f", &r, &g, &b);
 					glm::vec3 color(r, g, b);
 
 					switch(line.c_str()[1]){
@@ -183,10 +185,11 @@ map<string, Material> loadMaterialsFromMtl(const char *filepath){
 							break;
 					}
 				}
+				break;
 			case 'N':
 				{
 					float value;
-					sscanf(line.c_str(), "N%*[s] %f", &value);
+					sscanf(line.c_str(), "N%*1c%*[ \t]%f", &value);
 
 					switch(line.c_str()[1]){
 						case 's':

@@ -24,7 +24,8 @@ void ShaderProgram::loadSources(const GLchar *vertexShaderPath, const GLchar *fr
 
 		fileStream.close();
 		vertexShaderSource = ss.str();
-	}catch(std::ifstream::failure e){
+	}
+	catch(std::ifstream::failure e){
 		std::cout << "Failed to open file at " << vertexShaderPath << std::endl;
 	}
 
@@ -36,7 +37,8 @@ void ShaderProgram::loadSources(const GLchar *vertexShaderPath, const GLchar *fr
 
 		fileStream.close();
 		fragmentShaderSource = ss.str();
-	}catch(std::ifstream::failure e){
+	}
+	catch(std::ifstream::failure e){
 		std::cout << "Failed to open file at " << fragmentShaderPath << std::endl;
 	}
 
@@ -100,7 +102,6 @@ void ShaderProgram::checkCompilation(unsigned int shaderID){
 	glGetShaderInfoLog(shaderID, logSize, &logSize, &infoLog[0]);
 
 	if(!success){
-		glGetShaderInfoLog(this->id, sizeof(infoLog), NULL, infoLog);
 		throw ShaderException(infoLog);
 	}
 }
@@ -113,12 +114,11 @@ void ShaderProgram::checkLinking(){
 	int logSize;
 	glGetProgramiv(this->id, GL_LINK_STATUS, &success);
 
-	glGetShaderiv(this->id, GL_INFO_LOG_LENGTH, &logSize);
+	glGetProgramiv(this->id, GL_INFO_LOG_LENGTH, &logSize);
 	char infoLog[logSize];
-	glGetShaderInfoLog(this->id, logSize, &logSize, &infoLog[0]);
+	glGetProgramInfoLog(this->id, logSize, &logSize, &infoLog[0]);
 
 	if(!success){
-		glGetShaderInfoLog(this->id, sizeof(infoLog), NULL, infoLog);
 		throw ShaderException(infoLog);
 	}
 }

@@ -10,7 +10,7 @@ uniform mat3 normalModel;
 uniform mat4 view;
 uniform mat4 projection;
 
-uniform mat4 coordinateTransform;
+uniform mat4 modelViewProjection;
 
 out vec3 vertexNormal;
 out vec3 vertexColor;
@@ -19,7 +19,7 @@ out vec2 vertexTextureCoordinate;
 out vec3 fragPos;
 
 void main(){
-	gl_Position = coordinateTransform * vec4(aPos, 1.0);
+	gl_Position = modelViewProjection * vec4(aPos, 1.0);
 
 	vertexNormal = normalModel * aNormal;
 	vertexColor = aColor;

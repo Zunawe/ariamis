@@ -49,8 +49,8 @@ void ObjectRenderer::draw(const glm::mat4 &model, const glm::mat4 &view, const g
 	glUniformMatrix4fv(glGetUniformLocation(shader.getID(), "view"), 1, GL_FALSE, &view[0][0]);
 	glUniformMatrix4fv(glGetUniformLocation(shader.getID(), "projection"), 1, GL_FALSE, &projection[0][0]);
 
-	glm::mat4 coordinateTransform = projection * view * model;
-	glUniformMatrix4fv(glGetUniformLocation(shader.getID(), "coordinateTransform"), 1, GL_FALSE, &coordinateTransform[0][0]);
+	glm::mat4 modelViewProjection = projection * view * model;
+	glUniformMatrix4fv(glGetUniformLocation(shader.getID(), "modelViewProjection"), 1, GL_FALSE, &modelViewProjection[0][0]);
 
 
 	glUniform3fv(glGetUniformLocation(shader.getID(), "light.pos"), 1, &light.pos[0]);

@@ -49,63 +49,78 @@ void ShaderProgram::loadSources(const GLchar *vertexShaderPath, const GLchar *fr
 	unsigned int vertexShaderID = glCreateShader(GL_VERTEX_SHADER);
 	unsigned int fragmentShaderID = glCreateShader(GL_FRAGMENT_SHADER);
 
-	glShaderSource(vertexShaderID, 1, &vertexShaderSourceCStr, NULL);
-	glCompileShader(vertexShaderID);
-	if(hasCompileErrors(vertexShaderID)){
-		std::cout << "Failed to compile vertex shader" << std::endl;
+	try{
+		glShaderSource(vertexShaderID, 1, &vertexShaderSourceCStr, NULL);
+		glCompileShader(vertexShaderID);
+		checkCompilation(vertexShaderID);
+	}
+	catch(ShaderException &e){
+		std::cout << "Vertex shader compilation failed:" << std::endl;
+		std::cout << e.what() << std::endl;
+		exit(EXIT_FAILURE);
 	}
 
-	glShaderSource(fragmentShaderID, 1, &fragmentShaderSourceCStr, NULL);
-	glCompileShader(fragmentShaderID);
-	if(hasCompileErrors(fragmentShaderID)){
-		std::cout << "Failed to compile fragment shader" << std::endl;
+	try{
+		glShaderSource(fragmentShaderID, 1, &fragmentShaderSourceCStr, NULL);
+		glCompileShader(fragmentShaderID);
+		checkCompilation(fragmentShaderID);
 	}
-
+	catch(ShaderException &e){
+		std::cout << "Fragment shader compilation failed:" << std::endl;
+		std::cout << e.what() << std::endl;
+		exit(EXIT_FAILURE);
+	}
 
 	// Link
-	glAttachShader(this->id, vertexShaderID);
-	glAttachShader(this->id, fragmentShaderID);
-	glLinkProgram(this->id);
-	if(hasLinkErrors()){
-		std::cout << "Failed to link shaders" << std::endl;
+	try{
+		glAttachShader(this->id, vertexShaderID);
+		glAttachShader(this->id, fragmentShaderID);
+		glLinkProgram(this->id);
+		checkLinking();
+	}
+	catch(ShaderException &e){
+		std::cout << "Shader linking failed:" << std::endl;
+		std::cout << e.what() << std::endl;
+		exit(EXIT_FAILURE);
 	}
 }
 
 /**
- * Checks whether a shader compiled correctly. Prints the log if not.
+ * Checks whether a shader compiled correctly.
  * 
  * @param shaderID the OpenGL id of the shader in question.
- * @return true if the shader had no compilation errors.
  */
-bool ShaderProgram::hasCompileErrors(unsigned int shaderID){
+void ShaderProgram::checkCompilation(unsigned int shaderID){
 	int success;
-	char log[512];
+	int logSize;
 	glGetShaderiv(shaderID, GL_COMPILE_STATUS, &success);
 
+	glGetShaderiv(shaderID, GL_INFO_LOG_LENGTH, &logSize);
+	char infoLog[logSize];
+	glGetShaderInfoLog(shaderID, logSize, &logSize, &infoLog[0]);
+
 	if(!success){
-		glGetShaderInfoLog(this->id, sizeof(log), NULL, log);
-		std::cout << "Shader compilation failed\n" << log << std::endl;
-		return true;
+		glGetShaderInfoLog(this->id, sizeof(infoLog), NULL, infoLog);
+		throw ShaderException(infoLog);
 	}
-	return false;
 }
 
 /**
- * Checks whether this shader program linked correctly. Prints the log if not.
- * 
- * @return true if this shader program had no compilation errors.
+ * Checks whether this shader program linked correctly.
  */
-bool ShaderProgram::hasLinkErrors(){
+void ShaderProgram::checkLinking(){
 	int success;
-	char log[512];
+	int logSize;
 	glGetProgramiv(this->id, GL_LINK_STATUS, &success);
 
+	glGetShaderiv(this->id, GL_INFO_LOG_LENGTH, &logSize);
+	char infoLog[logSize];
+	glGetShaderInfoLog(this->id, logSize, &logSize, &infoLog[0]);
+
 	if(!success){
-		glGetShaderInfoLog(this->id, sizeof(log), NULL, log);
-		std::cout << "Program linking failed\n" << log << std::endl;
-		return true;
+		glGetShaderInfoLog(this->id, sizeof(infoLog), NULL, infoLog);
+		throw ShaderException(infoLog);
 	}
-	return false;
 }
 
 /**

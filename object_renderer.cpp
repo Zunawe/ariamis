@@ -34,7 +34,7 @@ ObjectRenderer::ObjectRenderer(){
  */
 void ObjectRenderer::draw(const glm::mat4 &model, const glm::mat4 &view, const glm::mat4 &projection, const Camera &camera){
 	Light light;
-	light.pos = glm::vec3(0, 2, 0);
+	light.pos = glm::vec3(-1, 5, -1);
 	light.ambient = glm::vec3(0.7f, 0.7f, 0.7f);
 	light.diffuse = glm::vec3(0.7f, 0.7f, 0.7f);
 	light.specular = glm::vec3(0.7f, 0.7f, 0.7f);

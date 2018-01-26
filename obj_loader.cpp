@@ -127,7 +127,13 @@ Mesh loadMeshFromObj(const char *filepath, vector<unsigned int> &materialIndices
 					int indices[3];
 					for(auto it = tokens.begin() + 1; it != tokens.end(); ++it){
 						indices[0] = indices[1] = indices[2] = 0;
-						sscanf((*it).c_str(), "%d/%d/%d", indices, indices + 1, indices + 2);
+						vector<string> stringIndices = split(*it, '/');
+						for(int i = 0; i < stringIndices.size(); ++i){
+							if(stringIndices[i] == ""){
+								continue;
+							}
+							indices[i] = stoi(stringIndices[i]);
+						}
 
 						faceVertexIndices.push_back(indices[0] > 0 ? mesh.addVertex(vertices[indices[0] - 1]) : mesh.addVertex(vertices[vertices.size() + indices[0]]));
 						if(indices[1] != 0){

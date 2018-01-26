@@ -14,11 +14,13 @@ ContextManager::ContextManager(GLFWwindow *window){
 	glfwSetFramebufferSizeCallback(window, resizeWindow);
 	glfwSetCursorPosCallback(window, handleMouse);
 
-	Shader::DEFAULT_SHADER.loadSources("default.vs", "default.fs");
+	Shader::DEFAULT_SHADER.loadSources("shaders/default.vs", "shaders/default.fs");
 	Material::DEFAULT_MATERIAL = Material();
 
 	objects.push_back(loadObj("objects/cube.obj"));
-	objects.push_back(loadObj("objects/cube.obj"));
+	objects.push_back(loadObj("objects/sphere.obj"));
+
+	camera.setPosition(glm::vec3(0, 0, -5));
 	
 	checkErrorAt("ContextManager Constructor");
 }
@@ -34,11 +36,10 @@ void ContextManager::display(){
 	projection = glm::perspective(glm::radians(45.0f), 1.0f, 0.1f, 100.0f);
 
 	model = glm::mat4(1);
-		model = glm::translate(model, glm::vec3(0, 0, 5));
 		objects[1].draw(model, view, projection, camera);
 
 	model = glm::mat4(1);
-		model = glm::translate(model, glm::vec3(0, -1, 0));
+		model = glm::translate(model, glm::vec3(0, -1.5, 0));
 		model = glm::scale(model, glm::vec3(50, 0.1, 50));
 		objects[0].draw(model, view, projection, camera);
 

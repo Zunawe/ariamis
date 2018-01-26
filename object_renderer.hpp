@@ -5,24 +5,19 @@
 
 #define GL_GLEXT_PROTOTYPES
 #include <GLFW/glfw3.h>
+#include <glm/glm.hpp>
 
 #include "mesh.hpp"
 #include "shader.hpp"
 #include "texture.hpp"
 #include "camera.hpp"
 #include "material.hpp"
-
-struct Light{
-	glm::vec3 pos;
-	glm::vec3 ambient;
-	glm::vec3 diffuse;
-	glm::vec3 specular;
-};
+#include "light.hpp"
 
 class ObjectRenderer{
 	public:
 		ObjectRenderer();
-		void draw(const glm::mat4 &model, const glm::mat4 &view, const glm::mat4 &projection, const Camera &camera);
+		void draw(const glm::mat4 &model, const glm::mat4 &view, const glm::mat4 &projection, const Camera &camera, const std::vector<Light> &lights);
 		unsigned int getVAO();
 		Mesh& getMesh();
 		void setMesh(const Mesh &mesh);

@@ -20,6 +20,14 @@ ContextManager::ContextManager(GLFWwindow *window){
 	objects.push_back(loadObj("objects/cube.obj"));
 	objects.push_back(loadObj("objects/sphere.obj"));
 
+	Light light;
+	light.position = glm::vec3(-1, 5, -1);
+	light.ambient = glm::vec3(0.7f, 0.7f, 0.7f);
+	light.diffuse = glm::vec3(0.7f, 0.7f, 0.7f);
+	light.specular = glm::vec3(0.7f, 0.7f, 0.7f);
+
+	lights.push_back(light);
+
 	camera.setPosition(glm::vec3(0, 0, -5));
 	
 	checkErrorAt("ContextManager Constructor");
@@ -36,12 +44,12 @@ void ContextManager::display(){
 	projection = glm::perspective(glm::radians(45.0f), 1.0f, 0.1f, 100.0f);
 
 	model = glm::mat4(1);
-		objects[1].draw(model, view, projection, camera);
+		objects[1].draw(model, view, projection, camera, lights);
 
 	model = glm::mat4(1);
 		model = glm::translate(model, glm::vec3(0, -1.5, 0));
 		model = glm::scale(model, glm::vec3(50, 0.1, 50));
-		objects[0].draw(model, view, projection, camera);
+		objects[0].draw(model, view, projection, camera, lights);
 
 	glfwSwapBuffers(window);
 	checkErrorAt("Display");

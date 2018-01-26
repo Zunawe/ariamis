@@ -37,6 +37,7 @@ class ContextManager{
 	private:
 		GLFWwindow *window;
 		std::vector<ObjectRenderer> objects;
+		std::vector<Light> lights;
 		ObjectRenderer lamp;
 		Camera camera;
 		glm::mat4 model;

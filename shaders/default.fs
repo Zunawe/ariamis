@@ -1,4 +1,4 @@
-#version 450 core
+#version 330 core
 
 struct Material{
 	vec3 ambient;
@@ -10,7 +10,7 @@ struct Material{
 };
 
 struct Light{
-	vec3 pos;
+	vec3 position;
 	vec3 ambient;
 	vec3 diffuse;
 	vec3 specular;
@@ -21,23 +21,31 @@ in vec2 vertexTextureCoordinate;
 in vec3 fragPos;
 
 uniform Material material;
-uniform Light light;
+uniform Light light[4];
 uniform vec3 cameraPos;
 
 out vec4 fragColor;
 
-void main(){
-	vec3 ambient = vec3(texture(material.diffuseMap, vertexTextureCoordinate)) * light.ambient * material.ambient;
-
+vec3 lighting(){
 	vec3 normal = normalize(vertexNormal);
-	vec3 toLight = normalize(light.pos - fragPos);
-	float multiplier = max(dot(normal, toLight), 0);
-	vec3 diffuse = vec3(texture(material.diffuseMap, vertexTextureCoordinate)) * (light.diffuse * material.diffuse) * multiplier;
-
 	vec3 toCamera = normalize(cameraPos - fragPos);
-	vec3 reflected = reflect(-toLight, normal);
-	float shinyMultiplier = pow(max(dot(toCamera, reflected), 0), material.shininess);
-	vec3 specular = vec3(texture(material.specularMap, vertexTextureCoordinate)) * (light.specular * material.specular) * shinyMultiplier;
 
-	fragColor = vec4(ambient + diffuse + specular, 1.0);
+	vec3 ambient, diffuse, specular;
+	for(int i = 0; i < 4; ++i){
+		ambient += vec3(texture(material.diffuseMap, vertexTextureCoordinate)) * light[i].ambient * material.ambient;
+
+		vec3 toLight = normalize(light[i].position - fragPos);
+		float multiplier = max(dot(normal, toLight), 0);
+		diffuse += vec3(texture(material.diffuseMap, vertexTextureCoordinate)) * (light[i].diffuse * material.diffuse) * multiplier;
+
+		vec3 reflected = reflect(-toLight, normal);
+		float shinyMultiplier = pow(max(dot(toCamera, reflected), 0), material.shininess);
+		specular += vec3(texture(material.specularMap, vertexTextureCoordinate)) * (light[i].specular * material.specular) * shinyMultiplier;
+	}
+	return ambient + diffuse + specular;
+}
+
+void main(){
+	vec3 lightingColor = lighting();
+	fragColor = vec4(lighting(), 1.0);
 }

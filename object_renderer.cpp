@@ -32,16 +32,18 @@ ObjectRenderer::ObjectRenderer(){
  * @param projection the projection matrix at the time of drawing the object.
  * @param camera the Camera the object is being viewed by.
  */
-void ObjectRenderer::draw(const glm::mat4 &model, const glm::mat4 &view, const glm::mat4 &projection, const Camera &camera){
-	Light light;
-	light.pos = glm::vec3(-1, 5, -1);
-	light.ambient = glm::vec3(0.7f, 0.7f, 0.7f);
-	light.diffuse = glm::vec3(0.7f, 0.7f, 0.7f);
-	light.specular = glm::vec3(0.7f, 0.7f, 0.7f);
+void ObjectRenderer::draw(const glm::mat4 &model, const glm::mat4 &view, const glm::mat4 &projection, const Camera &camera, const std::vector<Light> &lights){
+	shader.use();
+
+	for(int i = 0; i < lights.size(); ++i){
+		shader.setUniform("light[" + std::to_string(i) + "].position", lights[i].position);
+		shader.setUniform("light[" + std::to_string(i) + "].ambient", lights[i].ambient);
+		shader.setUniform("light[" + std::to_string(i) + "].diffuse", lights[i].diffuse);
+		shader.setUniform("light[" + std::to_string(i) + "].specular", lights[i].specular);
+	}
 
 	glm::vec3 cameraPos(camera.getPosition());
-
-	shader.use();
+	shader.setUniform("cameraPos", cameraPos);
 
 	glm::mat3 normalModel(glm::transpose(glm::inverse(model)));
 	shader.setUniform("model", model);
@@ -51,14 +53,6 @@ void ObjectRenderer::draw(const glm::mat4 &model, const glm::mat4 &view, const g
 
 	glm::mat4 modelViewProjection = projection * view * model;
 	shader.setUniform("modelViewProjection", modelViewProjection);
-
-
-	shader.setUniform("light.pos", light.pos);
-	shader.setUniform("light.ambient", light.ambient);
-	shader.setUniform("light.diffuse", light.diffuse);
-	shader.setUniform("light.specular", light.specular);
-
-	shader.setUniform("cameraPos", cameraPos);
 
 	std::vector<unsigned int> submeshes = mesh.getSubmeshBounds();
 	unsigned int submeshStart, submeshNumTriangles;

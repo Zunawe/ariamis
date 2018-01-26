@@ -18,7 +18,7 @@ ObjectRenderer::ObjectRenderer(){
 		glEnableVertexAttribArray(3);
 	glBindVertexArray(0);
 
-	setShader(ShaderProgram::DEFAULT_SHADER);
+	setShader(Shader::DEFAULT_SHADER);
 	setMaterial(Material::DEFAULT_MATERIAL);
 
 	checkErrorAt("Object Renderer Initialization");
@@ -44,21 +44,21 @@ void ObjectRenderer::draw(const glm::mat4 &model, const glm::mat4 &view, const g
 	shader.use();
 
 	glm::mat3 normalModel(glm::transpose(glm::inverse(model)));
-	glUniformMatrix4fv(glGetUniformLocation(shader.getID(), "model"), 1, GL_FALSE, &model[0][0]);
-	glUniformMatrix3fv(glGetUniformLocation(shader.getID(), "normalModel"), 1, GL_FALSE, &normalModel[0][0]);
-	glUniformMatrix4fv(glGetUniformLocation(shader.getID(), "view"), 1, GL_FALSE, &view[0][0]);
-	glUniformMatrix4fv(glGetUniformLocation(shader.getID(), "projection"), 1, GL_FALSE, &projection[0][0]);
+	shader.setUniform("model", model);
+	shader.setUniform("normalModel", normalModel);
+	shader.setUniform("view", view);
+	shader.setUniform("projection", projection);
 
 	glm::mat4 modelViewProjection = projection * view * model;
-	glUniformMatrix4fv(glGetUniformLocation(shader.getID(), "modelViewProjection"), 1, GL_FALSE, &modelViewProjection[0][0]);
+	shader.setUniform("modelViewProjection", modelViewProjection);
 
 
-	glUniform3fv(glGetUniformLocation(shader.getID(), "light.pos"), 1, &light.pos[0]);
-	glUniform3fv(glGetUniformLocation(shader.getID(), "light.ambient"), 1, &light.ambient[0]);
-	glUniform3fv(glGetUniformLocation(shader.getID(), "light.diffuse"), 1, &light.diffuse[0]);
-	glUniform3fv(glGetUniformLocation(shader.getID(), "light.specular"), 1, &light.specular[0]);
+	shader.setUniform("light.pos", light.pos);
+	shader.setUniform("light.ambient", light.ambient);
+	shader.setUniform("light.diffuse", light.diffuse);
+	shader.setUniform("light.specular", light.specular);
 
-	glUniform3fv(glGetUniformLocation(shader.getID(), "cameraPos"), 1, &cameraPos[0]);
+	shader.setUniform("cameraPos", cameraPos);
 
 	std::vector<unsigned int> submeshes = mesh.getSubmeshBounds();
 	unsigned int submeshStart, submeshNumTriangles;
@@ -66,19 +66,19 @@ void ObjectRenderer::draw(const glm::mat4 &model, const glm::mat4 &view, const g
 		for(unsigned int i = 0; i < submeshes.size(); ++i){
 			Material &material = materials[materialIndices[i]];
 
-			glUniform3fv(glGetUniformLocation(shader.getID(), "material.ambient"), 1, &material.ambient[0]);
+			shader.setUniform("material.ambient", material.ambient);
 
 			glActiveTexture(GL_TEXTURE0);
 			glBindTexture(GL_TEXTURE_2D, material.diffuseMap.getID());
-			glUniform1i(glGetUniformLocation(shader.getID(), "material.diffuseMap"), 0);
-			glUniform3fv(glGetUniformLocation(shader.getID(), "material.diffuse"), 1, &material.diffuse[0]);
+			shader.setUniform("material.diffuseMap", 0);
+			shader.setUniform("material.diffuse", material.diffuse);
 
 			glActiveTexture(GL_TEXTURE1);
 			glBindTexture(GL_TEXTURE_2D, material.specularMap.getID());
-			glUniform1i(glGetUniformLocation(shader.getID(), "material.specularMap"), 1);
-			glUniform3fv(glGetUniformLocation(shader.getID(), "material.specular"), 1, &material.specular[0]);
+			shader.setUniform("material.specularMap", 1);
+			shader.setUniform("material.specular", material.specular);
 
-			glUniform1f(glGetUniformLocation(shader.getID(), "material.shininess"), material.shininess);
+			shader.setUniform("material.shininess", material.shininess);
 
 			submeshStart = submeshes[i];
 			submeshNumTriangles = (i + 1 < submeshes.size() ? submeshes[i + 1] : mesh.getNumTriangles()) - submeshStart;
@@ -188,11 +188,11 @@ void ObjectRenderer::setMaterial(unsigned int submeshIndex, const Material &mate
 }
 
 /**
- * Sets the shader for this renderer. By default it is ShaderProgram::DEFAULT_SHADER.
+ * Sets the shader for this renderer. By default it is Shader::DEFAULT_SHADER.
  * 
  * @param shader the new shader to use.
  */
-void ObjectRenderer::setShader(const ShaderProgram &shader){
+void ObjectRenderer::setShader(const Shader &shader){
 	this->shader = shader;
 }
 

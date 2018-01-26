@@ -11,13 +11,22 @@
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 
-class ShaderProgram{
+class Shader{
 	public:
-		static ShaderProgram DEFAULT_SHADER;
+		static Shader DEFAULT_SHADER;
 
 		void loadSources(const GLchar *vertexShaderPath, const GLchar *fragmentShaderPath);
 		void use();
 		unsigned int getID();
+
+		bool setUniform(std::string name, const int &value);
+		bool setUniform(std::string name, const float &value);
+		bool setUniform(std::string name, const glm::vec2 &value);
+		bool setUniform(std::string name, const glm::vec3 &value);
+		bool setUniform(std::string name, const glm::vec4 &value);
+		bool setUniform(std::string name, const glm::mat2 &value);
+		bool setUniform(std::string name, const glm::mat3 &value);
+		bool setUniform(std::string name, const glm::mat4 &value);
 	
 	private:
 		unsigned int id;

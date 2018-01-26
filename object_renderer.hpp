@@ -7,7 +7,7 @@
 #include <GLFW/glfw3.h>
 
 #include "mesh.hpp"
-#include "shader_program.hpp"
+#include "shader.hpp"
 #include "texture.hpp"
 #include "camera.hpp"
 #include "material.hpp"
@@ -30,14 +30,14 @@ class ObjectRenderer{
 		Material& getMaterial(unsigned int submeshIndex);
 		void setMaterial(const Material &material);
 		void setMaterial(unsigned int submeshIndex, const Material &material);
-		void setShader(const ShaderProgram &shader);
+		void setShader(const Shader &shader);
 		void reloadMesh();
 
 	private:
 		Mesh mesh;
 		std::vector<unsigned int> materialIndices;
 		std::vector<Material> materials;
-		ShaderProgram shader;
+		Shader shader;
 		unsigned int VAO;
 		unsigned int VBO;
 		unsigned int EBO;

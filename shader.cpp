@@ -1,6 +1,6 @@
-#include "shader_program.hpp"
+#include "shader.hpp"
 
-ShaderProgram ShaderProgram::DEFAULT_SHADER;
+Shader Shader::DEFAULT_SHADER;
 
 /**
  * Loads the source code for the vertex shader and fragment shader, compiles them, and links them.
@@ -8,7 +8,7 @@ ShaderProgram ShaderProgram::DEFAULT_SHADER;
  * @param vertexShaderPath the path to the vertex shader.
  * @param fragmentShaderPath the path to the fragment shader.
  */
-void ShaderProgram::loadSources(const GLchar *vertexShaderPath, const GLchar *fragmentShaderPath){
+void Shader::loadSources(const GLchar *vertexShaderPath, const GLchar *fragmentShaderPath){
 	// Read source code
 	std::ifstream fileStream;
 	fileStream.exceptions(std::ifstream::failbit | std::ifstream::badbit);
@@ -92,7 +92,7 @@ void ShaderProgram::loadSources(const GLchar *vertexShaderPath, const GLchar *fr
  * 
  * @param shaderID the OpenGL id of the shader in question.
  */
-void ShaderProgram::checkCompilation(unsigned int shaderID){
+void Shader::checkCompilation(unsigned int shaderID){
 	int success;
 	int logSize;
 	glGetShaderiv(shaderID, GL_COMPILE_STATUS, &success);
@@ -109,7 +109,7 @@ void ShaderProgram::checkCompilation(unsigned int shaderID){
 /**
  * Checks whether this shader program linked correctly.
  */
-void ShaderProgram::checkLinking(){
+void Shader::checkLinking(){
 	int success;
 	int logSize;
 	glGetProgramiv(this->id, GL_LINK_STATUS, &success);
@@ -123,13 +123,85 @@ void ShaderProgram::checkLinking(){
 	}
 }
 
+bool Shader::setUniform(std::string name, const int &value){
+	int location = glGetUniformLocation(this->id, name.c_str());
+	if(location < 0){
+		return false;
+	}
+	glUniform1i(location, value);
+	return true;
+}
+
+bool Shader::setUniform(std::string name, const float &value){
+	int location = glGetUniformLocation(this->id, name.c_str());
+	if(location < 0){
+		return false;
+	}
+	glUniform1f(location, value);
+	return true;
+}
+
+bool Shader::setUniform(std::string name, const glm::vec2 &value){
+	int location = glGetUniformLocation(this->id, name.c_str());
+	if(location < 0){
+		return false;
+	}
+	glUniform2fv(location, 1, &value[0]);
+	return true;
+}
+
+bool Shader::setUniform(std::string name, const glm::vec3 &value){
+	int location = glGetUniformLocation(this->id, name.c_str());
+	if(location < 0){
+		return false;
+	}
+	glUniform3fv(location, 1, &value[0]);
+	return true;
+}
+
+bool Shader::setUniform(std::string name, const glm::vec4 &value){
+	int location = glGetUniformLocation(this->id, name.c_str());
+	if(location < 0){
+		return false;
+	}
+	glUniform4fv(location, 1, &value[0]);
+	return true;
+}
+
+bool Shader::setUniform(std::string name, const glm::mat2 &value){
+	int location = glGetUniformLocation(this->id, name.c_str());
+	if(location < 0){
+		return false;
+	}
+	glUniformMatrix2fv(location, 1, GL_FALSE, &value[0][0]);
+	return true;
+}
+
+bool Shader::setUniform(std::string name, const glm::mat3 &value){
+	int location = glGetUniformLocation(this->id, name.c_str());
+	if(location < 0){
+		return false;
+	}
+	glUniformMatrix3fv(location, 1, GL_FALSE, &value[0][0]);
+	return true;
+}
+
+bool Shader::setUniform(std::string name, const glm::mat4 &value){
+	int location = glGetUniformLocation(this->id, name.c_str());
+	if(location < 0){
+		return false;
+	}
+	glUniformMatrix4fv(location, 1, GL_FALSE, &value[0][0]);
+	return true;
+}
+
 /**
  * Tells OpenGL to use this shader program from now on.
  */
-void ShaderProgram::use(){
+void Shader::use(){
 	glUseProgram(this->id);
 }
 
-unsigned int ShaderProgram::getID(){
+unsigned int Shader::getID(){
 	return this->id;
 }

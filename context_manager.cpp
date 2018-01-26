@@ -14,7 +14,7 @@ ContextManager::ContextManager(GLFWwindow *window){
 	glfwSetFramebufferSizeCallback(window, resizeWindow);
 	glfwSetCursorPosCallback(window, handleMouse);
 
-	ShaderProgram::DEFAULT_SHADER.loadSources("default.vs", "default.fs");
+	Shader::DEFAULT_SHADER.loadSources("default.vs", "default.fs");
 	Material::DEFAULT_MATERIAL = Material();
 
 	objects.push_back(loadObj("objects/cube.obj"));

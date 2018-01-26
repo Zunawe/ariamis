@@ -13,7 +13,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-#include "shader_program.hpp"
+#include "shader.hpp"
 #include "camera.hpp"
 #include "texture.hpp"
 #include "object_renderer.hpp"

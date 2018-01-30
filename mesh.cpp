@@ -36,6 +36,38 @@ void Mesh::calculateFaceNormals(){
 	}
 }
 
+void Mesh::calculateTangents(){
+	calculateFaceNormals();
+	for(unsigned int i = 0; i < getNumTriangles(); ++i){
+		glm::vec3 vertex1 = getVertex(triangles[(i * 3) + 0]);
+		glm::vec3 vertex2 = getVertex(triangles[(i * 3) + 1]);
+		glm::vec3 vertex3 = getVertex(triangles[(i * 3) + 2]);
+
+		glm::vec3 edge1 = vertex2 - vertex1;
+		glm::vec3 edge2 = vertex3 - vertex1;
+
+		glm::vec2 uv1 = getTextureCoordinate(triangles[(i * 3) + 0]);
+		glm::vec2 uv2 = getTextureCoordinate(triangles[(i * 3) + 1]);
+		glm::vec2 uv3 = getTextureCoordinate(triangles[(i * 3) + 2]);
+
+		glm::vec2 deltaUV1 = uv2 - uv1;
+		glm::vec2 deltaUV2 = uv3 - uv1;
+
+		float f = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
+
+		glm::vec3 tangent;
+
+		tangent.x = f * (deltaUV2.y * edge1.x - deltaUV1.y * edge2.x);
+		tangent.y = f * (deltaUV2.y * edge1.y - deltaUV1.y * edge2.y);
+		tangent.z = f * (deltaUV2.y * edge1.z - deltaUV1.y * edge2.z);
+		tangent = glm::normalize(tangent);
+
+		setTangent(triangles[(i * 3) + 0], tangent);
+		setTangent(triangles[(i * 3) + 1], tangent);
+		setTangent(triangles[(i * 3) + 2], tangent);
+	}
+}
+
 glm::vec3 Mesh::getVertex(unsigned int i){
 	unsigned int attributeIndex = vertexIndexToAttributeIndex(i);
 	return glm::vec3(vertexData[attributeIndex + 0],
@@ -59,6 +91,10 @@ unsigned int Mesh::addVertex(float x, float y, float z){
 	vertexData.push_back(0.0f); // X (Normal)
 	vertexData.push_back(0.0f); // Y (Normal)
 	vertexData.push_back(0.0f); // Z (Normal)
+
+	vertexData.push_back(0.0f); // X (Tangent)
+	vertexData.push_back(0.0f); // Y (Tangent)
+	vertexData.push_back(0.0f); // Z (Tangent)
 
 	vertexData.push_back(1.0f); // R
 	vertexData.push_back(1.0f); // G
@@ -229,11 +265,34 @@ void Mesh::setNormal(glm::vec3 normal){
 	setNormal(getNumVertices() - 1, normal);
 }
 
+/**
+ * Sets the tangent of a vertex.
+ * 
+ * @param index the index of the vertex to set the tangent of.
+ * @param tangent the new tangent vector. (Does not need to be normalized.)
+ */
+void Mesh::setTangent(unsigned int index, glm::vec3 tangent){
+	unsigned int attributeIndex = vertexIndexToAttributeIndex(index);
+	tangent = glm::normalize(tangent);
+	vertexData[attributeIndex + 6] = tangent.x;
+	vertexData[attributeIndex + 7] = tangent.y;
+	vertexData[attributeIndex + 8] = tangent.z;
+}
+
+/**
+ * Sets the tangent of the last vertex. Useful for sequential calls to addVertex and setTangent.
+ * 
+ * @param tangent the new tangent vector. (Does not need to be normalized.)
+ */
+void Mesh::setTangent(glm::vec3 tangent){
+	setNormal(getNumVertices() - 1, tangent);
+}
+
 glm::vec3 Mesh::getColor(unsigned int i){
 	unsigned int attributeIndex = vertexIndexToAttributeIndex(i);
-	return glm::vec3(vertexData[attributeIndex + 6],
-	                 vertexData[attributeIndex + 7],
-					 vertexData[attributeIndex + 8]);
+	return glm::vec3(vertexData[attributeIndex +  9],
+	                 vertexData[attributeIndex + 10],
+					 vertexData[attributeIndex + 11]);
 }
 
 /**
@@ -244,9 +303,9 @@ glm::vec3 Mesh::getColor(unsigned int i){
  */
 void Mesh::setColor(unsigned int index, glm::vec3 color){
 	unsigned int attributeIndex = vertexIndexToAttributeIndex(index);
-	vertexData[attributeIndex + 6] = color.r;
-	vertexData[attributeIndex + 7] = color.g;
-	vertexData[attributeIndex + 8] = color.b;
+	vertexData[attributeIndex +  9] = color.r;
+	vertexData[attributeIndex + 10] = color.g;
+	vertexData[attributeIndex + 11] = color.b;
 }
 
 /**
@@ -260,8 +319,8 @@ void Mesh::setColor(glm::vec3 color){
 
 glm::vec2 Mesh::getTextureCoordinate(unsigned int i){
 	unsigned int attributeIndex = vertexIndexToAttributeIndex(i);
-	return glm::vec2(vertexData[attributeIndex + 9],
-	                 vertexData[attributeIndex + 10]);
+	return glm::vec2(vertexData[attributeIndex + 12],
+	                 vertexData[attributeIndex + 13]);
 }
 
 /**
@@ -273,8 +332,8 @@ glm::vec2 Mesh::getTextureCoordinate(unsigned int i){
  */
 void Mesh::setTextureCoordinate(unsigned int index, float u, float v){
 	unsigned int attributeIndex = vertexIndexToAttributeIndex(index);
-	vertexData[attributeIndex +  9] = u;
-	vertexData[attributeIndex + 10] = v;
+	vertexData[attributeIndex + 12] = u;
+	vertexData[attributeIndex + 13] = v;
 }
 
 /**

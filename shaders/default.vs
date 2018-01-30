@@ -2,8 +2,9 @@
 
 layout(location = 0) in vec3 aPos;
 layout(location = 1) in vec3 aNormal;
-layout(location = 2) in vec3 aColor;
-layout(location = 3) in vec2 aTextureCoordinate;
+layout(location = 2) in vec3 aTangent;
+layout(location = 3) in vec3 aColor;
+layout(location = 4) in vec2 aTextureCoordinate;
 
 uniform mat4 model;
 uniform mat3 normalModel;
@@ -16,14 +17,21 @@ out vec3 vertexNormal;
 out vec3 vertexColor;
 out vec2 vertexTextureCoordinate;
 
+out mat3 TBN;
+
 out vec3 fragPos;
 
 void main(){
 	gl_Position = modelViewProjection * vec4(aPos, 1.0);
 
 	vertexNormal = normalModel * aNormal;
+	vec3 vertexTangent = normalModel * aTangent;
 	vertexColor = aColor;
 	vertexTextureCoordinate = aTextureCoordinate;
+
+	TBN = mat3(normalize(vertexTangent),
+	           normalize(cross(vertexTangent, vertexColor)),
+			   normalize(vertexNormal));
 
 	fragPos = vec3(model * vec4(aPos, 1.0));
 }

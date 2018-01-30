@@ -21,6 +21,8 @@ in vec3 vertexColor;
 in vec2 vertexTextureCoordinate;
 in vec3 fragPos;
 
+in mat3 TBN;
+
 uniform Material material;
 uniform Light light[4];
 uniform vec3 cameraPos;

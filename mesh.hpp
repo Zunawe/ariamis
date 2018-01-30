@@ -3,15 +3,15 @@
 
 #include <vector>
 #include <algorithm>
-#include <iostream>
 #include <glm/glm.hpp>
 
 class Mesh{
 	public:
-		static const unsigned int ATTRIBUTE_SIZE = 11;
+		static const unsigned int ATTRIBUTE_SIZE = 14;
 
 		Mesh();
 		void calculateFaceNormals();
+		void calculateTangents();
 
 		glm::vec3 getVertex(unsigned int i);
 		unsigned int addVertex(float x, float y, float z);
@@ -29,6 +29,8 @@ class Mesh{
 		glm::vec3 getNormal(unsigned int i);
 		void setNormal(unsigned int index, glm::vec3 normal);
 		void setNormal(glm::vec3 normal);
+		void setTangent(unsigned int index, glm::vec3 tangent);
+		void setTangent(glm::vec3 tangent);
 		glm::vec3 getColor(unsigned int i);
 		void setColor(unsigned int index, glm::vec3 color);
 		void setColor(glm::vec3 color);

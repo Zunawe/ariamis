@@ -2,6 +2,8 @@
 #define MESH_H
 
 #include <vector>
+#include <algorithm>
+#include <iostream>
 #include <glm/glm.hpp>
 
 class Mesh{
@@ -9,6 +11,9 @@ class Mesh{
 		static const unsigned int ATTRIBUTE_SIZE = 11;
 
 		Mesh();
+		void calculateFaceNormals();
+
+		glm::vec3 getVertex(unsigned int i);
 		unsigned int addVertex(float x, float y, float z);
 		unsigned int addVertex(glm::vec3 vertex);
 		unsigned int addVertex(float x, float y);
@@ -21,10 +26,13 @@ class Mesh{
 		int addTriangles(std::vector<glm::vec3> indices);
 		int addTriangles(std::vector<unsigned int> indices);
 		void removeTriangle(unsigned int index);
+		glm::vec3 getNormal(unsigned int i);
 		void setNormal(unsigned int index, glm::vec3 normal);
 		void setNormal(glm::vec3 normal);
+		glm::vec3 getColor(unsigned int i);
 		void setColor(unsigned int index, glm::vec3 color);
 		void setColor(glm::vec3 color);
+		glm::vec2 getTextureCoordinate(unsigned int i);
 		void setTextureCoordinate(unsigned int index, float u, float v);
 		void setTextureCoordinate(unsigned int index, glm::vec2 coordinate);
 		void setTextureCoordinate(float u, float v);
@@ -46,6 +54,7 @@ class Mesh{
 		std::vector<unsigned int> submeshBounds;
 
 		unsigned int vertexIndexToAttributeIndex(unsigned int index);
+		void makeAllVerticesUnique();
 };
 
 #endif

@@ -4,6 +4,45 @@ Mesh::Mesh(){
 	submeshBounds.push_back(0);
 }
 
+
+/**
+ * Recalculates this mesh's normals based on triangle orientation and stores
+ * those new normals in the mesh's color data. Certain shaders (such as for
+ * extrusion or bump map coordinate transforms) assume normals are normal to
+ * their triangle, but many meshes average normals or use the underlying
+ * mathematics of the model to achieve smooth lighting. In order to allow both,
+ * there need to be 2 distinct sets of normals. When working with materials
+ * and textures, a vertex's color is rarely used, so that's where these true
+ * normals are stored. A custom shader can be used to access these true normals
+ * and do whatever manipulations are necessary, or even do lighting with them
+ * if that's desirable. This function will guarantee that there are 3
+ * unique vertices per triangle. This is not strictly necessary, but since
+ * many models that average vertices re-use existing vertices that have different
+ * true normals, it's necessary to increase the number of vertices.
+ */
+void Mesh::calculateFaceNormals(){
+	makeAllVerticesUnique();
+	for(unsigned int i = 0; i < getNumTriangles(); ++i){
+		glm::vec3 vertex1 = getVertex(triangles[(i * 3) + 0]);
+		glm::vec3 vertex2 = getVertex(triangles[(i * 3) + 1]);
+		glm::vec3 vertex3 = getVertex(triangles[(i * 3) + 2]);
+		glm::vec3 edge1 = vertex2 - vertex1;
+		glm::vec3 edge2 = vertex3 - vertex1;
+		glm::vec3 faceNormal = glm::normalize(glm::cross(edge1, edge2));
+
+		setColor(triangles[(i * 3) + 0], faceNormal);
+		setColor(triangles[(i * 3) + 1], faceNormal);
+		setColor(triangles[(i * 3) + 2], faceNormal);
+	}
+}
+
+glm::vec3 Mesh::getVertex(unsigned int i){
+	unsigned int attributeIndex = vertexIndexToAttributeIndex(i);
+	return glm::vec3(vertexData[attributeIndex + 0],
+	                 vertexData[attributeIndex + 1],
+					 vertexData[attributeIndex + 2]);
+}
+
 /**
  * Creates a new vertex attribute and sets the vertex position.
  * 
@@ -160,6 +199,13 @@ void Mesh::removeTriangle(unsigned int index){
 	triangles.erase(triangles.begin() + (index * 3), triangles.begin() + ((index + 1) * 3));
 }
 
+glm::vec3 Mesh::getNormal(unsigned int i){
+	unsigned int attributeIndex = vertexIndexToAttributeIndex(i);
+	return glm::vec3(vertexData[attributeIndex + 3],
+	                 vertexData[attributeIndex + 4],
+					 vertexData[attributeIndex + 5]);
+}
+
 /**
  * Sets the normal of a vertex.
  * 
@@ -183,6 +229,13 @@ void Mesh::setNormal(glm::vec3 normal){
 	setNormal(getNumVertices() - 1, normal);
 }
 
+glm::vec3 Mesh::getColor(unsigned int i){
+	unsigned int attributeIndex = vertexIndexToAttributeIndex(i);
+	return glm::vec3(vertexData[attributeIndex + 6],
+	                 vertexData[attributeIndex + 7],
+					 vertexData[attributeIndex + 8]);
+}
+
 /**
  * Sets the color of a vertex.
  * 
@@ -192,8 +245,8 @@ void Mesh::setNormal(glm::vec3 normal){
 void Mesh::setColor(unsigned int index, glm::vec3 color){
 	unsigned int attributeIndex = vertexIndexToAttributeIndex(index);
 	vertexData[attributeIndex + 6] = color.r;
-	vertexData[attributeIndex + 7] = color.b;
-	vertexData[attributeIndex + 8] = color.g;
+	vertexData[attributeIndex + 7] = color.g;
+	vertexData[attributeIndex + 8] = color.b;
 }
 
 /**
@@ -202,7 +255,13 @@ void Mesh::setColor(unsigned int index, glm::vec3 color){
  * @param color the new color.
  */
 void Mesh::setColor(glm::vec3 color){
-	setNormal(getNumVertices() - 1, color);
+	setColor(getNumVertices() - 1, color);
+}
+
+glm::vec2 Mesh::getTextureCoordinate(unsigned int i){
+	unsigned int attributeIndex = vertexIndexToAttributeIndex(i);
+	return glm::vec2(vertexData[attributeIndex + 9],
+	                 vertexData[attributeIndex + 10]);
 }
 
 /**
@@ -352,4 +411,30 @@ std::vector<unsigned int> Mesh::getSubmeshBounds(){
  */
 unsigned int Mesh::vertexIndexToAttributeIndex(unsigned int index){
 	return index * ATTRIBUTE_SIZE;
+}
+
+/**
+ * Ensures that every triangle has 3 vertices that are in no other triangles.
+ * This means that the number of vertices in the mesh will either increase
+ * or remain the same. This does not affect submeshes as those are based on
+ * the triangle indices which are modified to fit the new vertex list, but
+ * remain in the same position.
+ */
+void Mesh::makeAllVerticesUnique(){
+	std::vector<unsigned int> usedIndices;
+
+	for(unsigned int i = 0; i < triangles.size(); ++i){
+		unsigned int oldIndex = triangles[i];
+		if(std::find(usedIndices.begin(), usedIndices.end(), oldIndex) == triangles.end()){
+			usedIndices.push_back(oldIndex);
+		}
+		else{
+			unsigned int newIndex = addVertex(getVertex(oldIndex));
+			setNormal(getNormal(oldIndex));
+			setColor(glm::vec3(1, 0, 0));
+			setTextureCoordinate(getTextureCoordinate(oldIndex));
+
+			triangles[i] = newIndex;
+		}
+	}
 }

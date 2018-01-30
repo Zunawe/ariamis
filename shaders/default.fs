@@ -17,6 +17,7 @@ struct Light{
 };
 
 in vec3 vertexNormal;
+in vec3 vertexColor;
 in vec2 vertexTextureCoordinate;
 in vec3 fragPos;
 
@@ -46,6 +47,5 @@ vec3 lighting(){
 }
 
 void main(){
-	vec3 lightingColor = lighting();
 	fragColor = vec4(lighting(), 1.0);
 }

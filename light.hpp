@@ -11,4 +11,17 @@ class Light{
 		glm::vec3 specular;
 };
 
+class PointLight: public Light{
+	public:
+		float kc;
+		float kl;
+		float kq;
+};
+
+class SpotLight: public Light{
+	public:
+		glm::vec3 direction;
+		float angle;
+};
+
 #endif

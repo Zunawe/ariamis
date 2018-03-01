@@ -38,10 +38,20 @@ void ObjectRenderer::draw(const glm::mat4 &model, const glm::mat4 &view, const g
 	shader.use();
 
 	for(int i = 0; i < lights.size(); ++i){
-		shader.setUniform("light[" + std::to_string(i) + "].position", lights[i].position);
-		shader.setUniform("light[" + std::to_string(i) + "].ambient", lights[i].ambient);
-		shader.setUniform("light[" + std::to_string(i) + "].diffuse", lights[i].diffuse);
-		shader.setUniform("light[" + std::to_string(i) + "].specular", lights[i].specular);
+		shader.setUniform("dLights[" + std::to_string(i) + "].direction", -lights[i].position);
+		shader.setUniform("dLights[" + std::to_string(i) + "].ambient", lights[i].ambient);
+		shader.setUniform("dLights[" + std::to_string(i) + "].diffuse", lights[i].diffuse);
+		shader.setUniform("dLights[" + std::to_string(i) + "].specular", lights[i].specular);
+	}
+
+	for(int i = 0; i < lights.size(); ++i){
+		shader.setUniform("pLights[" + std::to_string(i) + "].position", lights[i].position);
+		shader.setUniform("pLights[" + std::to_string(i) + "].ambient", lights[i].ambient);
+		shader.setUniform("pLights[" + std::to_string(i) + "].diffuse", lights[i].diffuse);
+		shader.setUniform("pLights[" + std::to_string(i) + "].specular", lights[i].specular);
+		shader.setUniform("pLights[" + std::to_string(i) + "].kc", 1.0f);
+		shader.setUniform("pLights[" + std::to_string(i) + "].kl", 0.09f);
+		shader.setUniform("pLights[" + std::to_string(i) + "].kq", 0.032f);
 	}
 
 	glm::vec3 cameraPos(camera.getPosition());

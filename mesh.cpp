@@ -285,7 +285,7 @@ void Mesh::setTangent(unsigned int index, glm::vec3 tangent){
  * @param tangent the new tangent vector. (Does not need to be normalized.)
  */
 void Mesh::setTangent(glm::vec3 tangent){
-	setNormal(getNumVertices() - 1, tangent);
+	setTangent(getNumVertices() - 1, tangent);
 }
 
 glm::vec3 Mesh::getColor(unsigned int i){

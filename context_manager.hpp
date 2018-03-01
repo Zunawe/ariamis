@@ -33,9 +33,12 @@ class ContextManager{
 		static float yaw;
 
 		static glm::vec3 mouseLook;
+		static int width;
+		static int height;
 	
 	private:
 		GLFWwindow *window;
+
 		std::vector<ObjectRenderer> objects;
 		std::vector<Light> lights;
 		ObjectRenderer lamp;

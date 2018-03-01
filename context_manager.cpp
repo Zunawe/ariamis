@@ -8,6 +8,8 @@ float ContextManager::lastMouseX;
 float ContextManager::lastMouseY;
 float ContextManager::pitch;
 float ContextManager::yaw;
+int ContextManager::width;
+int ContextManager::height;
 
 ContextManager::ContextManager(GLFWwindow *window){
 	this->window = window;
@@ -41,7 +43,7 @@ void ContextManager::display(){
 
 	model = glm::mat4(1);
 	view = camera.getViewMatrix();
-	projection = glm::perspective(glm::radians(45.0f), 1.0f, 0.1f, 100.0f);
+	projection = glm::perspective(glm::radians(45.0f), (float)width / (float)height, 0.1f, 100.0f);
 
 	model = glm::mat4(1);
 		objects[1].draw(model, view, projection, camera, lights);
@@ -114,8 +116,10 @@ void ContextManager::run(){
 /**
  * Callback for GLFW defining the behavior for resizing a window.
  */
-void ContextManager::resizeWindow(GLFWwindow *window, int width, int height){
-	glViewport(0, 0, width, height);
+void ContextManager::resizeWindow(GLFWwindow *window, int newWidth, int newHeight){
+	glViewport(0, 0, newWidth, newHeight);
+	width = newWidth;
+	height = newHeight;
 }
 
 /**

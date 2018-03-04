@@ -2,6 +2,7 @@
 #define OBJECT_RENDERER_H
 
 #include <algorithm>
+#include <memory>
 
 #define GL_GLEXT_PROTOTYPES
 #include <GLFW/glfw3.h>
@@ -17,7 +18,7 @@
 class ObjectRenderer{
 	public:
 		ObjectRenderer();
-		void draw(const glm::mat4 &model, const glm::mat4 &view, const glm::mat4 &projection, const Camera &camera, const std::vector<Light> &lights);
+		void draw(const glm::mat4 &model, const glm::mat4 &view, const glm::mat4 &projection, const Camera &camera, const std::vector<std::shared_ptr<Light>> &lights);
 		unsigned int getVAO();
 		Mesh& getMesh();
 		void setMesh(const Mesh &mesh);

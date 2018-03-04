@@ -3,12 +3,16 @@
 
 #include <glm/glm.hpp>
 
+#include "shader.hpp"
+
 class Light{
 	public:
-		glm::vec3 position;
+		glm::vec4 position;
 		glm::vec3 ambient;
 		glm::vec3 diffuse;
 		glm::vec3 specular;
+
+		virtual bool setUniforms(Shader shader, std::string lightLocation) const;
 };
 
 class PointLight: public Light{
@@ -16,12 +20,16 @@ class PointLight: public Light{
 		float kc;
 		float kl;
 		float kq;
+
+		bool setUniforms(Shader shader, std::string lightLocation) const;
 };
 
 class SpotLight: public Light{
 	public:
 		glm::vec3 direction;
-		float angle;
+		float cosAngle;
+
+		bool setUniforms(Shader shader, std::string lightLocation) const;
 };
 
 #endif

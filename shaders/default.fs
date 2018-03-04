@@ -9,22 +9,20 @@ struct Material{
 	float shininess;
 };
 
-struct DirectionalLight{
-	vec3 direction;
-	vec3 ambient;
-	vec3 diffuse;
-	vec3 specular;
-};
-
-struct PointLight{
-	vec3 position;
+struct Light{
+	vec4 position;
 	vec3 ambient;
 	vec3 diffuse;
 	vec3 specular;
 
+	// Point
 	float kc;
 	float kl;
 	float kq;
+
+	// Spot
+	vec3 direction;
+	float cosAngle;
 };
 
 in vec3 vertexNormal;
@@ -35,46 +33,43 @@ in vec3 fragPos;
 in mat3 TBN;
 
 uniform Material material;
-uniform DirectionalLight dLights[4];
-uniform PointLight pLights[4];
+uniform Light lights[4];
 uniform vec3 cameraPos;
 
 out vec4 fragColor;
 
-vec3 getLightColor(vec3 a, vec3 d, vec3 s, vec3 normal, vec3 toCamera, vec3 toLight){
-	normal = normalize(normal);
-	toCamera = normalize(toCamera);
-	toLight = normalize(toLight);
-	vec3 ambient, diffuse, specular;
-
-	ambient = vec3(texture(material.diffuseMap, vertexTextureCoordinate)) * a * material.ambient;
-
-	float multiplier = max(dot(normal, toLight), 0);
-	diffuse = vec3(texture(material.diffuseMap, vertexTextureCoordinate)) * (d * material.diffuse) * multiplier;
-
-	vec3 reflected = reflect(-toLight, normal);
-	float shinyMultiplier = pow(max(dot(toCamera, reflected), 0), material.shininess);
-	specular = vec3(texture(material.specularMap, vertexTextureCoordinate)) * (s * material.specular) * shinyMultiplier;
-
-	return ambient + diffuse + specular;
-}
-
 vec3 lighting(){
-	vec3 toCamera = cameraPos - fragPos;
-	vec3 color;
+	vec3 normal = normalize(vertexNormal);
+	vec3 toCamera = normalize(cameraPos - fragPos);
 
-	for(int i = 0; i < dLights.length(); ++i){
-		color += getLightColor(dLights[i].ambient, dLights[i].diffuse, dLights[i].specular, vertexNormal, toCamera, -dLights[i].direction);
-	}
-	for(int i = 0; i < pLights.length(); ++i){
-		float distanceToLight = length(pLights[i].position - fragPos);
-		float attenuation = pLights[i].kc + (pLights[i].kl * distanceToLight) + (pLights[i].kq * distanceToLight * distanceToLight);
-		attenuation = attenuation > 0.0 ? 1 / attenuation : 1.0;
+	vec3 ambient, diffuse, specular;
+	for(int i = 0; i < 4; ++i){
+		Light light = lights[i];
 
-		color += attenuation * getLightColor(pLights[i].ambient, pLights[i].diffuse, pLights[i].specular, vertexNormal, toCamera, pLights[i].position - fragPos);
+		// Directional Light
+		vec3 toLight = normalize(light.position.w != 0.0 ? light.position.xyz - fragPos : -light.position.xyz);
+
+		// Point Light
+		float lightDistance = length(light.position.xyz - fragPos);
+		float denom = light.kc == 0.0 ? 1.0 : (light.kc + (light.kl * lightDistance) + (light.kq * lightDistance * lightDistance));
+		float attenuation = 1.0 / denom;
+
+		// Spotlight
+		float spotlightMultiplier = light.angle == 0.0 ? 1.0 : step(light.cosAngle, dot(normalize(light.direction), -toLight));
+
+		// Ambient
+		ambient += attenuation * vec3(texture(material.diffuseMap, vertexTextureCoordinate)) * light.ambient * material.ambient;
+
+		// Diffuse
+		float multiplier = max(dot(normal, toLight), 0);
+		diffuse += spotlightMultiplier * attenuation * vec3(texture(material.diffuseMap, vertexTextureCoordinate)) * (light.diffuse * material.diffuse) * multiplier;
+
+		// Specular
+		vec3 reflected = reflect(-toLight, normal);
+		float shinyMultiplier = pow(max(dot(toCamera, reflected), 0), material.shininess);
+		specular += spotlightMultiplier * attenuation * vec3(texture(material.specularMap, vertexTextureCoordinate)) * (light.specular * material.specular) * shinyMultiplier;
 	}
-	
-	return color;
+	return ambient + diffuse + specular;
 }
 
 void main(){

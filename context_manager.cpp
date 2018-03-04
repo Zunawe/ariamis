@@ -22,13 +22,21 @@ ContextManager::ContextManager(GLFWwindow *window){
 	objects.push_back(loadObj("objects/cube.obj"));
 	objects.push_back(loadObj("objects/sphere.obj"));
 
-	Light light;
-	light.position = glm::vec3(-1, 5, -1);
-	light.ambient = glm::vec3(0.7f, 0.7f, 0.7f);
-	light.diffuse = glm::vec3(0.7f, 0.7f, 0.7f);
-	light.specular = glm::vec3(0.7f, 0.7f, 0.7f);
+	shared_ptr<PointLight> pointLight(new PointLight());
+	pointLight->position = glm::vec4(1, 0, 5, 1);
+	pointLight->diffuse = glm::vec3(1.0f, 1.0f, 1.0f);
+	pointLight->specular = glm::vec3(1.0f, 1.0f, 1.0f);
+	pointLight->kc = 1.0f;
+	pointLight->kl = 0.05f;
+	pointLight->kq = 0.001f;
+	lights.push_back(pointLight);
 
-	lights.push_back(light);
+	shared_ptr<Light> directionalLight(new Light());
+	directionalLight->position = glm::vec4(-1, -1, 0, 0); // Direction
+	directionalLight->ambient = glm::vec3(0.1f, 0.1f, 0.1f);
+	directionalLight->diffuse = glm::vec3(0.7f, 0.7f, 0.7f);
+	directionalLight->specular = glm::vec3(0.9f, 0.9f, 0.9f);
+	lights.push_back(directionalLight);
 
 	camera.setPosition(glm::vec3(0, 0, -5));
 	

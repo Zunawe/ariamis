@@ -7,6 +7,7 @@
 #include <string>
 #include <cmath>
 #include <vector>
+#include <memory>
 
 #define GL_GLEXT_PROTOTYPES
 #include <GLFW/glfw3.h>
@@ -40,14 +41,14 @@ class ContextManager{
 		GLFWwindow *window;
 
 		std::vector<ObjectRenderer> objects;
-		std::vector<Light> lights;
+		std::vector<std::shared_ptr<Light>> lights;
 		ObjectRenderer lamp;
 		Camera camera;
 		glm::mat4 model;
 		glm::mat4 view;
 		glm::mat4 projection;
 
-		float cameraVelocity = 2;
+		float cameraVelocity = 2.0;
 
 		float deltaTime;
 		float lastTime;

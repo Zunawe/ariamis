@@ -2,10 +2,10 @@ EXE = graphic
 CFLAGS = `pkg-config --cflags glfw3` -std=c++11
 LIBS = `pkg-config --static --libs glfw3` -lGL
 
-$(EXE): $(EXE).o context_manager.o libwilsonengine.a
+$(EXE): $(EXE).o context_manager.o libariamis.a
 	g++ -o $@ $^ $(CFLAGS) $(LIBS)
 
-libwilsonengine.a: shader.o mesh.o texture.o camera.o object_renderer.o obj_loader.o stb_image.o material.o light.o
+libariamis.a: shader.o mesh.o texture.o camera.o object_renderer.o obj_loader.o stb_image.o material.o light.o
 	ar -cqv $@ $^
 
 .cpp.o:

@@ -3,7 +3,7 @@
 
 #include <glm/glm.hpp>
 
-#include "shader.hpp"
+#include "shader.h"
 
 class Light{
 	public:

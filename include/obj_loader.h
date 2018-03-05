@@ -9,9 +9,9 @@
 #include <map>
 #include <algorithm>
 
-#include "mesh.hpp"
-#include "object_renderer.hpp"
-#include "material.hpp"
+#include "mesh.h"
+#include "object_renderer.h"
+#include "material.h"
 
 ObjectRenderer loadObj(const char *filepath);
 void loadObj(const char *filepath, ObjectRenderer &renderer);

@@ -1,4 +1,4 @@
-#include "graphic.hpp"
+#include "graphic.h"
 
 using namespace std;
 

@@ -4,7 +4,7 @@
 #define GL_GLEXT_PROTOTYPES
 #include <GLFW/glfw3.h>
 
-#include "context_manager.hpp"
+#include "context_manager.h"
 
 void initGraphics();
 

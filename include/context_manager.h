@@ -14,11 +14,11 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-#include "shader.hpp"
-#include "camera.hpp"
-#include "texture.hpp"
-#include "object_renderer.hpp"
-#include "obj_loader.hpp"
+#include "shader.h"
+#include "camera.h"
+#include "texture.h"
+#include "object_renderer.h"
+#include "obj_loader.h"
 
 static void handleMouse(GLFWwindow *window, double xPos, double yPos);
 

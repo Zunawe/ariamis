@@ -1,4 +1,4 @@
-#include "object_renderer.hpp"
+#include "object_renderer.h"
 
 ObjectRenderer::ObjectRenderer(){
 	glGenBuffers(1, &VBO);

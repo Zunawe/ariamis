@@ -1,4 +1,4 @@
-#include "light.hpp"
+#include "light.h"
 
 bool Light::setUniforms(Shader shader, std::string lightLocation) const{
 	shader.setUniform(lightLocation + ".position", position);

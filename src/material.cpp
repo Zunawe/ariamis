@@ -1,4 +1,4 @@
-#include "material.hpp"
+#include "material.h"
 
 Material Material::DEFAULT_MATERIAL;
 

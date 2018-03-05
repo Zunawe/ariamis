@@ -8,12 +8,12 @@
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 
-#include "mesh.hpp"
-#include "shader.hpp"
-#include "texture.hpp"
-#include "camera.hpp"
-#include "material.hpp"
-#include "light.hpp"
+#include "mesh.h"
+#include "shader.h"
+#include "texture.h"
+#include "camera.h"
+#include "material.h"
+#include "light.h"
 
 class ObjectRenderer{
 	public:

@@ -1,4 +1,4 @@
-#include "obj_loader.hpp"
+#include "obj_loader.h"
 
 using namespace std;
 

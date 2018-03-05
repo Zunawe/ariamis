@@ -1,4 +1,4 @@
-#include "mesh.hpp"
+#include "mesh.h"
 
 Mesh::Mesh(){
 	submeshBounds.push_back(0);

@@ -55,7 +55,7 @@ vec3 lighting(){
 		float attenuation = 1.0 / denom;
 
 		// Spotlight
-		float spotlightMultiplier = light.angle == 0.0 ? 1.0 : step(light.cosAngle, dot(normalize(light.direction), -toLight));
+		float spotlightMultiplier = light.cosAngle == 0.0 ? 1.0 : step(light.cosAngle, dot(normalize(light.direction), -toLight));
 
 		// Ambient
 		ambient += attenuation * vec3(texture(material.diffuseMap, vertexTextureCoordinate)) * light.ambient * material.ambient;

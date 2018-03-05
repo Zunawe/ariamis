@@ -1,4 +1,4 @@
-#include "context_manager.hpp"
+#include "context_manager.h"
 
 using namespace std;
 
@@ -16,11 +16,11 @@ ContextManager::ContextManager(GLFWwindow *window){
 	glfwSetFramebufferSizeCallback(window, resizeWindow);
 	glfwSetCursorPosCallback(window, handleMouse);
 
-	Shader::DEFAULT_SHADER.loadSources("shaders/default.vs", "shaders/default.fs");
+	Shader::DEFAULT_SHADER.loadSources("data/shaders/default.vs", "data/shaders/default.fs");
 	Material::DEFAULT_MATERIAL = Material();
 
-	objects.push_back(loadObj("objects/cube.obj"));
-	objects.push_back(loadObj("objects/sphere.obj"));
+	objects.push_back(loadObj("data/objects/cube.obj"));
+	objects.push_back(loadObj("data/objects/sphere.obj"));
 
 	shared_ptr<PointLight> pointLight(new PointLight());
 	pointLight->position = glm::vec4(1, 0, 5, 1);

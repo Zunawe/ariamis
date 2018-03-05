@@ -1,10 +1,10 @@
-# Graphics Engine
+# Ariamis
 
 This started as just following a tutorial on OpenGL 3 and has grown as I've learned more things. At the moment, I use it as a base for homework in my graphics class, and it suits testing a new concept or shader pretty well.
 
 ## Dependencies
 
-You'll need [glm](https://glm.g-truc.net/0.9.8/index.html) and [GLFW](http://www.glfw.org/). It's possible that the program might compile with just a `make` command after installing those. If not, look at the output of `make`; I haven't experimented with running this on other platforms (I use Ubuntu 16.04). I can't guarantee anything on Windows, but it's just C++ code and a couple libraries.
+You'll need [glm](https://glm.g-truc.net/0.9.8/index.html) and [GLFW](http://www.glfw.org/). It's possible that the program might compile with just a `make` command after installing those. If not, look at the output of `make`; I haven't experimented with running this on other platforms (I use Ubuntu 16.04). I can't guarantee anything on Windows, but it's just C++ code and a couple libraries. There are unidentified problems when building to OS X.
 
 ## Classes
 

@@ -1,19 +1,15 @@
 #ifndef OBJECT_RENDERER_H
 #define OBJECT_RENDERER_H
 
-#include <algorithm>
 #include <memory>
 
-#define GL_GLEXT_PROTOTYPES
-#include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 
+#include "camera.h"
+#include "light.h"
+#include "material.h"
 #include "mesh.h"
 #include "shader.h"
-#include "texture.h"
-#include "camera.h"
-#include "material.h"
-#include "light.h"
 
 class ObjectRenderer{
 	public:

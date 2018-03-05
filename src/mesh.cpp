@@ -1,9 +1,10 @@
 #include "mesh.h"
 
+#include <algorithm>
+
 Mesh::Mesh(){
 	submeshBounds.push_back(0);
 }
-
 
 /**
  * Recalculates this mesh's normals based on triangle orientation and stores

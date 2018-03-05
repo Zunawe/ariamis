@@ -1,30 +1,21 @@
 #ifndef CONTEXT_MANAGER_H
 #define CONTEXT_MANAGER_H
 
-#include <time.h>
-
-#include <iostream>
-#include <string>
-#include <cmath>
-#include <vector>
 #include <memory>
+#include <vector>
 
-#define GL_GLEXT_PROTOTYPES
-#include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-#include "shader.h"
 #include "camera.h"
-#include "texture.h"
 #include "object_renderer.h"
-#include "obj_loader.h"
 
 static void handleMouse(GLFWwindow *window, double xPos, double yPos);
 
 class ContextManager{
 	public:
 		ContextManager(GLFWwindow *window);
+
 		void run();
 
 		static float lastMouseX;
@@ -38,11 +29,17 @@ class ContextManager{
 		static int height;
 	
 	private:
+		void display();
+		void processInputs();
+
+		static void checkErrorAt(const char *location);
+		static void resizeWindow(GLFWwindow *window, int width, int height);
+		static void handleMouse(GLFWwindow *window, double xPos, double yPos);
+
 		GLFWwindow *window;
 
 		std::vector<ObjectRenderer> objects;
 		std::vector<std::shared_ptr<Light>> lights;
-		ObjectRenderer lamp;
 		Camera camera;
 		glm::mat4 model;
 		glm::mat4 view;
@@ -52,12 +49,6 @@ class ContextManager{
 
 		float deltaTime;
 		float lastTime;
-
-		void display();
-		static void checkErrorAt(const char *location);
-		static void resizeWindow(GLFWwindow *window, int width, int height);
-		static void handleMouse(GLFWwindow *window, double xPos, double yPos);
-		void processInputs();
 };
 
 #endif

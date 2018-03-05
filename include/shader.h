@@ -1,11 +1,8 @@
 #ifndef SHADER_PROGRAM_H
 #define SHADER_PROGRAM_H
 
-#include <string>
-#include <fstream>
-#include <sstream>
-#include <iostream>
 #include <exception>
+#include <string>
 
 #define GL_GLEXT_PROTOTYPES
 #include <GLFW/glfw3.h>
@@ -29,9 +26,10 @@ class Shader{
 		bool setUniform(std::string name, const glm::mat4 &value);
 	
 	private:
-		unsigned int id;
 		void checkCompilation(unsigned int shaderID);
 		void checkLinking();
+		
+		unsigned int id;
 };
 
 struct ShaderException : public std::exception{

@@ -1,5 +1,9 @@
 #include "shader.h"
 
+#include <fstream>
+#include <iostream>
+#include <sstream>
+
 Shader Shader::DEFAULT_SHADER;
 
 /**

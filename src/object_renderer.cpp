@@ -1,5 +1,11 @@
 #include "object_renderer.h"
 
+#include <algorithm>
+#include <iostream>
+
+#define GL_GLEXT_PROTOTYPES
+#include <GLFW/glfw3.h>
+
 ObjectRenderer::ObjectRenderer(){
 	glGenBuffers(1, &VBO);
 	glGenBuffers(1, &EBO);

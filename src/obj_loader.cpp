@@ -1,5 +1,10 @@
 #include "obj_loader.h"
 
+#include <algorithm>
+#include <fstream>
+#include <iostream>
+#include <sstream>
+
 using namespace std;
 
 /**

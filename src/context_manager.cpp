@@ -1,5 +1,15 @@
 #include "context_manager.h"
 
+#include <iostream>
+#include <string>
+
+#define GL_GLEXT_PROTOTYPES
+#include <GLFW/glfw3.h>
+
+#include "obj_loader.h"
+#include "shader.h"
+#include "texture.h"
+
 using namespace std;
 
 float ContextManager::sensitivity = 0.1f;
@@ -44,6 +54,18 @@ ContextManager::ContextManager(GLFWwindow *window){
 }
 
 /**
+ * Main loop.
+ */
+void ContextManager::run(){
+	while(!glfwWindowShouldClose(window)){
+		glfwPollEvents();
+		processInputs();
+		display();
+	}
+	glfwTerminate();	
+}
+
+/**
  * Draws a single frame.
  */
 void ContextManager::display(){
@@ -63,18 +85,6 @@ void ContextManager::display(){
 
 	glfwSwapBuffers(window);
 	checkErrorAt("Display");
-}
-
-/**
- * Checks for an OpenGL error and prints the error code and location.
- * 
- * @param location a string for use in identifying where in the code the error occurs.
- */
-void ContextManager::checkErrorAt(const char *location){
-	GLenum err;
-	if((err = glGetError()) != GL_NO_ERROR){
-		cout << "Error at " << location << ": " << err << endl;
-	}
 }
 
 /**
@@ -110,15 +120,15 @@ void ContextManager::processInputs(){
 }
 
 /**
- * Main loop.
+ * Checks for an OpenGL error and prints the error code and location.
+ * 
+ * @param location a string for use in identifying where in the code the error occurs.
  */
-void ContextManager::run(){
-	while(!glfwWindowShouldClose(window)){
-		glfwPollEvents();
-		processInputs();
-		display();
+void ContextManager::checkErrorAt(const char *location){
+	GLenum err;
+	if((err = glGetError()) != GL_NO_ERROR){
+		cout << "Error at " << location << ": " << err << endl;
 	}
-	glfwTerminate();	
 }
 
 /**

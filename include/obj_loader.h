@@ -1,17 +1,13 @@
 #ifndef OBJ_LOADER_H
 #define OBJ_LOADER_H
 
-#include <string>
-#include <sstream>
-#include <fstream>
-#include <iostream>
-#include <vector>
 #include <map>
-#include <algorithm>
+#include <string>
+#include <vector>
 
+#include "material.h"
 #include "mesh.h"
 #include "object_renderer.h"
-#include "material.h"
 
 ObjectRenderer loadObj(const char *filepath);
 void loadObj(const char *filepath, ObjectRenderer &renderer);

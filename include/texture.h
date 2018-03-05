@@ -1,13 +1,6 @@
 #ifndef TEXTURE_H
 #define TEXTURE_H
 
-#include <vector>
-#include <iostream>
-#include <fstream>
-#include <string>
-
-#define GL_GLEXT_PROTOTYPES
-#include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 
 class Texture{
@@ -18,11 +11,11 @@ class Texture{
 		unsigned int getID() const;
 
 	private:
+		void generateTexture(unsigned char *imageData);
+
 		unsigned int id;
 		int width, height;
 		int numChannels;
-
-		void generateTexture(unsigned char *imageData);
 };
 
 #endif

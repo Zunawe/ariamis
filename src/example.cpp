@@ -9,14 +9,14 @@
 #include "light.h"
 
 int main(){
-	Engine ariamis = Engine::getInstance();
-	ariamis.createWindow(1024, 1024, "Graphic");
+	Engine ariamis = *(Engine::getInstance());
+	ariamis.createWindow(1024, 1024, "Example");
 
 	Scene s(ariamis.getWidth(), ariamis.getHeight());
 
-	Object sphere;
-	sphere.renderer.setMesh(loadMeshFromObj("data/objects/sphere.obj"));
-	s.objects.push_back(std::shared_ptr<Object>(&sphere));
+	std::shared_ptr<Object> sphere(new Object());
+	sphere->renderer.setMesh(loadMeshFromObj("data/objects/sphere.obj"));
+	s.objects.push_back(sphere);
 
 	std::shared_ptr<PointLight> pointLight(new PointLight());
 	pointLight->position = glm::vec4(1, 0, -2, 1);

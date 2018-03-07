@@ -58,6 +58,7 @@ void Engine::playScene(Scene &scene){
 		glfwPollEvents();
 		processInputs();
 
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		scene.draw();
 		glfwSwapBuffers(window);
 	}

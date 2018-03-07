@@ -12,8 +12,7 @@
 
 class Scene{
 	public:
-		Scene(int width, int height);
-		void addObject(std::shared_ptr<Object> o);
+		Scene();
 		void draw();
 
 		std::vector<std::shared_ptr<Object>> objects;

@@ -49,10 +49,15 @@ GLFWwindow* Engine::createWindow(int width, int height, const char *name){
 	return window;
 }
 
-void Engine::playScene(Scene scene){
+void Engine::playScene(Scene &scene){
 	while(!glfwWindowShouldClose(window)){
+		float newTime = glfwGetTime();
+		deltaTime = newTime - lastTime;
+		lastTime = newTime;
+
 		glfwPollEvents();
 		processInputs();
+
 		scene.draw();
 		glfwSwapBuffers(window);
 	}
@@ -60,32 +65,20 @@ void Engine::playScene(Scene scene){
 }
 
 void Engine::processInputs(){
-	float newTime = glfwGetTime();
-	deltaTime = newTime - lastTime;
-	lastTime = newTime;
-
 	if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS){
 		glfwSetWindowShouldClose(window, true);
 	}
-	// if(glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS){
-	// 	camera.move(glm::cross(camera.getUp(), camera.getRight()), cameraVelocity * deltaTime);
-	// }
-	// if(glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS){
-	// 	camera.move(glm::cross(camera.getRight(), camera.getUp()), cameraVelocity * deltaTime);
-	// }
-	// if(glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS){
-	// 	camera.move(-camera.getRight(), cameraVelocity * deltaTime);
-	// }
-	// if(glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS){
-	// 	camera.move(camera.getRight(), cameraVelocity * deltaTime);
-	// }
-	// if(glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS){
-	// 	camera.move(glm::vec3(0, 1, 0), cameraVelocity * deltaTime);
-	// }
-	// if(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS){
-	// 	camera.move(glm::vec3(0, -1, 0), cameraVelocity * deltaTime);
-	// }
-	// camera.setForward(mouseLook);
+	for(auto it = inputCallbacks.begin(); it != inputCallbacks.end(); ++it){
+		if(glfwGetKey(window, it->first) == GLFW_PRESS){
+			for(auto fp = it->second.begin(); fp != it->second.end(); ++fp){
+				(*fp)(deltaTime);
+			}
+		}
+	}
+}
+
+void Engine::registerKeyEvent(int key, std::function<void(float)> func){
+	inputCallbacks[key].push_back(func);
 }
 
 GLFWwindow* Engine::getWindow(){

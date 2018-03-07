@@ -1,3 +1,7 @@
+# Builds
 bin
 build
 lib
+
+# Editor settings
+.vscode

@@ -27,5 +27,31 @@ int main(){
 	pointLight->kq = 0.001f;
 	s.lights.push_back(pointLight);
 
+	float speedMultiplier = 2.0f;
+	ariamis.registerKeyEvent(GLFW_KEY_W, [&s, speedMultiplier](float dt){
+		Camera &camera = s.cameras[0];
+		camera.moveRelative(glm::vec3(0, 0, 1), dt * speedMultiplier);
+	});
+	ariamis.registerKeyEvent(GLFW_KEY_S, [&s, speedMultiplier](float dt){
+		Camera &camera = s.cameras[0];
+		camera.moveRelative(glm::vec3(0, 0, -1), dt * speedMultiplier);
+	});
+	ariamis.registerKeyEvent(GLFW_KEY_A, [&s, speedMultiplier](float dt){
+		Camera &camera = s.cameras[0];
+		camera.moveRelative(glm::vec3(-1, 0, 0), dt * speedMultiplier);
+	});
+	ariamis.registerKeyEvent(GLFW_KEY_D, [&s, speedMultiplier](float dt){
+		Camera &camera = s.cameras[0];
+		camera.moveRelative(glm::vec3(1, 0, 0), dt * speedMultiplier);
+	});
+	ariamis.registerKeyEvent(GLFW_KEY_SPACE, [&s, speedMultiplier](float dt){
+		Camera &camera = s.cameras[0];
+		camera.moveRelative(glm::vec3(0, 1, 0), dt * speedMultiplier);
+	});
+	ariamis.registerKeyEvent(GLFW_KEY_LEFT_SHIFT, [&s, speedMultiplier](float dt){
+		Camera &camera = s.cameras[0];
+		camera.moveRelative(glm::vec3(0, -1, 0), dt * speedMultiplier);
+	});
+
 	ariamis.playScene(s);
 }

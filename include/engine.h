@@ -1,6 +1,10 @@
 #ifndef ENGINE_H
 #define ENGINE_H
 
+#include <map>
+#include <vector>
+#include <functional>
+
 #define GL_GLEXT_PROTOTYPES
 #include <GLFW/glfw3.h>
 
@@ -12,8 +16,9 @@ class Engine{
 
 		~Engine();
 		GLFWwindow* createWindow(int width, int height, const char *name);
-		void playScene(Scene scene);
+		void playScene(Scene &scene);
 		void processInputs();
+		void registerKeyEvent(int key, std::function<void(float)> func);
 		GLFWwindow* getWindow();
 		int getWidth();
 		int getHeight();
@@ -25,6 +30,7 @@ class Engine{
 		void postContextCreation();
 
 		static Engine *instance;
+		std::map<int, std::vector<std::function<void(float)>>> inputCallbacks;
 		float lastTime;
 		float deltaTime;
 		int width;

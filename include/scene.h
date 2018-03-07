@@ -18,9 +18,9 @@ class Scene{
 
 		std::vector<std::shared_ptr<Object>> objects;
 		std::vector<std::shared_ptr<Light>> lights;
+		std::vector<Camera> cameras;
 
 	private:
-		std::vector<Camera> cameras;
 		glm::mat4 projection;
 };
 

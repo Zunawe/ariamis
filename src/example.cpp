@@ -9,8 +9,8 @@
 #include "light.h"
 
 int main(){
-	Engine ariamis = *(Engine::getInstance());
-	ariamis.createWindow(1024, 1024, "Example");
+	Engine *ariamis = Engine::getInstance();
+	ariamis->createWindow(1024, 1024, "Example");
 
 	Scene s;
 
@@ -29,24 +29,24 @@ int main(){
 
 	float speedMultiplier = 2.0f;
 	Camera &camera = s.cameras[0];
-	ariamis.registerKeyEvent(GLFW_KEY_W, [&camera, speedMultiplier](float dt){
+	ariamis->registerKeyEvent(GLFW_KEY_W, [&camera, speedMultiplier](float dt){
 		camera.moveRelative(glm::vec3(0, 0, 1), dt * speedMultiplier);
 	});
-	ariamis.registerKeyEvent(GLFW_KEY_S, [&camera, speedMultiplier](float dt){
+	ariamis->registerKeyEvent(GLFW_KEY_S, [&camera, speedMultiplier](float dt){
 		camera.moveRelative(glm::vec3(0, 0, -1), dt * speedMultiplier);
 	});
-	ariamis.registerKeyEvent(GLFW_KEY_A, [&camera, speedMultiplier](float dt){
+	ariamis->registerKeyEvent(GLFW_KEY_A, [&camera, speedMultiplier](float dt){
 		camera.moveRelative(glm::vec3(-1, 0, 0), dt * speedMultiplier);
 	});
-	ariamis.registerKeyEvent(GLFW_KEY_D, [&camera, speedMultiplier](float dt){
+	ariamis->registerKeyEvent(GLFW_KEY_D, [&camera, speedMultiplier](float dt){
 		camera.moveRelative(glm::vec3(1, 0, 0), dt * speedMultiplier);
 	});
-	ariamis.registerKeyEvent(GLFW_KEY_SPACE, [&camera, speedMultiplier](float dt){
+	ariamis->registerKeyEvent(GLFW_KEY_SPACE, [&camera, speedMultiplier](float dt){
 		camera.moveRelative(glm::vec3(0, 1, 0), dt * speedMultiplier);
 	});
-	ariamis.registerKeyEvent(GLFW_KEY_LEFT_SHIFT, [&camera, speedMultiplier](float dt){
+	ariamis->registerKeyEvent(GLFW_KEY_LEFT_SHIFT, [&camera, speedMultiplier](float dt){
 		camera.moveRelative(glm::vec3(0, -1, 0), dt * speedMultiplier);
 	});
 
-	ariamis.playScene(s);
+	ariamis->playScene(s);
 }

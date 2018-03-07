@@ -9,6 +9,7 @@ LIBS = `pkg-config --static --libs glfw3` -lGL -L lib
 INCLUDE = -I include
 
 $(TARGET): $(OBJECTS)
+	@mkdir -p bin
 	g++ $^ -o $(TARGET) $(LIBS)
 
 $(BUILDDIR)/%.o: $(SRCDIR)/%.$(SRCEXT)

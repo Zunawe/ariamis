@@ -2,6 +2,7 @@
 
 #define GL_GLEXT_PROTOTYPES
 #include <GLFW/glfw3.h>
+#include "glm/ext.hpp"
 
 #include "engine.h"
 #include "scene.h"
@@ -13,10 +14,19 @@ int main(){
 
 	Scene s;
 
+	// Objects
 	std::shared_ptr<Object> sphere(new Object());
 	sphere->renderer.setMesh(loadMeshFromObj("data/objects/sphere.obj"));
 	s.objects.push_back(sphere);
 
+	std::shared_ptr<Object> plane(new Object());
+	plane->renderer.setMesh(loadMeshFromObj("data/objects/cube.obj"));
+	s.objects.push_back(plane);
+
+	plane->translate(glm::vec3(0, -1, 0));
+	plane->scale(glm::vec3(50.0f, 0.1f, 50.0f));
+
+	// Lights
 	std::shared_ptr<PointLight> pointLight(new PointLight());
 	pointLight->position = glm::vec4(1, 0, -2, 1);
 	pointLight->diffuse = glm::vec3(1.0f, 1.0f, 1.0f);
@@ -26,6 +36,7 @@ int main(){
 	pointLight->kq = 0.001f;
 	s.lights.push_back(pointLight);
 
+	// Input
 	float speedMultiplier = 2.0f;
 	Camera &camera = s.cameras[0];
 	Engine::registerKeyEvent(GLFW_KEY_W, [&camera, speedMultiplier](float dt){

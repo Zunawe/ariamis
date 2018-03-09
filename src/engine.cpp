@@ -103,9 +103,7 @@ void Engine::resizeWindow(GLFWwindow *window, int newWidth, int newHeight){
 }
 
 void Engine::mouseMoveCallback(GLFWwindow *window, double x, double y){
-	auto callbacks = mouseMoveCallbacks;
-
-	for(auto it = callbacks.begin(); it != callbacks.end(); ++it){
+	for(auto it = mouseMoveCallbacks.begin(); it != mouseMoveCallbacks.end(); ++it){
 		(*it)(x, y);
 	}
 }

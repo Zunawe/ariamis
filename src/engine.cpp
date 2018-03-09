@@ -5,29 +5,26 @@
 #include "shader.h"
 #include "material.h"
 
-Engine *Engine::instance = nullptr;
-
-Engine::Engine(){
-	// Empty
-}
+std::map<int, std::vector<std::function<void(float)>>> Engine::keyCallbacks;
+std::vector<std::function<void(double, double)>> Engine::mouseMoveCallbacks;
+float Engine::lastTime;
+float Engine::deltaTime;
+int Engine::width;
+int Engine::height;
+GLFWwindow *Engine::window;
 
 void Engine::postContextCreation(){
-	glfwSetFramebufferSizeCallback(window, Engine::resizeWindow);
-	glfwSetCursorPosCallback(window, Engine::mouseMoveCallback);
+	glfwSetFramebufferSizeCallback(window, resizeWindow);
+	glfwSetCursorPosCallback(window, mouseMoveCallback);
 	glEnable(GL_DEPTH_TEST);
 	Shader::DEFAULT_SHADER.loadSources("data/shaders/default.vs", "data/shaders/default.fs");
 	Material::DEFAULT_MATERIAL = Material();
 }
 
-Engine::~Engine(){
+void Engine::cleanUp(){
 	glfwDestroyWindow(window);
-}
-
-Engine* Engine::getInstance(){
-	if(Engine::instance == nullptr){
-		Engine::instance = new Engine();
-	}
-	return Engine::instance;
+	keyCallbacks.clear();
+	mouseMoveCallbacks.clear();
 }
 
 GLFWwindow* Engine::createWindow(int width, int height, const char *name){
@@ -38,9 +35,9 @@ GLFWwindow* Engine::createWindow(int width, int height, const char *name){
 		return nullptr;
 	}
 
-	this->window = glfwCreateWindow(width, height, name, NULL, NULL);
-	this->width = width;
-	this->height = height;
+	window = glfwCreateWindow(width, height, name, NULL, NULL);
+	width = width;
+	height = height;
 
 	glfwMakeContextCurrent(window);
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
@@ -100,15 +97,13 @@ int Engine::getHeight(){
 }
 
 void Engine::resizeWindow(GLFWwindow *window, int newWidth, int newHeight){
-	Engine *e = Engine::getInstance();
 	glViewport(0, 0, newWidth, newHeight);
-	e->width = newWidth;
-	e->height = newHeight;
+	width = newWidth;
+	height = newHeight;
 }
 
 void Engine::mouseMoveCallback(GLFWwindow *window, double x, double y){
-	Engine *e = Engine::getInstance();
-	auto callbacks = e->mouseMoveCallbacks;
+	auto callbacks = mouseMoveCallbacks;
 
 	for(auto it = callbacks.begin(); it != callbacks.end(); ++it){
 		(*it)(x, y);

@@ -12,33 +12,29 @@
 
 class Engine{
 	public:
-		static Engine* getInstance();
-
-		~Engine();
-		GLFWwindow* createWindow(int width, int height, const char *name);
-		void playScene(Scene &scene);
-		void processInputs();
-		void registerKeyEvent(int key, std::function<void(float)> func);
-		void registerMouseMoveEvent(std::function<void(double, double)> func);
-		GLFWwindow* getWindow();
-		int getWidth();
-		int getHeight();
+		static void playScene(Scene &scene);
+		static void registerKeyEvent(int key, std::function<void(float)> func);
+		static void registerMouseMoveEvent(std::function<void(double, double)> func);
+		static GLFWwindow* createWindow(int width, int height, const char *name);
+		static GLFWwindow* getWindow();
+		static int getWidth();
+		static int getHeight();
+		static void cleanUp();
 
 	private:
 		static void resizeWindow(GLFWwindow *window, int newWidth, int newHeight);
 		static void mouseMoveCallback(GLFWwindow *window, double x, double y);
 
-		Engine();
-		void postContextCreation();
+		static void postContextCreation();
+		static void processInputs();
 
-		static Engine *instance;
-		std::map<int, std::vector<std::function<void(float)>>> keyCallbacks;
-		std::vector<std::function<void(double, double)>> mouseMoveCallbacks;
-		float lastTime;
-		float deltaTime;
-		int width;
-		int height;
-		GLFWwindow* window;
+		static std::map<int, std::vector<std::function<void(float)>>> keyCallbacks;
+		static std::vector<std::function<void(double, double)>> mouseMoveCallbacks;
+		static float lastTime;
+		static float deltaTime;
+		static int width;
+		static int height;
+		static GLFWwindow *window;
 };
 
 #endif

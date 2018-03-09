@@ -12,7 +12,7 @@ Scene::Scene(){
 }
 
 void Scene::draw(){
-	projection = glm::perspective(glm::radians(45.0f), (float)Engine::getInstance()->getWidth() / (float)Engine::getInstance()->getHeight(), 0.1f, 100.0f);
+	projection = glm::perspective(glm::radians(45.0f), (float)Engine::getWidth() / (float)Engine::getHeight(), 0.1f, 100.0f);
 	for(auto it = objects.begin(); it != objects.end(); ++it){
 		(*it)->renderer.draw((*it)->getModel(), cameras[0].getViewMatrix(), projection, cameras[0], lights);
 	}

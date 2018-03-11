@@ -34,8 +34,8 @@ int main(){
 	plane->renderer.setShader(toonShader);
 	s.objects.push_back(plane);
 
-	plane->translate(glm::vec3(0, -1, 0));
-	plane->scale(glm::vec3(50.0f, 0.1f, 50.0f));
+	plane->position += glm::vec3(0, -1, 0);
+	plane->scale *= glm::vec3(50.0f, 0.1f, 50.0f);
 
 	// Lights
 	std::shared_ptr<PointLight> pointLight(new PointLight());

@@ -13,6 +13,7 @@
 class Scene{
 	public:
 		Scene();
+		void update();
 		void draw();
 
 		std::vector<std::shared_ptr<Object>> objects;

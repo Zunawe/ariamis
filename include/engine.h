@@ -17,8 +17,11 @@ class Engine{
 		static void registerMouseMoveEvent(std::function<void(double, double)> func);
 		static GLFWwindow* createWindow(int width, int height, const char *name);
 		static GLFWwindow* getWindow();
+		static void quit();
 		static int getWidth();
 		static int getHeight();
+		static float getDeltaTime();
+		static float getTime();
 		static void cleanUp();
 
 	private:

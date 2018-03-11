@@ -1,6 +1,9 @@
 #ifndef OBJECT_H
 #define OBJECT_H
 
+#include <functional>
+#include <memory>
+
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -15,8 +18,7 @@ class Object{
 		glm::mat4 getModel();
 
 		ObjectRenderer renderer;
-
-	private:
+		void (*update)(std::shared_ptr<Object>);
 		glm::vec3 position;
 		glm::vec3 scales;
 		glm::vec4 rotation;

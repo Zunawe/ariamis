@@ -56,6 +56,7 @@ void Engine::playScene(Scene &scene){
 		glfwPollEvents();
 		processInputs();
 
+		scene.update();
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		scene.draw();
 		glfwSwapBuffers(window);
@@ -64,9 +65,6 @@ void Engine::playScene(Scene &scene){
 }
 
 void Engine::processInputs(){
-	if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS){
-		glfwSetWindowShouldClose(window, true);
-	}
 	for(auto it = keyCallbacks.begin(); it != keyCallbacks.end(); ++it){
 		if(glfwGetKey(window, it->first) == GLFW_PRESS){
 			for(auto fp = it->second.begin(); fp != it->second.end(); ++fp){
@@ -74,6 +72,10 @@ void Engine::processInputs(){
 			}
 		}
 	}
+}
+
+void Engine::quit(){
+	glfwSetWindowShouldClose(window, true);
 }
 
 void Engine::registerKeyEvent(int key, std::function<void(float)> func){
@@ -94,6 +96,14 @@ int Engine::getWidth(){
 
 int Engine::getHeight(){
 	return height;
+}
+
+float Engine::getDeltaTime(){
+	return deltaTime;
+}
+
+float Engine::getTime(){
+	return lastTime;
 }
 
 void Engine::resizeWindow(GLFWwindow *window, int newWidth, int newHeight){

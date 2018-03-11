@@ -2,6 +2,9 @@
 
 Object::Object(){
 	scales = glm::vec3(1.0f, 1.0f, 1.0f);
+	update = [](std::shared_ptr<Object> me){
+		// Empty
+	};
 }
 
 void Object::translate(glm::vec3 delta){

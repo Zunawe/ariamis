@@ -14,13 +14,24 @@ int main(){
 
 	Scene s;
 
+	Shader toonShader;
+	toonShader.loadSources("data/shaders/default.vs", "data/shaders/default.fs");
+
 	// Objects
 	std::shared_ptr<Object> sphere(new Object());
 	sphere->renderer.setMesh(loadMeshFromObj("data/objects/sphere.obj"));
+	sphere->renderer.setShader(toonShader);
+
+	sphere->update = [](std::shared_ptr<Object> me){
+		me->position.x = 6.0f * cos(Engine::getTime());
+		me->position.z = 6.0f * sin(Engine::getTime());
+	};
+
 	s.objects.push_back(sphere);
 
 	std::shared_ptr<Object> plane(new Object());
 	plane->renderer.setMesh(loadMeshFromObj("data/objects/cube.obj"));
+	plane->renderer.setShader(toonShader);
 	s.objects.push_back(plane);
 
 	plane->translate(glm::vec3(0, -1, 0));
@@ -30,6 +41,7 @@ int main(){
 	std::shared_ptr<PointLight> pointLight(new PointLight());
 	pointLight->position = glm::vec4(1, 0, -2, 1);
 	pointLight->diffuse = glm::vec3(1.0f, 1.0f, 1.0f);
+	pointLight->ambient = glm::vec3(0.1f, 0.1f, 0.1f);
 	pointLight->specular = glm::vec3(1.0f, 1.0f, 1.0f);
 	pointLight->kc = 1.0f;
 	pointLight->kl = 0.05f;
@@ -39,6 +51,9 @@ int main(){
 	// Input
 	float speedMultiplier = 2.0f;
 	Camera &camera = s.cameras[0];
+	Engine::registerKeyEvent(GLFW_KEY_ESCAPE, [](float dt){
+		Engine::quit();
+	});
 	Engine::registerKeyEvent(GLFW_KEY_W, [&camera, speedMultiplier](float dt){
 		camera.moveRelative(glm::vec3(0, 0, 1), dt * speedMultiplier);
 	});

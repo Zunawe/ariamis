@@ -33,6 +33,11 @@ void Texture::load(const char *filePath){
 	delete imageData;
 }
 
+/**
+ * Sends an array of pixels to the GPU as a texture and saves its name.
+ * 
+ * @param imageData raw pixel data.
+ */
 void Texture::generateTexture(unsigned char *imageData){
 	glGenTextures(1, &this->id);
 

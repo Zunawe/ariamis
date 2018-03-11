@@ -11,12 +11,18 @@ Scene::Scene(){
 	cameras[0].lookAt(glm::vec3(0, 0, 0));
 }
 
+/**
+ * Runs before every frame.
+ */
 void Scene::update(){
 	for(auto it = objects.begin(); it != objects.end(); ++it){
 		(*it)->update(*it);
 	}
 }
 
+/**
+ * Tells this scene's objects to draw themselves.
+ */
 void Scene::draw(){
 	projection = glm::perspective(glm::radians(45.0f), (float)Engine::getWidth() / (float)Engine::getHeight(), 0.1f, 100.0f);
 	for(auto it = objects.begin(); it != objects.end(); ++it){

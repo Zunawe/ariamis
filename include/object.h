@@ -12,15 +12,12 @@
 class Object{
 	public:
 		Object();
-		void translate(glm::vec3 delta);
-		void scale(glm::vec3 delta);
-		void rotate(float angle, glm::vec3 delta);
 		glm::mat4 getModel();
 
 		ObjectRenderer renderer;
 		void (*update)(std::shared_ptr<Object>);
 		glm::vec3 position;
-		glm::vec3 scales;
+		glm::vec3 scale;
 		glm::vec4 rotation;
 };
 

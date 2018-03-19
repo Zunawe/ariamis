@@ -47,8 +47,8 @@ GLFWwindow* Engine::createWindow(int width, int height, const char *name){
 	}
 
 	window = glfwCreateWindow(width, height, name, NULL, NULL);
-	width = width;
-	height = height;
+	Engine::width = width;
+	Engine::height = height;
 
 	glfwMakeContextCurrent(window);
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);

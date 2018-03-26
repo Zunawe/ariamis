@@ -20,7 +20,9 @@ void Engine::postContextCreation(){
 	glfwSetFramebufferSizeCallback(window, resizeWindow);
 	glfwSetCursorPosCallback(window, mouseMoveCallback);
 	glEnable(GL_DEPTH_TEST);
-	Shader::DEFAULT_SHADER.loadSources("data/shaders/default.vs", "data/shaders/default.fs");
+	Shader::DEFAULT_SHADER.loadFile("data/shaders/default.vs", GL_VERTEX_SHADER);
+	Shader::DEFAULT_SHADER.loadFile("data/shaders/default.fs", GL_FRAGMENT_SHADER);
+	Shader::DEFAULT_SHADER.link();
 	Material::DEFAULT_MATERIAL = Material();
 }
 

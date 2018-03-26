@@ -3,6 +3,7 @@
 
 #include <exception>
 #include <string>
+#include <vector>
 
 #define GL_GLEXT_PROTOTYPES
 #include <GLFW/glfw3.h>
@@ -12,7 +13,9 @@ class Shader{
 	public:
 		static Shader DEFAULT_SHADER;
 
-		void loadSources(const GLchar *vertexShaderPath, const GLchar *fragmentShaderPath);
+		void loadFile(const GLchar *sourcePath, GLenum type);
+		void loadSource(const char *source, GLenum type);
+		void link();
 		void use();
 		unsigned int getID();
 
@@ -30,6 +33,7 @@ class Shader{
 		void checkLinking();
 		
 		unsigned int id;
+		std::vector<unsigned int> shaders;
 };
 
 struct ShaderException : public std::exception{

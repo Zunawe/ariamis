@@ -12,83 +12,44 @@ Shader Shader::DEFAULT_SHADER;
  * @param vertexShaderPath the path to the vertex shader.
  * @param fragmentShaderPath the path to the fragment shader.
  */
-void Shader::loadSources(const GLchar *vertexShaderPath, const GLchar *fragmentShaderPath){
+void Shader::loadFile(const char *sourcePath, GLenum type){
 	// Read source code
 	std::ifstream fileStream;
 	fileStream.exceptions(std::ifstream::failbit | std::ifstream::badbit);
 
-	std::string vertexShaderSource;
-	std::string fragmentShaderSource;
+	std::string source;
 
 	try{
-		fileStream.open(vertexShaderPath);
+		fileStream.open(sourcePath);
 
 		std::stringstream ss;
 		ss << fileStream.rdbuf();
 
 		fileStream.close();
-		vertexShaderSource = ss.str();
+		source = ss.str();
 	}
 	catch(std::ifstream::failure e){
-		std::cout << "Failed to open file at " << vertexShaderPath << std::endl;
+		std::cout << "Failed to open file at " << sourcePath << std::endl;
 	}
 
-	try{
-		fileStream.open(fragmentShaderPath);
+	loadSource(source.c_str(), type);
+}
 
-		std::stringstream ss;
-		ss << fileStream.rdbuf();
+void Shader::loadSource(const char *source, GLenum type){
+	unsigned int shaderID = glCreateShader(type);
+	glShaderSource(shaderID, 1, &source, NULL);
+	glCompileShader(shaderID);
+	checkCompilation(shaderID);
+	shaders.push_back(shaderID);
+}
 
-		fileStream.close();
-		fragmentShaderSource = ss.str();
-	}
-	catch(std::ifstream::failure e){
-		std::cout << "Failed to open file at " << fragmentShaderPath << std::endl;
-	}
-
-	const char *vertexShaderSourceCStr = vertexShaderSource.c_str();
-	const char *fragmentShaderSourceCStr = fragmentShaderSource.c_str();
-
-
-	// Compile
+void Shader::link(){
 	this->id = glCreateProgram();
-	unsigned int vertexShaderID = glCreateShader(GL_VERTEX_SHADER);
-	unsigned int fragmentShaderID = glCreateShader(GL_FRAGMENT_SHADER);
-
-	try{
-		glShaderSource(vertexShaderID, 1, &vertexShaderSourceCStr, NULL);
-		glCompileShader(vertexShaderID);
-		checkCompilation(vertexShaderID);
+	for(auto it = shaders.begin(); it != shaders.end(); ++it){
+		glAttachShader(this->id, *it);
 	}
-	catch(ShaderException &e){
-		std::cout << "Vertex shader compilation failed:" << std::endl;
-		std::cout << e.what() << std::endl;
-		exit(EXIT_FAILURE);
-	}
-
-	try{
-		glShaderSource(fragmentShaderID, 1, &fragmentShaderSourceCStr, NULL);
-		glCompileShader(fragmentShaderID);
-		checkCompilation(fragmentShaderID);
-	}
-	catch(ShaderException &e){
-		std::cout << "Fragment shader compilation failed:" << std::endl;
-		std::cout << e.what() << std::endl;
-		exit(EXIT_FAILURE);
-	}
-
-	// Link
-	try{
-		glAttachShader(this->id, vertexShaderID);
-		glAttachShader(this->id, fragmentShaderID);
-		glLinkProgram(this->id);
-		checkLinking();
-	}
-	catch(ShaderException &e){
-		std::cout << "Shader linking failed:" << std::endl;
-		std::cout << e.what() << std::endl;
-		exit(EXIT_FAILURE);
-	}
+	glLinkProgram(this->id);
+	checkLinking();
 }
 
 /**

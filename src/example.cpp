@@ -14,13 +14,9 @@ int main(){
 
 	Scene s;
 
-	Shader toonShader;
-	toonShader.loadSources("data/shaders/default.vs", "data/shaders/default.fs");
-
 	// Objects
 	std::shared_ptr<Object> sphere(new Object());
 	sphere->renderer.setMesh(loadMeshFromObj("data/objects/sphere.obj"));
-	sphere->renderer.setShader(toonShader);
 
 	sphere->update = [](std::shared_ptr<Object> me){
 		me->position.x = 6.0f * cos(Engine::getTime());
@@ -31,7 +27,6 @@ int main(){
 
 	std::shared_ptr<Object> plane(new Object());
 	plane->renderer.setMesh(loadMeshFromObj("data/objects/cube.obj"));
-	plane->renderer.setShader(toonShader);
 	s.objects.push_back(plane);
 
 	plane->position += glm::vec3(0, -1, 0);

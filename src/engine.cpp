@@ -5,6 +5,14 @@
 #include "shader.h"
 #include "material.h"
 
+unsigned int Engine::gBuffer;
+unsigned int Engine::gPosition;
+unsigned int Engine::gNormal;
+unsigned int Engine::gColorSpec;
+unsigned int Engine::quadVAO;
+Shader Engine::quadShader;
+Shader Engine::gBufferShader;
+
 std::map<int, std::vector<std::function<void(float)>>> Engine::keyCallbacks;
 std::vector<std::function<void(double, double)>> Engine::mouseMoveCallbacks;
 float Engine::lastTime;
@@ -19,11 +27,46 @@ GLFWwindow *Engine::window;
 void Engine::postContextCreation(){
 	glfwSetFramebufferSizeCallback(window, resizeWindow);
 	glfwSetCursorPosCallback(window, mouseMoveCallback);
+
 	glEnable(GL_DEPTH_TEST);
+
 	Shader::DEFAULT_SHADER.loadFile("data/shaders/default.vs", GL_VERTEX_SHADER);
 	Shader::DEFAULT_SHADER.loadFile("data/shaders/default.fs", GL_FRAGMENT_SHADER);
 	Shader::DEFAULT_SHADER.link();
+
+	quadShader.loadFile("data/shaders/quad_shader.vs", GL_VERTEX_SHADER);
+	quadShader.loadFile("data/shaders/quad_shader.fs", GL_FRAGMENT_SHADER);
+	quadShader.link();
+
+	gBufferShader.loadFile("data/shaders/gbuffer.vs", GL_VERTEX_SHADER);
+	gBufferShader.loadFile("data/shaders/gbuffer.fs", GL_FRAGMENT_SHADER);
+	gBufferShader.link();
+
 	Material::DEFAULT_MATERIAL = Material();
+	initializeGBuffer();
+}
+
+void Engine::initializeGBuffer(){
+	glGenFramebuffers(1, &gBuffer);
+	glBindFramebuffer(GL_FRAMEBUFFER, gBuffer);
+
+	glGenTextures(1, &gPosition);
+	glBindTexture(GL_TEXTURE_2D, gPosition);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, width, height, 0, GL_RGB, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, gPosition, 0);
+
+	unsigned int attachments[]{GL_COLOR_ATTACHMENT0};
+	glDrawBuffers(1, attachments);
+
+	unsigned int depthRBO;
+	glGenRenderbuffers(1, &depthRBO);
+	glBindRenderbuffer(GL_RENDERBUFFER, depthRBO);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, width, height);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthRBO);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 /**
@@ -67,6 +110,10 @@ GLFWwindow* Engine::createWindow(int width, int height, const char *name){
  * @param scene the scene to display and run.
  */
 void Engine::playScene(Scene &scene){
+	for(auto it = scene.objects.begin(); it != scene.objects.end(); ++it){
+		(*it)->renderer.setShader(gBufferShader);
+	}
+
 	while(!glfwWindowShouldClose(window)){
 		float newTime = glfwGetTime();
 		deltaTime = newTime - lastTime;
@@ -77,10 +124,47 @@ void Engine::playScene(Scene &scene){
 
 		scene.update();
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		scene.draw();
+		glBindFramebuffer(GL_FRAMEBUFFER, gBuffer);
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+			scene.draw();
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		renderQuad();
 		glfwSwapBuffers(window);
 	}
+
 	glfwTerminate();
+}
+
+void Engine::renderQuad(){
+	if(!quadVAO){
+		unsigned int quadVBO;
+		float attributes[]{
+			 1.0f, -1.0f, 0.0f,  1.0f, 0.0f,
+			 1.0f,  1.0f, 0.0f,  1.0f, 1.0f,
+			-1.0f, -1.0f, 0.0f,  0.0f, 0.0f,
+			-1.0f,  1.0f, 0.0f,  0.0f, 1.0f
+		};
+		glGenVertexArrays(1, &quadVAO);
+		glGenBuffers(1, &quadVBO);
+
+		glBindVertexArray(quadVAO);
+			glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
+			glBufferData(GL_ARRAY_BUFFER, sizeof(attributes), &attributes, GL_STATIC_DRAW);
+			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+			glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+			glEnableVertexAttribArray(0);
+			glEnableVertexAttribArray(1);
+		glBindVertexArray(0);
+	}
+
+	quadShader.use();
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, gPosition);
+	quadShader.setUniform("image", 0);
+
+	glBindVertexArray(quadVAO);
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+	glBindVertexArray(0);
 }
 
 /**
@@ -160,6 +244,8 @@ void Engine::resizeWindow(GLFWwindow *window, int newWidth, int newHeight){
 	glViewport(0, 0, newWidth, newHeight);
 	width = newWidth;
 	height = newHeight;
+	glDeleteFramebuffers(1, &gBuffer);
+	initializeGBuffer();
 }
 
 /**

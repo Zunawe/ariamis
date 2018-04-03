@@ -29,7 +29,17 @@ class Engine{
 		static void mouseMoveCallback(GLFWwindow *window, double x, double y);
 
 		static void postContextCreation();
+		static void initializeGBuffer();
 		static void processInputs();
+		static void renderQuad();
+
+		static unsigned int gBuffer;
+		static unsigned int gPosition;
+		static unsigned int gNormal;
+		static unsigned int gColorSpec;
+		static unsigned int quadVAO;
+		static Shader quadShader;
+		static Shader gBufferShader;
 
 		static std::map<int, std::vector<std::function<void(float)>>> keyCallbacks;
 		static std::vector<std::function<void(double, double)>> mouseMoveCallbacks;

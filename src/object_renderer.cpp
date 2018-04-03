@@ -40,15 +40,8 @@ ObjectRenderer::ObjectRenderer(){
  * @param projection the projection matrix at the time of drawing the object.
  * @param camera the Camera the object is being viewed by.
  */
-void ObjectRenderer::draw(const glm::mat4 &model, const glm::mat4 &view, const glm::mat4 &projection, const Camera &camera, const std::vector<std::shared_ptr<Light>> &lights){
+void ObjectRenderer::draw(const glm::mat4 &model, const glm::mat4 &view, const glm::mat4 &projection){
 	shader.use();
-
-	for(int i = 0; i < lights.size(); ++i){
-		lights[i]->setUniforms(shader, "lights[" + std::to_string(i) + "]");
-	}
-
-	glm::vec3 cameraPos(camera.getPosition());
-	shader.setUniform("cameraPos", cameraPos);
 
 	glm::mat3 normalModel(glm::transpose(glm::inverse(model)));
 	shader.setUniform("model", model);
@@ -65,17 +58,13 @@ void ObjectRenderer::draw(const glm::mat4 &model, const glm::mat4 &view, const g
 		for(unsigned int i = 0; i < submeshes.size(); ++i){
 			Material &material = materials[materialIndices[i]];
 
-			shader.setUniform("material.ambient", material.ambient);
-
 			glActiveTexture(GL_TEXTURE0);
 			glBindTexture(GL_TEXTURE_2D, material.diffuseMap.getID());
 			shader.setUniform("material.diffuseMap", 0);
-			shader.setUniform("material.diffuse", material.diffuse);
 
 			glActiveTexture(GL_TEXTURE1);
 			glBindTexture(GL_TEXTURE_2D, material.specularMap.getID());
 			shader.setUniform("material.specularMap", 1);
-			shader.setUniform("material.specular", material.specular);
 
 			shader.setUniform("material.shininess", material.shininess);
 

@@ -14,7 +14,7 @@
 class ObjectRenderer{
 	public:
 		ObjectRenderer();
-		void draw(const glm::mat4 &model, const glm::mat4 &view, const glm::mat4 &projection, const Camera &camera, const std::vector<std::shared_ptr<Light>> &lights);
+		void draw(const glm::mat4 &model, const glm::mat4 &view, const glm::mat4 &projection);
 		unsigned int getVAO();
 		Mesh& getMesh();
 		void setMesh(const Mesh &mesh);

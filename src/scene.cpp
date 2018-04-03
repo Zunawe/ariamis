@@ -26,6 +26,6 @@ void Scene::update(){
 void Scene::draw(){
 	projection = glm::perspective(glm::radians(45.0f), (float)Engine::getWidth() / (float)Engine::getHeight(), 0.1f, 100.0f);
 	for(auto it = objects.begin(); it != objects.end(); ++it){
-		(*it)->renderer.draw((*it)->getModel(), cameras[0].getViewMatrix(), projection, cameras[0], lights);
+		(*it)->renderer.draw((*it)->getModel(), cameras[0].getViewMatrix(), projection);
 	}
 }

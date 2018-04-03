@@ -8,9 +8,9 @@
 unsigned int Engine::gBuffer;
 unsigned int Engine::gPosition;
 unsigned int Engine::gNormal;
-unsigned int Engine::gColorSpec;
+unsigned int Engine::gAlbedoSpecular;
 unsigned int Engine::quadVAO;
-Shader Engine::quadShader;
+Shader Engine::lightingShader;
 Shader Engine::gBufferShader;
 
 std::map<int, std::vector<std::function<void(float)>>> Engine::keyCallbacks;
@@ -34,9 +34,9 @@ void Engine::postContextCreation(){
 	Shader::DEFAULT_SHADER.loadFile("data/shaders/default.fs", GL_FRAGMENT_SHADER);
 	Shader::DEFAULT_SHADER.link();
 
-	quadShader.loadFile("data/shaders/quad_shader.vs", GL_VERTEX_SHADER);
-	quadShader.loadFile("data/shaders/quad_shader.fs", GL_FRAGMENT_SHADER);
-	quadShader.link();
+	lightingShader.loadFile("data/shaders/lighting.vs", GL_VERTEX_SHADER);
+	lightingShader.loadFile("data/shaders/lighting.fs", GL_FRAGMENT_SHADER);
+	lightingShader.link();
 
 	gBufferShader.loadFile("data/shaders/gbuffer.vs", GL_VERTEX_SHADER);
 	gBufferShader.loadFile("data/shaders/gbuffer.fs", GL_FRAGMENT_SHADER);
@@ -57,8 +57,22 @@ void Engine::initializeGBuffer(){
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, gPosition, 0);
 
-	unsigned int attachments[]{GL_COLOR_ATTACHMENT0};
-	glDrawBuffers(1, attachments);
+	glGenTextures(1, &gNormal);
+	glBindTexture(GL_TEXTURE_2D, gNormal);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, width, height, 0, GL_RGB, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, gNormal, 0);
+
+	glGenTextures(1, &gAlbedoSpecular);
+	glBindTexture(GL_TEXTURE_2D, gAlbedoSpecular);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, gAlbedoSpecular, 0);
+
+	unsigned int attachments[]{GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2};
+	glDrawBuffers(3, attachments);
 
 	unsigned int depthRBO;
 	glGenRenderbuffers(1, &depthRBO);
@@ -128,14 +142,14 @@ void Engine::playScene(Scene &scene){
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			scene.draw();
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-		renderQuad();
+		renderQuad(scene.lights, scene.cameras[0].getPosition());
 		glfwSwapBuffers(window);
 	}
 
 	glfwTerminate();
 }
 
-void Engine::renderQuad(){
+void Engine::renderQuad(const std::vector<std::shared_ptr<Light>> &lights, glm::vec3 cameraPosition){
 	if(!quadVAO){
 		unsigned int quadVBO;
 		float attributes[]{
@@ -157,10 +171,21 @@ void Engine::renderQuad(){
 		glBindVertexArray(0);
 	}
 
-	quadShader.use();
+	lightingShader.use();
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, gPosition);
-	quadShader.setUniform("image", 0);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, gNormal);
+	glActiveTexture(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_2D, gAlbedoSpecular);
+	lightingShader.setUniform("gPosition", 0);
+	lightingShader.setUniform("gNormal", 1);
+	lightingShader.setUniform("gAlbedoSpecular", 2);
+	lightingShader.setUniform("cameraPosition", cameraPosition);
+
+	for(int i = 0; i < lights.size(); ++i){
+		lights[i]->setUniforms(lightingShader, "lights[" + std::to_string(i) + "]");
+	}
 
 	glBindVertexArray(quadVAO);
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);

@@ -27,6 +27,7 @@ int main(){
 
 	std::shared_ptr<Object> plane(new Object());
 	plane->renderer.setMesh(loadMeshFromObj("data/objects/cube.obj"));
+	plane->renderer.getMaterial().diffuseMap = Texture("data/textures/container_diff.png");
 	s.objects.push_back(plane);
 
 	plane->position += glm::vec3(0, -1, 0);
@@ -34,7 +35,7 @@ int main(){
 
 	// Lights
 	std::shared_ptr<PointLight> pointLight(new PointLight());
-	pointLight->position = glm::vec4(1, 0, -2, 1);
+	pointLight->position = glm::vec4(1, 0.1f, -2, 1);
 	pointLight->diffuse = glm::vec3(1.0f, 1.0f, 1.0f);
 	pointLight->ambient = glm::vec3(0.1f, 0.1f, 0.1f);
 	pointLight->specular = glm::vec3(1.0f, 1.0f, 1.0f);
@@ -42,6 +43,15 @@ int main(){
 	pointLight->kl = 0.05f;
 	pointLight->kq = 0.001f;
 	s.lights.push_back(pointLight);
+
+	std::shared_ptr<SpotLight> spotLight(new SpotLight());
+	spotLight->position = glm::vec4(1.3, 1, 3.5, 1);
+	spotLight->diffuse = glm::vec3(1.0f, 1.0f, 1.0f);
+	spotLight->ambient = glm::vec3(0.1f, 0.1f, 0.1f);
+	spotLight->specular = glm::vec3(1.0f, 1.0f, 1.0f);
+	spotLight->direction = glm::vec3(0.8f, -1.0f, 0.0f);
+	spotLight->cosAngle = cos(glm::radians(30.0f));
+	s.lights.push_back(spotLight);
 
 	// Input
 	float speedMultiplier = 2.0f;

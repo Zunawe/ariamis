@@ -31,14 +31,14 @@ class Engine{
 		static void postContextCreation();
 		static void initializeGBuffer();
 		static void processInputs();
-		static void renderQuad();
+		static void renderQuad(const std::vector<std::shared_ptr<Light>> &lights, glm::vec3 cameraPosition);
 
 		static unsigned int gBuffer;
 		static unsigned int gPosition;
 		static unsigned int gNormal;
-		static unsigned int gColorSpec;
+		static unsigned int gAlbedoSpecular;
 		static unsigned int quadVAO;
-		static Shader quadShader;
+		static Shader lightingShader;
 		static Shader gBufferShader;
 
 		static std::map<int, std::vector<std::function<void(float)>>> keyCallbacks;

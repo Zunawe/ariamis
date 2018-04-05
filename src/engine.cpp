@@ -1,6 +1,7 @@
 #include "engine.h"
 
 #include <iostream>
+#include <random>
 
 #include "shader.h"
 #include "material.h"
@@ -12,6 +13,15 @@ unsigned int Engine::gAlbedoSpecular;
 unsigned int Engine::quadVAO;
 Shader Engine::lightingShader;
 Shader Engine::gBufferShader;
+
+unsigned int Engine::SSAOBuffer;
+unsigned int Engine::SSAOOutput;
+unsigned int Engine::SSAOIntermediate;
+std::vector<glm::vec3> Engine::kernelSSAO;
+unsigned int Engine::rotationNoiseSSAO;
+Shader Engine::SSAOShader;
+Shader Engine::SSAOHBlurShader;
+Shader Engine::SSAOVBlurShader;
 
 std::map<int, std::vector<std::function<void(float)>>> Engine::keyCallbacks;
 std::vector<std::function<void(double, double)>> Engine::mouseMoveCallbacks;
@@ -30,11 +40,11 @@ void Engine::postContextCreation(){
 
 	glEnable(GL_DEPTH_TEST);
 
-	Shader::DEFAULT_SHADER.loadFile("data/shaders/default.vs", GL_VERTEX_SHADER);
-	Shader::DEFAULT_SHADER.loadFile("data/shaders/default.fs", GL_FRAGMENT_SHADER);
+	Shader::DEFAULT_SHADER.loadFile("data/shaders/forward.vs", GL_VERTEX_SHADER);
+	Shader::DEFAULT_SHADER.loadFile("data/shaders/forward.fs", GL_FRAGMENT_SHADER);
 	Shader::DEFAULT_SHADER.link();
 
-	lightingShader.loadFile("data/shaders/lighting.vs", GL_VERTEX_SHADER);
+	lightingShader.loadFile("data/shaders/quad.vs", GL_VERTEX_SHADER);
 	lightingShader.loadFile("data/shaders/lighting.fs", GL_FRAGMENT_SHADER);
 	lightingShader.link();
 
@@ -42,8 +52,27 @@ void Engine::postContextCreation(){
 	gBufferShader.loadFile("data/shaders/gbuffer.fs", GL_FRAGMENT_SHADER);
 	gBufferShader.link();
 
+	SSAOShader.loadFile("data/shaders/quad.vs", GL_VERTEX_SHADER);
+	SSAOShader.loadFile("data/shaders/ssao.fs", GL_FRAGMENT_SHADER);
+	SSAOShader.link();
+
+	SSAOHBlurShader.loadFile("data/shaders/quad.vs", GL_VERTEX_SHADER);
+	SSAOHBlurShader.loadFile("data/shaders/h_blur.fs", GL_FRAGMENT_SHADER);
+	SSAOHBlurShader.link();
+
+	SSAOVBlurShader.loadFile("data/shaders/quad.vs", GL_VERTEX_SHADER);
+	SSAOVBlurShader.loadFile("data/shaders/v_blur.fs", GL_FRAGMENT_SHADER);
+	SSAOVBlurShader.link();
+
 	Material::DEFAULT_MATERIAL = Material();
+
 	initializeGBuffer();
+	initializeSSAOBuffer();
+
+	glfwSwapInterval(0);
+
+	kernelSSAO = generateSampleKernelSSAO(NUM_KERNEL_SAMPLES);
+	rotationNoiseSSAO = generateRotationNoiseTextureSSAO();
 }
 
 void Engine::initializeGBuffer(){
@@ -55,6 +84,8 @@ void Engine::initializeGBuffer(){
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, width, height, 0, GL_RGB, GL_FLOAT, NULL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, gPosition, 0);
 
 	glGenTextures(1, &gNormal);
@@ -105,7 +136,7 @@ GLFWwindow* Engine::createWindow(int width, int height, const char *name){
 		return nullptr;
 	}
 
-	window = glfwCreateWindow(width, height, name, NULL, NULL);
+	window = glfwCreateWindow(width, height, name, glfwGetPrimaryMonitor(), NULL);
 	Engine::width = width;
 	Engine::height = height;
 
@@ -132,24 +163,82 @@ void Engine::playScene(Scene &scene){
 		float newTime = glfwGetTime();
 		deltaTime = newTime - lastTime;
 		lastTime = newTime;
+		std::cout << 1.0f / deltaTime << '\r' << std::flush;
 
 		glfwPollEvents();
 		processInputs();
 
 		scene.update();
+
+		// G-Buffer Pass
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glBindFramebuffer(GL_FRAMEBUFFER, gBuffer);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			scene.draw();
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-		renderQuad(scene.lights, scene.cameras[0].getPosition());
+
+		// SSAO
+		glBindFramebuffer(GL_FRAMEBUFFER, SSAOBuffer);
+			glClear(GL_COLOR_BUFFER_BIT);
+
+			SSAOShader.use();
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, gPosition);
+			glActiveTexture(GL_TEXTURE1);
+			glBindTexture(GL_TEXTURE_2D, gNormal);
+			glActiveTexture(GL_TEXTURE2);
+			glBindTexture(GL_TEXTURE_2D, rotationNoiseSSAO);
+			SSAOShader.setUniform("gPosition", 0);
+			SSAOShader.setUniform("gNormal", 1);
+			SSAOShader.setUniform("rotationNoise", 2);
+			SSAOShader.setUniform("projection", scene.projection);
+			for(unsigned int i = 0; i < NUM_KERNEL_SAMPLES; ++i){
+				SSAOShader.setUniform("samples[" + std::to_string(i) + "]", kernelSSAO[i]);
+			}
+			drawQuad();
+
+			SSAOHBlurShader.use();
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, SSAOOutput);
+			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, SSAOIntermediate, 0);
+			drawQuad();
+
+			SSAOVBlurShader.use();
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, SSAOIntermediate);
+			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, SSAOOutput, 0);
+			drawQuad();
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+		// Lighting Pass
+		lightingShader.use();
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, gPosition);
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, gNormal);
+		glActiveTexture(GL_TEXTURE2);
+		glBindTexture(GL_TEXTURE_2D, gAlbedoSpecular);
+		glActiveTexture(GL_TEXTURE3);
+		glBindTexture(GL_TEXTURE_2D, SSAOOutput);
+		lightingShader.setUniform("gPosition", 0);
+		lightingShader.setUniform("gNormal", 1);
+		lightingShader.setUniform("gAlbedoSpecular", 2);
+		lightingShader.setUniform("ambientOcclusion", 3);
+		lightingShader.setUniform("view", scene.cameras[0].getViewMatrix());
+
+		for(int i = 0; i < scene.lights.size(); ++i){
+			scene.lights[i]->setUniforms(lightingShader, "lights[" + std::to_string(i) + "]");
+		}
+
+		drawQuad();
+
 		glfwSwapBuffers(window);
 	}
 
 	glfwTerminate();
 }
 
-void Engine::renderQuad(const std::vector<std::shared_ptr<Light>> &lights, glm::vec3 cameraPosition){
+void Engine::drawQuad(){
 	if(!quadVAO){
 		unsigned int quadVBO;
 		float attributes[]{
@@ -171,24 +260,8 @@ void Engine::renderQuad(const std::vector<std::shared_ptr<Light>> &lights, glm::
 		glBindVertexArray(0);
 	}
 
-	lightingShader.use();
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, gPosition);
-	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, gNormal);
-	glActiveTexture(GL_TEXTURE2);
-	glBindTexture(GL_TEXTURE_2D, gAlbedoSpecular);
-	lightingShader.setUniform("gPosition", 0);
-	lightingShader.setUniform("gNormal", 1);
-	lightingShader.setUniform("gAlbedoSpecular", 2);
-	lightingShader.setUniform("cameraPosition", cameraPosition);
-
-	for(int i = 0; i < lights.size(); ++i){
-		lights[i]->setUniforms(lightingShader, "lights[" + std::to_string(i) + "]");
-	}
-
 	glBindVertexArray(quadVAO);
-	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 	glBindVertexArray(0);
 }
 
@@ -271,6 +344,7 @@ void Engine::resizeWindow(GLFWwindow *window, int newWidth, int newHeight){
 	height = newHeight;
 	glDeleteFramebuffers(1, &gBuffer);
 	initializeGBuffer();
+	initializeSSAOBuffer();
 }
 
 /**
@@ -281,4 +355,72 @@ void Engine::mouseMoveCallback(GLFWwindow *window, double x, double y){
 	for(auto it = mouseMoveCallbacks.begin(); it != mouseMoveCallbacks.end(); ++it){
 		(*it)(x, y);
 	}
+}
+
+std::vector<glm::vec3> Engine::generateSampleKernelSSAO(unsigned int numSamples){
+	std::default_random_engine generator;
+	std::uniform_real_distribution<float> unif(0.0f, 1.0f);
+	std::vector<glm::vec3> kernel;
+
+	for(unsigned int i = 0; i < numSamples; ++i){
+		glm::vec3 sample(
+			(unif(generator) * 2.0f) - 1.0f,
+			(unif(generator) * 2.0f) - 1.0f,
+			 unif(generator)
+		);
+		sample = glm::normalize(sample) * unif(generator);
+		float scale = (float)i / 64.0f;
+		scale = 0.1f + (scale * scale * 0.9f);
+		sample *= scale;
+		kernel.push_back(sample);
+	}
+
+	return kernel;
+}
+
+unsigned int Engine::generateRotationNoiseTextureSSAO(){
+	std::default_random_engine generator;
+	std::uniform_real_distribution<float> unif(0.0f, 1.0f);
+	float rotations[16 * 3];
+	for(unsigned int i = 0; i < 16 * 3; i += 3){
+		rotations[i + 0] = (unif(generator) * 2.0f) - 1.0f;
+		rotations[i + 1] = (unif(generator) * 2.0f) - 1.0f;
+		rotations[i + 2] = 0.0f;
+	}
+
+	unsigned int id;
+	glGenTextures(1, &id);
+	glBindTexture(GL_TEXTURE_2D, id);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, 4, 4, 0, GL_RGB, GL_FLOAT, rotations);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+	return id;
+}
+
+void Engine::initializeSSAOBuffer(){
+	glGenFramebuffers(1, &SSAOBuffer);
+	glBindFramebuffer(GL_FRAMEBUFFER, SSAOBuffer);
+
+	glGenTextures(1, &SSAOOutput);
+	glBindTexture(GL_TEXTURE_2D, SSAOOutput);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, width, height, 0, GL_RGB, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+	glGenTextures(1, &SSAOIntermediate);
+	glBindTexture(GL_TEXTURE_2D, SSAOIntermediate);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, width, height, 0, GL_RGB, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, SSAOOutput, 0);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }

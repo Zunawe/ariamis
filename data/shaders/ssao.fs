@@ -1,0 +1,47 @@
+#version 330 core
+
+in vec2 vertexTextureCoordinates;
+
+uniform sampler2D gPosition;
+uniform sampler2D gNormal;
+uniform sampler2D rotationNoise;
+
+uniform vec3 samples[16];
+uniform mat4 projection;
+uniform mat4 view;
+
+out float fragmentColor;
+
+const vec2 noiseScale = vec2(1920.0 / 8.0, 1080.0 / 4.0);
+const float radius = 0.5;
+const float bias = 0.025;
+
+void main(){
+	vec3 position = texture(gPosition, vertexTextureCoordinates).xyz;
+	vec3 normal = texture(gNormal, vertexTextureCoordinates).xyz;
+	vec3 kernelRotation = normalize(texture(rotationNoise, vertexTextureCoordinates * noiseScale)).xyz;
+
+	vec3 tangent = normalize(kernelRotation - (normal * dot(kernelRotation, normal)));
+	vec3 bitangent = cross(normal, tangent);
+
+	mat3 TBN = mat3(tangent, bitangent, normal);
+
+	float occlusion = 0.0;
+
+	for(int i = 0; i < 16; ++i){
+		vec3 sample = TBN * samples[i];
+		sample = position + (sample * radius);
+
+		vec4 offset = projection * vec4(sample, 1.0);
+		offset.xyz /= offset.w;
+		offset.xyz = offset.xyz * 0.5 + 0.5;
+
+		float sampleDepth = texture(gPosition, offset.xy).z;
+
+		float rangeScale = smoothstep(0.0, 1.0, radius / abs(position.z - sampleDepth));
+
+		occlusion += (sampleDepth >= sample.z + bias ? 1.0 : 0.0) * rangeScale;
+	}
+
+	fragmentColor = 1.0 - (occlusion / 16.0);
+}

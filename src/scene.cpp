@@ -7,7 +7,7 @@
 Scene::Scene(){
 	projection =  glm::mat4(1);
 	cameras.push_back(Camera());
-	cameras[0].setPosition(glm::vec3(0, 0, -5));
+	cameras[0].setPosition(glm::vec3(0, 0, 5));
 	cameras[0].lookAt(glm::vec3(0, 0, 0));
 }
 

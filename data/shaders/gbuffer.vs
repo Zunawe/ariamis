@@ -26,5 +26,5 @@ void main(){
 	vertexColor = aColor;
 	vertexTextureCoordinates = aTextureCoordinates;
 
-	fragPos = vec3(model * vec4(aPos, 1.0));
+	fragPos = vec3(view * model * vec4(aPos, 1.0));
 }

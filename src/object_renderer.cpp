@@ -43,7 +43,7 @@ ObjectRenderer::ObjectRenderer(){
 void ObjectRenderer::draw(const glm::mat4 &model, const glm::mat4 &view, const glm::mat4 &projection){
 	shader.use();
 
-	glm::mat3 normalModel(glm::transpose(glm::inverse(model)));
+	glm::mat3 normalModel(glm::transpose(glm::inverse(view * model)));
 	shader.setUniform("model", model);
 	shader.setUniform("normalModel", normalModel);
 	shader.setUniform("view", view);

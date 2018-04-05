@@ -10,6 +10,8 @@
 
 #include "scene.h"
 
+#define NUM_KERNEL_SAMPLES 16
+
 class Engine{
 	public:
 		static void playScene(Scene &scene);
@@ -30,8 +32,11 @@ class Engine{
 
 		static void postContextCreation();
 		static void initializeGBuffer();
+		static void initializeSSAOBuffer();
 		static void processInputs();
-		static void renderQuad(const std::vector<std::shared_ptr<Light>> &lights, glm::vec3 cameraPosition);
+		static void drawQuad();
+		static std::vector<glm::vec3> generateSampleKernelSSAO(unsigned int numSamples);
+		static unsigned int generateRotationNoiseTextureSSAO();
 
 		static unsigned int gBuffer;
 		static unsigned int gPosition;
@@ -40,6 +45,15 @@ class Engine{
 		static unsigned int quadVAO;
 		static Shader lightingShader;
 		static Shader gBufferShader;
+
+		static unsigned int SSAOBuffer;
+		static unsigned int SSAOOutput;
+		static unsigned int SSAOIntermediate;
+		static std::vector<glm::vec3> kernelSSAO;
+		static unsigned int rotationNoiseSSAO;
+		static Shader SSAOShader;
+		static Shader SSAOHBlurShader;
+		static Shader SSAOVBlurShader;
 
 		static std::map<int, std::vector<std::function<void(float)>>> keyCallbacks;
 		static std::vector<std::function<void(double, double)>> mouseMoveCallbacks;

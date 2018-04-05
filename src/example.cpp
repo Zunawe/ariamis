@@ -15,30 +15,31 @@ int main(){
 	Scene s;
 
 	// Objects
-	std::shared_ptr<Object> sphere(new Object());
-	sphere->renderer.setMesh(loadMeshFromObj("data/objects/sphere.obj"));
+	std::shared_ptr<Object> rock(new Object());
+	rock->renderer.setMesh(loadMeshFromObj("data/objects/rock.obj"));
+	// rock->renderer.getMaterial().diffuseMap = Texture("data/textures/rock_diffuse.png");
+	rock->renderer.getMaterial().specularMap = Texture("data/textures/rock_specular.png");
 
-	sphere->update = [](std::shared_ptr<Object> me){
-		me->position.x = 6.0f * cos(Engine::getTime());
-		me->position.z = 6.0f * sin(Engine::getTime());
-	};
+	// rock->position = glm::vec3(4, 0, 0);
 
-	s.objects.push_back(sphere);
+	s.objects.push_back(rock);
 
-	std::shared_ptr<Object> plane(new Object());
-	plane->renderer.setMesh(loadMeshFromObj("data/objects/cube.obj"));
-	plane->renderer.getMaterial().diffuseMap = Texture("data/textures/container_diff.png");
-	s.objects.push_back(plane);
+	for(int i = 0; i < 6; ++i){
+		std::shared_ptr<Object> plane(new Object());
+		plane->renderer.setMesh(loadMeshFromObj("data/objects/cube.obj"));
+		s.objects.push_back(plane);
 
-	plane->position += glm::vec3(0, -1, 0);
-	plane->scale *= glm::vec3(50.0f, 0.1f, 50.0f);
+		plane->position = glm::vec3(0, 0, 0);
+		plane->position[i / 2] = ((2 * (i % 2)) - 1) * 10.0f;
+		plane->scale *= glm::vec3(10.0f, 10.0f, 10.0f);
+	}
 
 	// Lights
 	std::shared_ptr<PointLight> pointLight(new PointLight());
-	pointLight->position = glm::vec4(1, 0.1f, -2, 1);
-	pointLight->diffuse = glm::vec3(1.0f, 1.0f, 1.0f);
-	pointLight->ambient = glm::vec3(0.1f, 0.1f, 0.1f);
-	pointLight->specular = glm::vec3(1.0f, 1.0f, 1.0f);
+	pointLight->position = glm::vec4(1, 0.1f, 2, 1);
+	pointLight->diffuse = glm::vec3(0.3f, 0.3f, 0.3f);
+	pointLight->ambient = glm::vec3(0.7f, 0.7f, 0.7f);
+	pointLight->specular = glm::vec3(0.4f, 0.4f, 0.4f);
 	pointLight->kc = 1.0f;
 	pointLight->kl = 0.05f;
 	pointLight->kq = 0.001f;
@@ -46,9 +47,9 @@ int main(){
 
 	std::shared_ptr<SpotLight> spotLight(new SpotLight());
 	spotLight->position = glm::vec4(1.3, 1, 3.5, 1);
-	spotLight->diffuse = glm::vec3(1.0f, 1.0f, 1.0f);
-	spotLight->ambient = glm::vec3(0.1f, 0.1f, 0.1f);
-	spotLight->specular = glm::vec3(1.0f, 1.0f, 1.0f);
+	spotLight->diffuse = glm::vec3(0.4f, 0.4f, 0.4f);
+	spotLight->ambient = glm::vec3(0.0f, 0.0f, 0.0f);
+	spotLight->specular = glm::vec3(0.8f, 0.8f, 0.8f);
 	spotLight->direction = glm::vec3(0.8f, -1.0f, 0.0f);
 	spotLight->cosAngle = cos(glm::radians(30.0f));
 	s.lights.push_back(spotLight);
@@ -79,7 +80,7 @@ int main(){
 	});
 
 	// Need to set yaw and pitch based on the original camera position
-	float yaw = 90.0f;
+	float yaw = -90.0f;
 	float pitch = 0.0f;
 	double lastX, lastY;
 	float sensitivity = 0.1f;

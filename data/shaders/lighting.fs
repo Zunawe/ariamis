@@ -21,9 +21,11 @@ in vec2 vertexTextureCoordinates;
 uniform sampler2D gPosition;
 uniform sampler2D gNormal;
 uniform sampler2D gAlbedoSpecular;
+uniform sampler2D ambientOcclusion;
+
+uniform mat4 view;
 
 uniform Light lights[4];
-uniform vec3 cameraPosition;
 
 out vec4 fragmentColor;
 
@@ -34,11 +36,15 @@ void main(){
 	vec3 albedo = albedoSpecular.rgb;
 	vec3 spec = albedoSpecular.aaa;
 
-	vec3 toCamera = normalize(cameraPosition - position);
+	float occlusion = texture(ambientOcclusion, vertexTextureCoordinates).r;
+
+	vec3 toCamera = normalize(-position);
 
 	vec3 ambient, diffuse, specular;
 	for(int i = 0; i < 4; ++i){
 		Light light = lights[i];
+		light.position = view * light.position;
+		light.direction = (view * vec4(light.direction, 0.0)).xyz;
 
 		// Directional Light
 		vec3 toLight = normalize(light.position.w != 0.0 ? light.position.xyz - position : -light.position.xyz);
@@ -63,6 +69,7 @@ void main(){
 		float shinyMultiplier = pow(max(dot(toCamera, reflected), 0), 32.0);
 		specular += spotlightMultiplier * attenuation * spec * light.specular * shinyMultiplier;
 	}
-	// fragmentColor = texture(gPosition, vertexTextureCoordinates);
+	ambient *= occlusion;
+
 	fragmentColor = vec4(ambient + diffuse + specular, 1.0);
 }

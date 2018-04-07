@@ -1,6 +1,7 @@
 #include "mesh.h"
 
 #include <algorithm>
+#include <iostream>
 
 Mesh::Mesh(){
 	submeshBounds.push_back(0);
@@ -70,10 +71,9 @@ void Mesh::calculateTangents(){
 }
 
 glm::vec3 Mesh::getVertex(unsigned int i){
-	unsigned int attributeIndex = vertexIndexToAttributeIndex(i);
-	return glm::vec3(vertexData[attributeIndex + 0],
-	                 vertexData[attributeIndex + 1],
-					 vertexData[attributeIndex + 2]);
+	return glm::vec3(vertexData[i].x,
+	                 vertexData[i].y,
+					 vertexData[i].z);
 }
 
 /**
@@ -85,26 +85,21 @@ glm::vec3 Mesh::getVertex(unsigned int i){
  * @return the index of the created vertex.
  */
 unsigned int Mesh::addVertex(float x, float y, float z){
-	vertexData.push_back(x); // X
-	vertexData.push_back(y); // Y
-	vertexData.push_back(z); // Z
-
-	vertexData.push_back(0.0f); // X (Normal)
-	vertexData.push_back(0.0f); // Y (Normal)
-	vertexData.push_back(0.0f); // Z (Normal)
-
-	vertexData.push_back(0.0f); // X (Tangent)
-	vertexData.push_back(0.0f); // Y (Tangent)
-	vertexData.push_back(0.0f); // Z (Tangent)
-
-	vertexData.push_back(1.0f); // R
-	vertexData.push_back(1.0f); // G
-	vertexData.push_back(1.0f); // B
-
-	vertexData.push_back(0.0f); // U
-	vertexData.push_back(0.0f); // V
+	Attribute a;
+	a.x = x;
+	a.y = y;
+	a.z = z;
+	a.nx = 0.0f;
+	a.ny = 0.0f;
+	a.nz = 0.0f;
+	a.r = 1.0f;
+	a.g = 1.0f;
+	a.b = 1.0f;
+	a.u = 0.0f;
+	a.v = 0.0f;
+	vertexData.push_back(a);
 	
-	return (vertexData.size() / ATTRIBUTE_SIZE) - 1;
+	return vertexData.size() - 1;
 }
 
 /**
@@ -159,10 +154,9 @@ unsigned int Mesh::addVertices(const std::vector<glm::vec3> &vertices){
  * @param vertex the new value for the vertex's position.
  */
 void Mesh::setVertex(unsigned int index, glm::vec3 vertex){
-	unsigned int attributeIndex = vertexIndexToAttributeIndex(index);
-	vertexData[attributeIndex + 0] = vertex.x;
-	vertexData[attributeIndex + 1] = vertex.y;
-	vertexData[attributeIndex + 2] = vertex.z;
+	vertexData[index].x = vertex.x;
+	vertexData[index].y = vertex.y;
+	vertexData[index].z = vertex.z;
 }
 
 /**
@@ -171,8 +165,7 @@ void Mesh::setVertex(unsigned int index, glm::vec3 vertex){
  * @param index the index of the vertex to remove.
  */
 void Mesh::removeVertex(unsigned int index){
-	unsigned int attributeIndex = vertexIndexToAttributeIndex(index);
-	vertexData.erase(vertexData.begin() + attributeIndex, vertexData.begin() + attributeIndex + ATTRIBUTE_SIZE);
+	vertexData.erase(vertexData.begin() + index, vertexData.begin() + index + 1);
 }
 
 /**
@@ -237,10 +230,9 @@ void Mesh::removeTriangle(unsigned int index){
 }
 
 glm::vec3 Mesh::getNormal(unsigned int i){
-	unsigned int attributeIndex = vertexIndexToAttributeIndex(i);
-	return glm::vec3(vertexData[attributeIndex + 3],
-	                 vertexData[attributeIndex + 4],
-					 vertexData[attributeIndex + 5]);
+	return glm::vec3(vertexData[i].nx,
+	                 vertexData[i].ny,
+					 vertexData[i].nz);
 }
 
 /**
@@ -250,11 +242,10 @@ glm::vec3 Mesh::getNormal(unsigned int i){
  * @param normal the new normal vector. (Does not need to be normalized.)
  */
 void Mesh::setNormal(unsigned int index, glm::vec3 normal){
-	unsigned int attributeIndex = vertexIndexToAttributeIndex(index);
 	normal = glm::normalize(normal);
-	vertexData[attributeIndex + 3] = normal.x;
-	vertexData[attributeIndex + 4] = normal.y;
-	vertexData[attributeIndex + 5] = normal.z;
+	vertexData[index].nx = normal.x;
+	vertexData[index].ny = normal.y;
+	vertexData[index].nz = normal.z;
 }
 
 /**
@@ -273,11 +264,10 @@ void Mesh::setNormal(glm::vec3 normal){
  * @param tangent the new tangent vector. (Does not need to be normalized.)
  */
 void Mesh::setTangent(unsigned int index, glm::vec3 tangent){
-	unsigned int attributeIndex = vertexIndexToAttributeIndex(index);
 	tangent = glm::normalize(tangent);
-	vertexData[attributeIndex + 6] = tangent.x;
-	vertexData[attributeIndex + 7] = tangent.y;
-	vertexData[attributeIndex + 8] = tangent.z;
+	vertexData[index].tx = tangent.x;
+	vertexData[index].ty = tangent.y;
+	vertexData[index].tz = tangent.z;
 }
 
 /**
@@ -290,10 +280,9 @@ void Mesh::setTangent(glm::vec3 tangent){
 }
 
 glm::vec3 Mesh::getColor(unsigned int i){
-	unsigned int attributeIndex = vertexIndexToAttributeIndex(i);
-	return glm::vec3(vertexData[attributeIndex +  9],
-	                 vertexData[attributeIndex + 10],
-					 vertexData[attributeIndex + 11]);
+	return glm::vec3(vertexData[i].r,
+	                 vertexData[i].g,
+					 vertexData[i].b);
 }
 
 /**
@@ -303,10 +292,9 @@ glm::vec3 Mesh::getColor(unsigned int i){
  * @param color the new color.
  */
 void Mesh::setColor(unsigned int index, glm::vec3 color){
-	unsigned int attributeIndex = vertexIndexToAttributeIndex(index);
-	vertexData[attributeIndex +  9] = color.r;
-	vertexData[attributeIndex + 10] = color.g;
-	vertexData[attributeIndex + 11] = color.b;
+	vertexData[index].r = color.r;
+	vertexData[index].g = color.g;
+	vertexData[index].b = color.b;
 }
 
 /**
@@ -319,9 +307,8 @@ void Mesh::setColor(glm::vec3 color){
 }
 
 glm::vec2 Mesh::getTextureCoordinate(unsigned int i){
-	unsigned int attributeIndex = vertexIndexToAttributeIndex(i);
-	return glm::vec2(vertexData[attributeIndex + 12],
-	                 vertexData[attributeIndex + 13]);
+	return glm::vec2(vertexData[i].u,
+	                 vertexData[i].v);
 }
 
 /**
@@ -332,9 +319,8 @@ glm::vec2 Mesh::getTextureCoordinate(unsigned int i){
  * @param v the y position of the new texture coordinate
  */
 void Mesh::setTextureCoordinate(unsigned int index, float u, float v){
-	unsigned int attributeIndex = vertexIndexToAttributeIndex(index);
-	vertexData[attributeIndex + 12] = u;
-	vertexData[attributeIndex + 13] = v;
+	vertexData[index].u = u;
+	vertexData[index].v = v;
 }
 
 /**
@@ -408,7 +394,7 @@ void Mesh::startNewSubmesh(){
  * @return the pointer to the vertex data.
  */
 float* Mesh::getVertexData(){
-	return &vertexData[0];
+	return &(vertexData[0].x);
 }
 
 /**
@@ -427,7 +413,7 @@ unsigned int* Mesh::getIndexData(){
  * @return the number of vertices in the mesh.
  */
 unsigned int Mesh::getNumVertices(){
-	return vertexData.size() / ATTRIBUTE_SIZE;
+	return vertexData.size();
 }
 
 /**
@@ -467,13 +453,6 @@ std::vector<unsigned int> Mesh::getSubmeshBounds(){
 }
 
 /**
- * Turns the conceptual index of the vertex into the index of the first float in a vertex attribute.
- */
-unsigned int Mesh::vertexIndexToAttributeIndex(unsigned int index){
-	return index * ATTRIBUTE_SIZE;
-}
-
-/**
  * Ensures that every triangle has 3 vertices that are in no other triangles.
  * This means that the number of vertices in the mesh will either increase
  * or remain the same. This does not affect submeshes as those are based on
@@ -489,12 +468,34 @@ void Mesh::makeAllVerticesUnique(){
 			usedIndices.push_back(oldIndex);
 		}
 		else{
-			unsigned int newIndex = addVertex(getVertex(oldIndex));
-			setNormal(getNormal(oldIndex));
-			setColor(glm::vec3(1, 0, 0));
-			setTextureCoordinate(getTextureCoordinate(oldIndex));
-
-			triangles[i] = newIndex;
+			Attribute a = vertexData[oldIndex];
+			vertexData.push_back(a);
+			triangles[i] = vertexData.size() - 1;
 		}
 	}
+}
+
+/**
+ * Shrinks vertex data to minimal size while still ensuring all vertices needed
+ * by triangle indices are represented. This is very expensive, but should only
+ * be run once or twice per object. Not intended for use with dynamic meshes.
+ */
+void Mesh::compress(){
+	std::vector<Attribute> newVertexData;
+	std::vector<unsigned int> newTriangles;
+	for(unsigned int i = 0; i < getNumTriangles() * 3; ++i){
+		unsigned int j;
+		for(j = 0; j < newVertexData.size(); ++j){
+			if(vertexData[triangles[i]] == newVertexData[j]){
+				break;
+			}
+		}
+		newTriangles.push_back(j);
+		if(j == newVertexData.size()){
+			newVertexData.push_back(vertexData[triangles[i]]);
+		}
+	}
+
+	triangles = newTriangles;
+	vertexData = newVertexData;
 }

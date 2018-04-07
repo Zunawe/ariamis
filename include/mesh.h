@@ -6,8 +6,65 @@
 #include <glm/glm.hpp>
 
 class Mesh{
+	private:
+		struct Attribute{
+			float x;
+			float y;
+			float z;
+			float nx;
+			float ny;
+			float nz;
+			float tx;
+			float ty;
+			float tz;
+			float r;
+			float g;
+			float b;
+			float u;
+			float v;
+
+			bool operator==(const Attribute &a) const{
+				return x == a.x &&
+					   y == a.y &&
+					   z == a.z &&
+					   nx == a.nx &&
+					   ny == a.ny &&
+					   nz == a.nz &&
+					   tx == a.tx &&
+					   ty == a.ty &&
+					   tz == a.tz &&
+					   r == a.r &&
+					   g == a.g &&
+					   b == a.b &&
+					   u == a.u &&
+					   v == a.v;
+			}
+
+			bool operator!=(const Attribute &a) const{
+				return !(*this == a);
+			}
+
+			Attribute& operator=(const Attribute &a){
+				x = a.x;
+				y = a.y;
+				z = a.z;
+				nx = a.nx;
+				ny = a.ny;
+				nz = a.nz;
+				tx = a.tx;
+				ty = a.ty;
+				tz = a.tz;
+				r = a.r;
+				g = a.g;
+				b = a.b;
+				u = a.u;
+				v = a.v;
+
+				return *this;
+			}
+		};
 	public:
-		static const unsigned int ATTRIBUTE_SIZE = 14;
+		static const unsigned int ATTRIBUTE_SIZE = sizeof(Attribute) / sizeof(float);
 
 		Mesh();
 		void calculateFaceNormals();
@@ -47,6 +104,8 @@ class Mesh{
 
 		void startNewSubmeshAt(unsigned int i);
 		void startNewSubmesh();
+
+		void compress();
 	
 		float* getVertexData();
 		unsigned int* getIndexData();
@@ -54,12 +113,11 @@ class Mesh{
 		unsigned int getNumTriangles();
 		unsigned int getNumSubmeshes();
 		std::vector<unsigned int> getSubmeshBounds();
+		void makeAllVerticesUnique();
 		
 	private:
-		unsigned int vertexIndexToAttributeIndex(unsigned int index);
-		void makeAllVerticesUnique();
 
-		std::vector<float> vertexData;
+		std::vector<Attribute> vertexData;
 		std::vector<unsigned int> triangles;
 		glm::vec3 defaultColor;
 		std::vector<unsigned int> submeshBounds;

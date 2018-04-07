@@ -196,6 +196,7 @@ Mesh loadMeshFromObj(const char *filepath, vector<unsigned int> &materialIndices
 
 	file.close();
 
+	mesh.compress();
 	return mesh;
 }
 

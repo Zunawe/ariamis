@@ -6,15 +6,15 @@ uniform sampler2D gPosition;
 uniform sampler2D gNormal;
 uniform sampler2D rotationNoise;
 
-uniform vec3 samples[16];
+uniform vec3 samples[32];
 uniform mat4 projection;
 uniform mat4 view;
 
 out float fragmentColor;
 
 const vec2 noiseScale = vec2(1920.0 / 8.0, 1080.0 / 4.0);
-const float radius = 0.5;
-const float bias = 0.025;
+const float radius = 1.0;
+const float bias = 0.05;
 
 void main(){
 	vec3 position = texture(gPosition, vertexTextureCoordinates).xyz;
@@ -28,13 +28,13 @@ void main(){
 
 	float occlusion = 0.0;
 
-	for(int i = 0; i < 16; ++i){
+	for(int i = 0; i < 32; ++i){
 		vec3 sample = TBN * samples[i];
 		sample = position + (sample * radius);
 
 		vec4 offset = projection * vec4(sample, 1.0);
-		offset.xyz /= offset.w;
-		offset.xyz = offset.xyz * 0.5 + 0.5;
+		offset /= offset.w;
+		offset = (offset + 1.0) / 2.0;
 
 		float sampleDepth = texture(gPosition, offset.xy).z;
 
@@ -43,5 +43,5 @@ void main(){
 		occlusion += (sampleDepth >= sample.z + bias ? 1.0 : 0.0) * rangeScale;
 	}
 
-	fragmentColor = 1.0 - (occlusion / 16.0);
+	fragmentColor = 1.0 - (occlusion / 32.0);
 }

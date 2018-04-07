@@ -23,4 +23,3 @@ void main(){
 	gColorSpec.rgb = texture(material.diffuseMap, vertexTextureCoordinates).rgb;
 	gColorSpec.a = texture(material.specularMap, vertexTextureCoordinates).r;
 }
-

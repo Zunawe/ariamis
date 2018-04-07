@@ -20,8 +20,7 @@ unsigned int Engine::SSAOIntermediate;
 std::vector<glm::vec3> Engine::kernelSSAO;
 unsigned int Engine::rotationNoiseSSAO;
 Shader Engine::SSAOShader;
-Shader Engine::SSAOHBlurShader;
-Shader Engine::SSAOVBlurShader;
+Shader Engine::SSAOBlurShader;
 
 std::map<int, std::vector<std::function<void(float)>>> Engine::keyCallbacks;
 std::vector<std::function<void(double, double)>> Engine::mouseMoveCallbacks;
@@ -56,13 +55,9 @@ void Engine::postContextCreation(){
 	SSAOShader.loadFile("data/shaders/ssao.fs", GL_FRAGMENT_SHADER);
 	SSAOShader.link();
 
-	SSAOHBlurShader.loadFile("data/shaders/quad.vs", GL_VERTEX_SHADER);
-	SSAOHBlurShader.loadFile("data/shaders/h_blur.fs", GL_FRAGMENT_SHADER);
-	SSAOHBlurShader.link();
-
-	SSAOVBlurShader.loadFile("data/shaders/quad.vs", GL_VERTEX_SHADER);
-	SSAOVBlurShader.loadFile("data/shaders/v_blur.fs", GL_FRAGMENT_SHADER);
-	SSAOVBlurShader.link();
+	SSAOBlurShader.loadFile("data/shaders/quad.vs", GL_VERTEX_SHADER);
+	SSAOBlurShader.loadFile("data/shaders/ssao_blur.fs", GL_FRAGMENT_SHADER);
+	SSAOBlurShader.link();
 
 	Material::DEFAULT_MATERIAL = Material();
 
@@ -128,7 +123,7 @@ void Engine::cleanUp(){
  * things that require said context. You should do this before creating any
  * other instances of anything from this library.
  */
-GLFWwindow* Engine::createWindow(int width, int height, const char *name){
+GLFWwindow* Engine::createWindow(const char *name){
 	glfwDestroyWindow(window);
 
 	if(!glfwInit()){
@@ -136,9 +131,11 @@ GLFWwindow* Engine::createWindow(int width, int height, const char *name){
 		return nullptr;
 	}
 
+	const GLFWvidmode *mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+	width = mode->width;
+	height = mode->height;
+
 	window = glfwCreateWindow(width, height, name, glfwGetPrimaryMonitor(), NULL);
-	Engine::width = width;
-	Engine::height = height;
 
 	glfwMakeContextCurrent(window);
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
@@ -197,15 +194,18 @@ void Engine::playScene(Scene &scene){
 			}
 			drawQuad();
 
-			SSAOHBlurShader.use();
+			SSAOBlurShader.use();
 			glActiveTexture(GL_TEXTURE0);
 			glBindTexture(GL_TEXTURE_2D, SSAOOutput);
+			SSAOBlurShader.setUniform("source", 0);
+			SSAOBlurShader.setUniform("axis", 0);
 			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, SSAOIntermediate, 0);
 			drawQuad();
 
-			SSAOVBlurShader.use();
 			glActiveTexture(GL_TEXTURE0);
 			glBindTexture(GL_TEXTURE_2D, SSAOIntermediate);
+			SSAOBlurShader.setUniform("source", 0);
+			SSAOBlurShader.setUniform("axis", 1);
 			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, SSAOOutput, 0);
 			drawQuad();
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);

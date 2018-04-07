@@ -10,7 +10,7 @@
 #include "light.h"
 
 int main(){
-	Engine::createWindow(1024, 1024, "Example");
+	Engine::createWindow("Example");
 
 	Scene s;
 
@@ -20,7 +20,7 @@ int main(){
 	// rock->renderer.getMaterial().diffuseMap = Texture("data/textures/rock_diffuse.png");
 	rock->renderer.getMaterial().specularMap = Texture("data/textures/rock_specular.png");
 
-	// rock->position = glm::vec3(4, 0, 0);
+	rock->position = glm::vec3(4, 0, 0);
 
 	s.objects.push_back(rock);
 

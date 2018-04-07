@@ -10,14 +10,14 @@
 
 #include "scene.h"
 
-#define NUM_KERNEL_SAMPLES 16
+#define NUM_KERNEL_SAMPLES 32
 
 class Engine{
 	public:
 		static void playScene(Scene &scene);
 		static void registerKeyEvent(int key, std::function<void(float)> func);
 		static void registerMouseMoveEvent(std::function<void(double, double)> func);
-		static GLFWwindow* createWindow(int width, int height, const char *name);
+		static GLFWwindow* createWindow(const char *name);
 		static GLFWwindow* getWindow();
 		static void quit();
 		static int getWidth();
@@ -52,8 +52,7 @@ class Engine{
 		static std::vector<glm::vec3> kernelSSAO;
 		static unsigned int rotationNoiseSSAO;
 		static Shader SSAOShader;
-		static Shader SSAOHBlurShader;
-		static Shader SSAOVBlurShader;
+		static Shader SSAOBlurShader;
 
 		static std::map<int, std::vector<std::function<void(float)>>> keyCallbacks;
 		static std::vector<std::function<void(double, double)>> mouseMoveCallbacks;

@@ -464,7 +464,7 @@ void Mesh::makeAllVerticesUnique(){
 
 	for(unsigned int i = 0; i < triangles.size(); ++i){
 		unsigned int oldIndex = triangles[i];
-		if(std::find(usedIndices.begin(), usedIndices.end(), oldIndex) == triangles.end()){
+		if(std::find(usedIndices.begin(), usedIndices.end(), oldIndex) == usedIndices.end()){
 			usedIndices.push_back(oldIndex);
 		}
 		else{

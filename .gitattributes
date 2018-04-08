@@ -1,1 +1,2 @@
 stb* linguist-vendored
+test/gtest/* linguist-vendored

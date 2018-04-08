@@ -154,7 +154,7 @@ void ObjectRenderer::setMaterial(const Material &material){
 
 	this->materialIndices.clear();
 	this->materialIndices.resize(mesh.getNumSubmeshes());
-	for(int i = 0; i < this->mesh.getNumSubmeshes(); ++i){
+	for(unsigned int i = 0; i < this->mesh.getNumSubmeshes(); ++i){
 		materialIndices.push_back(0);
 	}
 }

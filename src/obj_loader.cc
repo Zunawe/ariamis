@@ -133,7 +133,7 @@ Mesh loadMeshFromObj(const char *filepath, vector<unsigned int> &materialIndices
 					for(auto it = tokens.begin() + 1; it != tokens.end(); ++it){
 						indices[0] = indices[1] = indices[2] = 0;
 						vector<string> stringIndices = split(*it, '/');
-						for(int i = 0; i < stringIndices.size(); ++i){
+						for(unsigned int i = 0; i < stringIndices.size(); ++i){
 							if(stringIndices[i] == ""){
 								continue;
 							}
@@ -161,7 +161,7 @@ Mesh loadMeshFromObj(const char *filepath, vector<unsigned int> &materialIndices
 					char materialNameBuffer[128];
 					sscanf(line.c_str(), "usemtl %127s", materialNameBuffer);
 
-					int materialIndex = find(materialNames.begin(), materialNames.end(), materialNameBuffer) - materialNames.begin();
+					unsigned int materialIndex = find(materialNames.begin(), materialNames.end(), materialNameBuffer) - materialNames.begin();
 					if(materialIndex == materialNames.size()){
 						materialNames.push_back(string(materialNameBuffer));
 					}

@@ -6,6 +6,7 @@
 class Texture{
 	public:
 		Texture();
+		~Texture();
 		Texture(const char *filePath);
 		void load(const char *filename);
 		unsigned int getID() const;

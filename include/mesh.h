@@ -69,6 +69,7 @@ class Mesh{
 		Mesh();
 		void calculateFaceNormals();
 		void calculateTangents();
+		void makeAllVerticesUnique();
 
 		glm::vec3 getVertex(unsigned int i);
 		unsigned int addVertex(float x, float y, float z);
@@ -113,10 +114,8 @@ class Mesh{
 		unsigned int getNumTriangles();
 		unsigned int getNumSubmeshes();
 		std::vector<unsigned int> getSubmeshBounds();
-		void makeAllVerticesUnique();
 		
 	private:
-
 		std::vector<Attribute> vertexData;
 		std::vector<unsigned int> triangles;
 		glm::vec3 defaultColor;

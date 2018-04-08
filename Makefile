@@ -18,7 +18,7 @@ $(BUILDDIR)/%.o: $(SRCDIR)/%.$(SRCEXT)
 
 clean:
 	@rm -rf $(BUILDDIR)
-	@rm -f $(TARGET)
+	@rm -rf bin
 	@rm -rf test/build
 	@rm -rf test/bin
 
@@ -44,12 +44,12 @@ TEST_TARGET_DIR = test/bin
 TESTS = $(patsubst test/%.cpp, %, $(shell find test -type f -name *.$(SRCEXT)))
 TEST_TARGETS = $(patsubst %, $(TEST_TARGET_DIR)/%, $(TESTS))
 
-test/build/%.o: test/%.cpp $(SRCDIR)/*.cpp $(GTEST_HEADERS)
+test/build/%.o: test/%.cpp $(SRCDIR)/*.$(SRCEXT) $(GTEST_HEADERS)
 	@mkdir -p test/build
 	g++ -isystem $(GTEST_DIR)/include -I$(GTEST_DIR) $(INCLUDE) $(CFLAGS) -pthread \
 		-c $< -o $@
 
-$(TEST_TARGET_DIR)/%: test/build/%.o $(GTEST_TARGET)
+$(TEST_TARGET_DIR)/%: test/build/%.o build/mesh.o $(GTEST_TARGET)
 	@mkdir -p test/bin
 	g++ -isystem $(GTEST_DIR)/include -I$(GTEST_DIR) $(INCLUDE) $(CFLAGS) -pthread \
 		-lpthread $^ -o $@ $(LIBS)

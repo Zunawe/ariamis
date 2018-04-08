@@ -19,6 +19,10 @@ Texture::Texture(const char *filePath){
 	load(filePath);
 }
 
+Texture::~Texture(){
+	// glDeleteTextures(1, &id);
+}
+
 /**
  * Loads an RGB PNG file into memory as a texture.
  * 

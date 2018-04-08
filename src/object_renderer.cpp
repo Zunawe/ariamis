@@ -43,7 +43,7 @@ ObjectRenderer::ObjectRenderer(){
 void ObjectRenderer::draw(const glm::mat4 &model, const glm::mat4 &view, const glm::mat4 &projection, const Camera &camera, const std::vector<std::shared_ptr<Light>> &lights){
 	shader.use();
 
-	for(int i = 0; i < lights.size(); ++i){
+	for(unsigned int i = 0; i < lights.size(); ++i){
 		lights[i]->setUniforms(shader, "lights[" + std::to_string(i) + "]");
 	}
 
@@ -165,7 +165,7 @@ void ObjectRenderer::setMaterial(const Material &material){
 
 	this->materialIndices.clear();
 	this->materialIndices.resize(mesh.getNumSubmeshes());
-	for(int i = 0; i < this->mesh.getNumSubmeshes(); ++i){
+	for(unsigned int i = 0; i < this->mesh.getNumSubmeshes(); ++i){
 		materialIndices.push_back(0);
 	}
 }

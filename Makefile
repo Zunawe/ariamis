@@ -1,7 +1,7 @@
 SRCDIR = src
 BUILDDIR = build
-TARGET = bin/graphic
-SRCEXT := cpp
+TARGET = lib/libariamis.a
+SRCEXT := cc
 SOURCES = $(shell find $(SRCDIR) -type f -name *.$(SRCEXT))
 OBJECTS := $(patsubst $(SRCDIR)/%, $(BUILDDIR)/%, $(SOURCES:.$(SRCEXT)=.o))
 CFLAGS = `pkg-config --cflags glfw3` -Wall -Wextra -std=c++11
@@ -9,8 +9,8 @@ LIBS = `pkg-config --static --libs glfw3` -lGL -L lib
 INCLUDE = -I include
 
 $(TARGET): $(OBJECTS)
-	@mkdir -p bin
-	g++ $^ -o $(TARGET) $(LIBS)
+	@mkdir -p lib
+	ar rcs $@ $^
 
 $(BUILDDIR)/%.o: $(SRCDIR)/%.$(SRCEXT)
 	@mkdir -p $(BUILDDIR)
@@ -18,7 +18,7 @@ $(BUILDDIR)/%.o: $(SRCDIR)/%.$(SRCEXT)
 
 clean:
 	@rm -rf $(BUILDDIR)
-	@rm -rf bin
+	@rm -r $(TARGET)
 	@rm -rf test/build
 	@rm -rf test/bin
 
@@ -49,7 +49,7 @@ test/build/%.o: test/%.cpp $(SRCDIR)/*.$(SRCEXT) $(GTEST_HEADERS)
 	g++ -isystem $(GTEST_DIR)/include -I$(GTEST_DIR) $(INCLUDE) $(CFLAGS) -pthread \
 		-c $< -o $@
 
-$(TEST_TARGET_DIR)/%: test/build/%.o build/mesh.o $(GTEST_TARGET)
+$(TEST_TARGET_DIR)/%: test/build/%.o $(TARGET) $(GTEST_TARGET)
 	@mkdir -p test/bin
 	g++ -isystem $(GTEST_DIR)/include -I$(GTEST_DIR) $(INCLUDE) $(CFLAGS) -pthread \
 		-lpthread $^ -o $@ $(LIBS)

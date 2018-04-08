@@ -41,10 +41,10 @@ $(GTEST_TARGET): $(GTEST_OBJECTS)
 
 
 TEST_TARGET_DIR = test/bin
-TESTS = $(patsubst test/%.cpp, %, $(shell find test -type f -name *.$(SRCEXT)))
+TESTS = $(patsubst test/%.cc, %, $(shell find test -maxdepth 1 -type f -name *.$(SRCEXT)))
 TEST_TARGETS = $(patsubst %, $(TEST_TARGET_DIR)/%, $(TESTS))
 
-test/build/%.o: test/%.cpp $(SRCDIR)/*.$(SRCEXT) $(GTEST_HEADERS)
+test/build/%.o: test/%.cc $(SRCDIR)/*.$(SRCEXT) $(GTEST_HEADERS)
 	@mkdir -p test/build
 	g++ -isystem $(GTEST_DIR)/include -I$(GTEST_DIR) $(INCLUDE) $(CFLAGS) -pthread \
 		-c $< -o $@

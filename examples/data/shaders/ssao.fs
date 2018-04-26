@@ -12,9 +12,9 @@ uniform mat4 view;
 
 out float fragmentColor;
 
-const vec2 noiseScale = vec2(1920.0 / 8.0, 1080.0 / 4.0);
-const float radius = 1.0;
-const float bias = 0.05;
+const vec2 noiseScale = vec2(1920.0 / 4.0 / 2.0, 1080.0 / 4.0 / 2.0);
+const float radius = 5.0;
+const float bias = 0.1;
 
 void main(){
 	vec3 position = texture(gPosition, vertexTextureCoordinates).xyz;

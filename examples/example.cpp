@@ -17,10 +17,10 @@ int main(){
 	// Objects
 	std::shared_ptr<Object> rock(new Object());
 	rock->renderer.setMesh(loadMeshFromObj("data/objects/rock.obj"));
-	// rock->renderer.getMaterial().diffuseMap = Texture("data/textures/rock_diffuse.png");
+	rock->renderer.getMaterial().diffuseMap = Texture("data/textures/rock_diffuse.png");
 	rock->renderer.getMaterial().specularMap = Texture("data/textures/rock_specular.png");
 
-	rock->position = glm::vec3(4, 0, 0);
+	rock->position = glm::vec3(4, 4, 4);
 
 	s.objects.push_back(rock);
 
@@ -46,11 +46,11 @@ int main(){
 	s.lights.push_back(pointLight);
 
 	std::shared_ptr<SpotLight> spotLight(new SpotLight());
-	spotLight->position = glm::vec4(1.3, 1, 3.5, 1);
+	spotLight->position = glm::vec4(0, 0, 0, 1);
 	spotLight->diffuse = glm::vec3(0.4f, 0.4f, 0.4f);
 	spotLight->ambient = glm::vec3(0.0f, 0.0f, 0.0f);
 	spotLight->specular = glm::vec3(0.8f, 0.8f, 0.8f);
-	spotLight->direction = glm::vec3(0.8f, -1.0f, 0.0f);
+	spotLight->direction = glm::vec3(1.0f, 0.5f, 0.2f);
 	spotLight->cosAngle = cos(glm::radians(30.0f));
 	s.lights.push_back(spotLight);
 

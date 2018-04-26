@@ -176,6 +176,7 @@ void Engine::playScene(Scene &scene){
 
 		// SSAO
 		glBindFramebuffer(GL_FRAMEBUFFER, SSAOBuffer);
+			glViewport(0, 0, width / 2.0f, height / 2.0f);
 			glClear(GL_COLOR_BUFFER_BIT);
 
 			SSAOShader.use();
@@ -198,6 +199,7 @@ void Engine::playScene(Scene &scene){
 			glActiveTexture(GL_TEXTURE0);
 			glBindTexture(GL_TEXTURE_2D, SSAOOutput);
 			SSAOBlurShader.setUniform("source", 0);
+			SSAOBlurShader.setUniform("gPosition", 1);
 			SSAOBlurShader.setUniform("axis", 0);
 			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, SSAOIntermediate, 0);
 			drawQuad();
@@ -205,12 +207,14 @@ void Engine::playScene(Scene &scene){
 			glActiveTexture(GL_TEXTURE0);
 			glBindTexture(GL_TEXTURE_2D, SSAOIntermediate);
 			SSAOBlurShader.setUniform("source", 0);
+			SSAOBlurShader.setUniform("gPosition", 1);
 			SSAOBlurShader.setUniform("axis", 1);
 			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, SSAOOutput, 0);
 			drawQuad();
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 		// Lighting Pass
+		glViewport(0, 0, width, height);
 		lightingShader.use();
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, gPosition);
@@ -226,7 +230,7 @@ void Engine::playScene(Scene &scene){
 		lightingShader.setUniform("ambientOcclusion", 3);
 		lightingShader.setUniform("view", scene.cameras[0].getViewMatrix());
 
-		for(int i = 0; i < scene.lights.size(); ++i){
+		for(unsigned int i = 0; i < scene.lights.size(); ++i){
 			scene.lights[i]->setUniforms(lightingShader, "lights[" + std::to_string(i) + "]");
 		}
 
@@ -401,12 +405,14 @@ unsigned int Engine::generateRotationNoiseTextureSSAO(){
 }
 
 void Engine::initializeSSAOBuffer(){
+	glDeleteFramebuffers(1, &SSAOBuffer);
+
 	glGenFramebuffers(1, &SSAOBuffer);
 	glBindFramebuffer(GL_FRAMEBUFFER, SSAOBuffer);
 
 	glGenTextures(1, &SSAOOutput);
 	glBindTexture(GL_TEXTURE_2D, SSAOOutput);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, width, height, 0, GL_RGB, GL_FLOAT, NULL);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, (float)width / 2.0f, (float)height / 2.0f, 0, GL_RGB, GL_FLOAT, NULL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -414,7 +420,7 @@ void Engine::initializeSSAOBuffer(){
 
 	glGenTextures(1, &SSAOIntermediate);
 	glBindTexture(GL_TEXTURE_2D, SSAOIntermediate);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, width, height, 0, GL_RGB, GL_FLOAT, NULL);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, (float)width / 2.0f, (float)height / 2.0f, 0, GL_RGB, GL_FLOAT, NULL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);

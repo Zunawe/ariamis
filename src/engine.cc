@@ -17,7 +17,6 @@ Shader Engine::gBufferShader;
 unsigned int Engine::SSAOBuffer;
 unsigned int Engine::SSAOOutput;
 unsigned int Engine::SSAOIntermediate;
-std::vector<glm::vec3> Engine::kernelSSAO;
 unsigned int Engine::rotationNoiseSSAO;
 Shader Engine::SSAOShader;
 Shader Engine::SSAOBlurShader;
@@ -66,7 +65,10 @@ void Engine::postContextCreation(){
 
 	glfwSwapInterval(0);
 
-	kernelSSAO = generateSampleKernelSSAO(NUM_KERNEL_SAMPLES);
+	std::vector<glm::vec3> kernelSSAO = generateSampleKernelSSAO(NUM_KERNEL_SAMPLES);
+	for(unsigned int i = 0; i < NUM_KERNEL_SAMPLES; ++i){
+		SSAOShader.setUniform("samples[" + std::to_string(i) + "]", kernelSSAO[i]);
+	}
 	rotationNoiseSSAO = generateRotationNoiseTextureSSAO();
 }
 
@@ -174,40 +176,41 @@ void Engine::playScene(Scene &scene){
 			scene.draw();
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, gPosition);
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, gNormal);
+		glActiveTexture(GL_TEXTURE2);
+		glBindTexture(GL_TEXTURE_2D, gAlbedoSpecular);
+		lightingShader.setUniform("gPosition", 0);
+		lightingShader.setUniform("gNormal", 1);
+		lightingShader.setUniform("gAlbedoSpecular", 2);
+
 		// SSAO
 		glBindFramebuffer(GL_FRAMEBUFFER, SSAOBuffer);
 			glViewport(0, 0, width / 2.0f, height / 2.0f);
 			glClear(GL_COLOR_BUFFER_BIT);
 
 			SSAOShader.use();
-			glActiveTexture(GL_TEXTURE0);
-			glBindTexture(GL_TEXTURE_2D, gPosition);
-			glActiveTexture(GL_TEXTURE1);
-			glBindTexture(GL_TEXTURE_2D, gNormal);
 			glActiveTexture(GL_TEXTURE2);
 			glBindTexture(GL_TEXTURE_2D, rotationNoiseSSAO);
 			SSAOShader.setUniform("gPosition", 0);
 			SSAOShader.setUniform("gNormal", 1);
 			SSAOShader.setUniform("rotationNoise", 2);
 			SSAOShader.setUniform("projection", scene.projection);
-			for(unsigned int i = 0; i < NUM_KERNEL_SAMPLES; ++i){
-				SSAOShader.setUniform("samples[" + std::to_string(i) + "]", kernelSSAO[i]);
-			}
 			drawQuad();
 
 			SSAOBlurShader.use();
-			glActiveTexture(GL_TEXTURE0);
+			SSAOBlurShader.setUniform("source", 3);
+
+			glActiveTexture(GL_TEXTURE3);
 			glBindTexture(GL_TEXTURE_2D, SSAOOutput);
-			SSAOBlurShader.setUniform("source", 0);
-			SSAOBlurShader.setUniform("gPosition", 1);
 			SSAOBlurShader.setUniform("axis", 0);
 			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, SSAOIntermediate, 0);
 			drawQuad();
 
-			glActiveTexture(GL_TEXTURE0);
+			glActiveTexture(GL_TEXTURE3);
 			glBindTexture(GL_TEXTURE_2D, SSAOIntermediate);
-			SSAOBlurShader.setUniform("source", 0);
-			SSAOBlurShader.setUniform("gPosition", 1);
 			SSAOBlurShader.setUniform("axis", 1);
 			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, SSAOOutput, 0);
 			drawQuad();
@@ -216,17 +219,10 @@ void Engine::playScene(Scene &scene){
 		// Lighting Pass
 		glViewport(0, 0, width, height);
 		lightingShader.use();
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, gPosition);
-		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, gNormal);
-		glActiveTexture(GL_TEXTURE2);
-		glBindTexture(GL_TEXTURE_2D, gAlbedoSpecular);
 		glActiveTexture(GL_TEXTURE3);
 		glBindTexture(GL_TEXTURE_2D, SSAOOutput);
-		lightingShader.setUniform("gPosition", 0);
-		lightingShader.setUniform("gNormal", 1);
-		lightingShader.setUniform("gAlbedoSpecular", 2);
+		glActiveTexture(GL_TEXTURE2);
+		glBindTexture(GL_TEXTURE_2D, gAlbedoSpecular);
 		lightingShader.setUniform("ambientOcclusion", 3);
 		lightingShader.setUniform("view", scene.cameras[0].getViewMatrix());
 
@@ -342,7 +338,7 @@ float Engine::getTime(){
  * GLFW callback for when the window is resized. Resets the viewport and records
  * the new width and height.
  */
-void Engine::resizeWindow(GLFWwindow *window, int newWidth, int newHeight){
+void Engine::resizeWindow(GLFWwindow * /*window*/, int newWidth, int newHeight){
 	glViewport(0, 0, newWidth, newHeight);
 	width = newWidth;
 	height = newHeight;
@@ -355,7 +351,7 @@ void Engine::resizeWindow(GLFWwindow *window, int newWidth, int newHeight){
  * GLFW callback for when the mouse moves. Calls all the registered callbacks,
  * so this function can dynamically add or remove functionality.
  */
-void Engine::mouseMoveCallback(GLFWwindow *window, double x, double y){
+void Engine::mouseMoveCallback(GLFWwindow * /*window*/, double x, double y){
 	for(auto it = mouseMoveCallbacks.begin(); it != mouseMoveCallbacks.end(); ++it){
 		(*it)(x, y);
 	}

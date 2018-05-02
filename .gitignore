@@ -4,7 +4,7 @@ build
 lib
 *.o
 *.a
-example/example
+example
 
 # Editor settings
 .vscode

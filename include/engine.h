@@ -27,8 +27,8 @@ class Engine{
 		static void cleanUp();
 
 	private:
-		static void resizeWindow(GLFWwindow *window, int newWidth, int newHeight);
-		static void mouseMoveCallback(GLFWwindow *window, double x, double y);
+		static void resizeWindow(GLFWwindow * /*window*/, int newWidth, int newHeight);
+		static void mouseMoveCallback(GLFWwindow * /*window*/, double x, double y);
 
 		static void postContextCreation();
 		static void initializeGBuffer();
@@ -49,7 +49,6 @@ class Engine{
 		static unsigned int SSAOBuffer;
 		static unsigned int SSAOOutput;
 		static unsigned int SSAOIntermediate;
-		static std::vector<glm::vec3> kernelSSAO;
 		static unsigned int rotationNoiseSSAO;
 		static Shader SSAOShader;
 		static Shader SSAOBlurShader;

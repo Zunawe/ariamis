@@ -89,6 +89,7 @@ void Shader::checkLinking(){
 }
 
 bool Shader::setUniform(std::string name, const int &value){
+	use();
 	int location = glGetUniformLocation(this->id, name.c_str());
 	if(location < 0){
 		return false;
@@ -98,6 +99,7 @@ bool Shader::setUniform(std::string name, const int &value){
 }
 
 bool Shader::setUniform(std::string name, const float &value){
+	use();
 	int location = glGetUniformLocation(this->id, name.c_str());
 	if(location < 0){
 		return false;
@@ -107,6 +109,7 @@ bool Shader::setUniform(std::string name, const float &value){
 }
 
 bool Shader::setUniform(std::string name, const glm::vec2 &value){
+	use();
 	int location = glGetUniformLocation(this->id, name.c_str());
 	if(location < 0){
 		return false;
@@ -116,6 +119,7 @@ bool Shader::setUniform(std::string name, const glm::vec2 &value){
 }
 
 bool Shader::setUniform(std::string name, const glm::vec3 &value){
+	use();
 	int location = glGetUniformLocation(this->id, name.c_str());
 	if(location < 0){
 		return false;
@@ -125,6 +129,7 @@ bool Shader::setUniform(std::string name, const glm::vec3 &value){
 }
 
 bool Shader::setUniform(std::string name, const glm::vec4 &value){
+	use();
 	int location = glGetUniformLocation(this->id, name.c_str());
 	if(location < 0){
 		return false;
@@ -134,6 +139,7 @@ bool Shader::setUniform(std::string name, const glm::vec4 &value){
 }
 
 bool Shader::setUniform(std::string name, const glm::mat2 &value){
+	use();
 	int location = glGetUniformLocation(this->id, name.c_str());
 	if(location < 0){
 		return false;
@@ -143,6 +149,7 @@ bool Shader::setUniform(std::string name, const glm::mat2 &value){
 }
 
 bool Shader::setUniform(std::string name, const glm::mat3 &value){
+	use();
 	int location = glGetUniformLocation(this->id, name.c_str());
 	if(location < 0){
 		return false;
@@ -152,6 +159,7 @@ bool Shader::setUniform(std::string name, const glm::mat3 &value){
 }
 
 bool Shader::setUniform(std::string name, const glm::mat4 &value){
+	use();
 	int location = glGetUniformLocation(this->id, name.c_str());
 	if(location < 0){
 		return false;

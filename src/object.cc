@@ -2,7 +2,7 @@
 
 Object::Object(){
 	scale = glm::vec3(1.0f, 1.0f, 1.0f);
-	update = [](std::shared_ptr<Object> me){
+	update = [](std::shared_ptr<Object> /*me*/){
 		// Empty
 	};
 }

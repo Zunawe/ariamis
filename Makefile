@@ -1,3 +1,5 @@
+CXX ?= g++
+
 SRCDIR = src
 BUILDDIR = build
 TARGET = lib/libariamis.a
@@ -14,7 +16,7 @@ $(TARGET): $(OBJECTS)
 
 $(BUILDDIR)/%.o: $(SRCDIR)/%.$(SRCEXT)
 	@mkdir -p $(BUILDDIR)
-	g++ $(CFLAGS) $(INCLUDE) -c -o $@ $<
+	$(CXX) $(CFLAGS) $(INCLUDE) -c -o $@ $<
 
 clean:
 	@rm -rf $(BUILDDIR)
@@ -25,8 +27,8 @@ clean:
 
 example: $(TARGET) example.$(SRCEXT)
 	@mkdir -p $(BUILDDIR)
-	g++ $(CFLAGS) $(INCLUDE) -c -o $(BUILDDIR)/$@.o $@.$(SRCEXT)
-	g++ $(BUILDDIR)/$@.o $(TARGET) -o $@ $(LIBS)
+	$(CXX) $(CFLAGS) $(INCLUDE) -c -o $(BUILDDIR)/$@.o $@.$(SRCEXT)
+	$(CXX) $(BUILDDIR)/$@.o $(TARGET) -o $@ $(LIBS)
 
 GTEST_DIR = test/gtest
 GTEST_HEADERS = $(GTEST_DIR)/include/gtest/*.h $(GTEST_DIR)/include/gtest/internal/*.h
@@ -37,7 +39,7 @@ GTEST_TARGET = $(GTEST_DIR)/lib/gtest_main.a
 
 $(GTEST_BUILDDIR)/%.o: $(GTEST_DIR)/src/%.cc
 	@mkdir -p $(GTEST_DIR)/build
-	g++ -isystem $(GTEST_DIR)/include -I$(GTEST_DIR) -g -Wall -Wextra -pthread \
+	$(CXX) -isystem $(GTEST_DIR)/include -I$(GTEST_DIR) -g -Wall -Wextra -pthread \
 	-c $^ -o $@
 
 $(GTEST_TARGET): $(GTEST_OBJECTS)
@@ -51,12 +53,12 @@ TEST_TARGETS = $(patsubst %, $(TEST_TARGET_DIR)/%, $(TESTS))
 
 test/build/%.o: test/%.$(SRCEXT) $(TARGET) $(GTEST_HEADERS)
 	@mkdir -p test/build
-	g++ -isystem $(GTEST_DIR)/include -I$(GTEST_DIR) $(INCLUDE) $(CFLAGS) -pthread \
+	$(CXX) -isystem $(GTEST_DIR)/include -I$(GTEST_DIR) $(INCLUDE) $(CFLAGS) -pthread \
 		-c $< -o $@
 
 $(TEST_TARGET_DIR)/%: test/build/%.o $(TARGET) $(GTEST_TARGET)
 	@mkdir -p test/bin
-	g++ -isystem $(GTEST_DIR)/include -I$(GTEST_DIR) $(INCLUDE) $(CFLAGS) -pthread \
+	$(CXX) -isystem $(GTEST_DIR)/include -I$(GTEST_DIR) $(INCLUDE) $(CFLAGS) -pthread \
 		-lpthread $^ -o $@ $(LIBS)
 
 test: $(TEST_TARGETS)
@@ -66,3 +68,9 @@ test: $(TEST_TARGETS)
 clean_gtest:
 	@rm -rf $(GTEST_BUILDDIR)
 	@rm -f $(GTEST_TARGET)
+
+get-deps:
+	sudo apt-get -qq update
+	sudo apt-get -qq install xorg-dev
+	git clone --depth=1 https://github.com/g-truc/glm.git && mkdir glm_build  && cd glm_build&& cmake ../glm && sudo make install
+	git clone --depth=1 https://github.com/glfw/glfw.git && mkdir glfw_build && cd glfw_build && cmake ../glfw && make -j4 && sudo make install

@@ -1,5 +1,7 @@
 # Ariamis
 
+[![Build Status](https://travis-ci.org/Zunawe/ariamis.svg?branch=master)](https://travis-ci.org/Zunawe/ariamis)
+
 This started as just following a tutorial on OpenGL 3 and has grown as I've learned more things. At the moment, I use it as a base for homework in my graphics class, and it suits testing a new concept or shader pretty well.
 
 There is an `example.cpp` which shows how to use it, which is how I test it, and I try to keep up on documentation comments, but that's all there is right now.

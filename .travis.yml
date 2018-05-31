@@ -1,0 +1,7 @@
+language: cpp
+sudo: enabled
+
+install:
+  make get-deps
+
+script: make test

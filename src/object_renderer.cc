@@ -14,11 +14,11 @@ ObjectRenderer::ObjectRenderer(){
 	glBindVertexArray(VAO);
 		glBindBuffer(GL_ARRAY_BUFFER, VBO);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, mesh.ATTRIBUTE_SIZE * sizeof(float), (void *)0);                     // Vertex
-		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, mesh.ATTRIBUTE_SIZE * sizeof(float), (void *)(3 * sizeof(float)));   // Normal
-		glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, mesh.ATTRIBUTE_SIZE * sizeof(float), (void *)(6 * sizeof(float)));   // Tangent
-		glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, mesh.ATTRIBUTE_SIZE * sizeof(float), (void *)(9 * sizeof(float)));   // Color
-		glVertexAttribPointer(4, 2, GL_FLOAT, GL_FALSE, mesh.ATTRIBUTE_SIZE * sizeof(float), (void *)(12 * sizeof(float)));  // Texture
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, Mesh::VERTEX_SIZE, (void *)0);                     // Vertex
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, Mesh::VERTEX_SIZE, (void *)(3 * sizeof(float)));   // Normal
+		glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, Mesh::VERTEX_SIZE, (void *)(6 * sizeof(float)));   // Tangent
+		glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, Mesh::VERTEX_SIZE, (void *)(9 * sizeof(float)));   // Color
+		glVertexAttribPointer(4, 2, GL_FLOAT, GL_FALSE, Mesh::VERTEX_SIZE, (void *)(12 * sizeof(float)));  // Texture
 		glEnableVertexAttribArray(0);
 		glEnableVertexAttribArray(1);
 		glEnableVertexAttribArray(2);
@@ -85,7 +85,7 @@ void ObjectRenderer::draw(const glm::mat4 &model, const glm::mat4 &view, const g
  */
 void ObjectRenderer::reloadMesh(){
 	glBindVertexArray(VAO);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(float) * mesh.getNumVertices() * mesh.ATTRIBUTE_SIZE, mesh.getVertexData(), GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(float) * mesh.getNumVertices() * Mesh::VERTEX_SIZE, mesh.getVertexData(), GL_STATIC_DRAW);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * mesh.getNumTriangles() * 3, mesh.getIndexData(), GL_STATIC_DRAW);
 	glBindVertexArray(0);
 }

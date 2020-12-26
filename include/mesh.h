@@ -7,118 +7,105 @@
 
 class Mesh{
 	private:
-		struct Attribute{
+		struct Vertex{
 			float x;
 			float y;
 			float z;
 			float nx;
 			float ny;
 			float nz;
-			float tx;
-			float ty;
-			float tz;
 			float r;
-			float g;
 			float b;
+			float g;
 			float u;
 			float v;
 
-			bool operator==(const Attribute &a) const{
-				return x == a.x &&
-					   y == a.y &&
-					   z == a.z &&
-					   nx == a.nx &&
-					   ny == a.ny &&
-					   nz == a.nz &&
-					   tx == a.tx &&
-					   ty == a.ty &&
-					   tz == a.tz &&
-					   r == a.r &&
-					   g == a.g &&
-					   b == a.b &&
-					   u == a.u &&
-					   v == a.v;
+			bool operator==(const Vertex &v) const{
+				return this->x == v.x &&
+					   this->y == v.y &&
+					   this->z == v.z &&
+					   this->nx == v.nx &&
+					   this->ny == v.ny &&
+					   this->nz == v.nz &&
+					   this->r == v.r &&
+					   this->g == v.g &&
+					   this->b == v.b &&
+					   this->u == v.u &&
+					   this->v == v.v;
 			}
 
-			bool operator!=(const Attribute &a) const{
-				return !(*this == a);
+			bool operator!=(const Vertex &v) const{
+				return !(*this == v);
 			}
 
-			Attribute& operator=(const Attribute &a){
-				x = a.x;
-				y = a.y;
-				z = a.z;
-				nx = a.nx;
-				ny = a.ny;
-				nz = a.nz;
-				tx = a.tx;
-				ty = a.ty;
-				tz = a.tz;
-				r = a.r;
-				g = a.g;
-				b = a.b;
-				u = a.u;
-				v = a.v;
+			Vertex& operator=(const Vertex &v){
+				this->x = v.x;
+				this->y = v.y;
+				this->z = v.z;
+				this->nx = v.nx;
+				this->ny = v.ny;
+				this->nz = v.nz;
+				this->r = v.r;
+				this->g = v.g;
+				this->b = v.b;
+				this->u = v.u;
+				this->v = v.v;
 
 				return *this;
 			}
 		};
 	public:
-		static const unsigned int ATTRIBUTE_SIZE = sizeof(Attribute) / sizeof(float);
+		static const unsigned int VERTEX_SIZE = sizeof(Vertex);
 
 		Mesh();
+		void uniquifyVertices();
+		void compress();
 		void calculateFaceNormals();
-		void calculateTangents();
-		void makeAllVerticesUnique();
 
 		glm::vec3 getVertex(unsigned int i);
 		unsigned int addVertex(float x, float y, float z);
-		unsigned int addVertex(glm::vec3 vertex);
+		unsigned int addVertex(glm::vec3 v);
 		unsigned int addVertex(float x, float y);
-		unsigned int addVertex(glm::vec2 vertex);
+		unsigned int addVertex(glm::vec2 v);
 		unsigned int addVertices(const std::vector<glm::vec3> &vertices);
-		void setVertex(unsigned int index, glm::vec3 vertex);
-		void removeVertex(unsigned int index);
+		void removeVertex(unsigned int i);
 
-		int addTriangle(glm::vec3 indices);
-		int addTriangle(unsigned int index1, unsigned int index2, unsigned int index3);
-		int addTriangles(std::vector<glm::vec3> triangles);
-		int addTriangles(std::vector<unsigned int> indices);
-		void removeTriangle(unsigned int index);
+		void setVertexPosition(unsigned int i, glm::vec3 v);
+		void setVertexPosition(glm::vec3 v);
 
 		glm::vec3 getNormal(unsigned int i);
-		void setNormal(unsigned int index, glm::vec3 normal);
-		void setNormal(glm::vec3 normal);
-
-		void setTangent(unsigned int index, glm::vec3 tangent);
-		void setTangent(glm::vec3 tangent);
+		void setNormal(unsigned int i, glm::vec3 n);
+		void setNormal(glm::vec3 n);
 
 		glm::vec3 getColor(unsigned int i);
-		void setColor(unsigned int index, glm::vec3 color);
-		void setColor(glm::vec3 color);
+		void setColor(unsigned int i, glm::vec3 c);
+		void setColor(glm::vec3 c);
 
 		glm::vec2 getTextureCoordinate(unsigned int i);
-		void setTextureCoordinate(unsigned int index, float u, float v);
-		void setTextureCoordinate(unsigned int index, glm::vec2 coordinate);
+		void setTextureCoordinate(unsigned int i, float u, float v);
+		void setTextureCoordinate(unsigned int i, glm::vec2 coordinate);
 		void setTextureCoordinate(float u, float v);
 		void setTextureCoordinate(glm::vec2 coordinate);
 
+		int addTriangle(glm::vec3 indices);
+		int addTriangle(unsigned int i1, unsigned int i2, unsigned int i3);
+		int addTriangles(std::vector<glm::vec3> triangles);
+		int addTriangles(std::vector<unsigned int> indices);
+		void removeTriangle(unsigned int i);
+
 		void startNewSubmeshAt(unsigned int i);
 		void startNewSubmesh();
-
-		void compress();
 	
 		float* getVertexData();
 		unsigned int* getIndexData();
+		std::vector<unsigned int> getSubmeshBounds();
 		unsigned int getNumVertices();
 		unsigned int getNumTriangles();
 		unsigned int getNumSubmeshes();
-		std::vector<unsigned int> getSubmeshBounds();
 		
 	private:
-		std::vector<Attribute> vertexData;
+		std::vector<Vertex> vertices;
 		std::vector<unsigned int> triangles;
-		glm::vec3 defaultColor;
 		std::vector<unsigned int> submeshBounds;
 };
 

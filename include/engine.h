@@ -5,24 +5,24 @@
 #include <vector>
 #include <functional>
 
-#define GL_GLEXT_PROTOTYPES
+#include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
 #include "scene.h"
 
 class Engine{
 	public:
-		static void playScene(Scene &scene);
-		static void registerKeyEvent(int key, std::function<void(float)> func);
-		static void registerMouseMoveEvent(std::function<void(double, double)> func);
 		static GLFWwindow* createWindow(const char *name);
 		static GLFWwindow* getWindow();
-		static void quit();
+		static void registerKeyEvent(int key, std::function<void(float)> func);
+		static void registerMouseMoveEvent(std::function<void(double, double)> func);
+		static void playScene(Scene &scene);
 		static int getWidth();
 		static int getHeight();
-		static float getDeltaTime();
 		static float getTime();
+		static float getDeltaTime();
 		static void cleanUp();
+		static void quit();
 
 	private:
 		static void resizeWindow(GLFWwindow * /*window*/, int newWidth, int newHeight);
@@ -37,16 +37,17 @@ class Engine{
 		static unsigned int gPosition;
 		static unsigned int gNormal;
 		static unsigned int gAlbedoSpecular;
-		static unsigned int quadVAO;
 		static Shader lightingShader;
 		static Shader gBufferShader;
+
+		static unsigned int quadVAO;
 
 		static std::map<int, std::vector<std::function<void(float)>>> keyCallbacks;
 		static std::vector<std::function<void(double, double)>> mouseMoveCallbacks;
 		static float lastTime;
 		static float deltaTime;
-		static int width;
-		static int height;
+		static unsigned int width;
+		static unsigned int height;
 		static GLFWwindow *window;
 };
 

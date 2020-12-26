@@ -5,20 +5,21 @@
 #include "shader.h"
 #include "material.h"
 
-unsigned int Engine::gBuffer;
-unsigned int Engine::gPosition;
-unsigned int Engine::gNormal;
-unsigned int Engine::gAlbedoSpecular;
-unsigned int Engine::quadVAO;
+unsigned int Engine::gBuffer = 0;
+unsigned int Engine::gPosition = 0;
+unsigned int Engine::gNormal = 0;
+unsigned int Engine::gAlbedoSpecular = 0;
 Shader Engine::lightingShader;
 Shader Engine::gBufferShader;
 
+unsigned int Engine::quadVAO = 0;
+
 std::map<int, std::vector<std::function<void(float)>>> Engine::keyCallbacks;
 std::vector<std::function<void(double, double)>> Engine::mouseMoveCallbacks;
-float Engine::lastTime;
-float Engine::deltaTime;
-int Engine::width;
-int Engine::height;
+float Engine::lastTime = 0.0f;
+float Engine::deltaTime = 0.0f;
+unsigned int Engine::width = 0;
+unsigned int Engine::height = 0;
 GLFWwindow *Engine::window;
 
 /**
@@ -106,8 +107,7 @@ GLFWwindow* Engine::createWindow(const char *name){
 	glfwDestroyWindow(window);
 
 	if(!glfwInit()){
-		std::cout << "Failed to initialize GLFW" << std::endl;
-		return nullptr;
+		throw std::runtime_error("Failed to initialize GLFW");
 	}
 
 	const GLFWvidmode *mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
@@ -118,6 +118,10 @@ GLFWwindow* Engine::createWindow(const char *name){
 
 	glfwMakeContextCurrent(window);
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
+	if(!gladLoadGL()){
+		throw std::runtime_error("Failed to Load GLAD");
+	}
 
 	postContextCreation();
 

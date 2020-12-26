@@ -6,8 +6,8 @@ TARGET = lib/libariamis.a
 SRCEXT := cc
 SOURCES = $(shell find $(SRCDIR) -type f -name "*.$(SRCEXT)")
 OBJECTS := $(patsubst $(SRCDIR)/%, $(BUILDDIR)/%, $(SOURCES:.$(SRCEXT)=.o))
-CFLAGS = `pkg-config --cflags glfw3` -Wall -Wextra -std=c++11
-LIBS = `pkg-config --static --libs glfw3` -lGL -L lib
+CFLAGS = -Wall -Wextra -std=c++11
+LIBS = -lglfw -lGL -ldl -L lib
 INCLUDE = -I include
 
 $(TARGET): $(OBJECTS)
@@ -68,9 +68,3 @@ test: $(TEST_TARGETS)
 clean_gtest:
 	@rm -rf $(GTEST_BUILDDIR)
 	@rm -f $(GTEST_TARGET)
-
-get-deps:
-	sudo apt-get -qq update
-	sudo apt-get -qq install xorg-dev
-	git clone --depth=1 https://github.com/g-truc/glm.git && mkdir glm_build  && cd glm_build&& cmake ../glm && sudo make install
-	git clone --depth=1 https://github.com/glfw/glfw.git && mkdir glfw_build && cd glfw_build && cmake ../glfw && make -j4 && sudo make install

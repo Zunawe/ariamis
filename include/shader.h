@@ -5,8 +5,7 @@
 #include <string>
 #include <vector>
 
-#define GL_GLEXT_PROTOTYPES
-#include <GLFW/glfw3.h>
+#include <glad/glad.h>
 #include <glm/glm.hpp>
 
 class Shader{

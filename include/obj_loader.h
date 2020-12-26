@@ -7,10 +7,10 @@
 
 #include "material.h"
 #include "mesh.h"
-#include "object_renderer.h"
+#include "renderer.h"
 
-ObjectRenderer loadObj(const char *filepath);
-void loadObj(const char *filepath, ObjectRenderer &renderer);
+Renderer loadObj(const char *filepath);
+void loadObj(const char *filepath, Renderer &renderer);
 Mesh loadMeshFromObj(const char *filepath);
 Mesh loadMeshFromObj(const char *filepath, std::vector<unsigned int> &materialIndices);
 Mesh loadMeshFromObj(const char *filepath, std::vector<unsigned int> &materialIndices, std::vector<Material> &materials);

@@ -1,5 +1,5 @@
-#ifndef OBJECT_RENDERER_H
-#define OBJECT_RENDERER_H
+#ifndef RENDERER_H
+#define RENDERER_H
 
 #include <memory>
 
@@ -11,9 +11,9 @@
 #include "mesh.h"
 #include "shader.h"
 
-class ObjectRenderer{
+class Renderer{
 	public:
-		ObjectRenderer();
+		Renderer();
 		void draw(const glm::mat4 &model, const glm::mat4 &view, const glm::mat4 &projection);
 		unsigned int getVAO();
 		Mesh& getMesh();

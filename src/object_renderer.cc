@@ -1,12 +1,9 @@
-#include "object_renderer.h"
+#include "renderer.h"
 
 #include <algorithm>
 #include <iostream>
 
-#define GL_GLEXT_PROTOTYPES
-#include <GLFW/glfw3.h>
-
-ObjectRenderer::ObjectRenderer(){
+Renderer::Renderer(){
 	glGenBuffers(1, &VBO);
 	glGenBuffers(1, &EBO);
 	glGenVertexArrays(1, &VAO);
@@ -40,7 +37,7 @@ ObjectRenderer::ObjectRenderer(){
  * @param projection the projection matrix at the time of drawing the object.
  * @param camera the Camera the object is being viewed by.
  */
-void ObjectRenderer::draw(const glm::mat4 &model, const glm::mat4 &view, const glm::mat4 &projection){
+void Renderer::draw(const glm::mat4 &model, const glm::mat4 &view, const glm::mat4 &projection){
 	shader.use();
 
 	glm::mat3 normalModel(glm::transpose(glm::inverse(view * model)));
@@ -75,7 +72,7 @@ void ObjectRenderer::draw(const glm::mat4 &model, const glm::mat4 &view, const g
 	glBindVertexArray(0);
 	glBindTexture(GL_TEXTURE_2D, 0);
 
-	checkErrorAt("ObjectRenderer draw");
+	checkErrorAt("Renderer draw");
 }
 
 /**
@@ -83,7 +80,7 @@ void ObjectRenderer::draw(const glm::mat4 &model, const glm::mat4 &view, const g
  * this function must be called before changes take effect. (Note: Using setMesh to set the mesh to a new Mesh object
  * calls this method by default.)
  */
-void ObjectRenderer::reloadMesh(){
+void Renderer::reloadMesh(){
 	glBindVertexArray(VAO);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(float) * mesh.getNumVertices() * Mesh::VERTEX_SIZE, mesh.getVertexData(), GL_STATIC_DRAW);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * mesh.getNumTriangles() * 3, mesh.getIndexData(), GL_STATIC_DRAW);
@@ -95,7 +92,7 @@ void ObjectRenderer::reloadMesh(){
  * 
  * @return the ID of the VAO for this renderer.
  */
-unsigned int ObjectRenderer::getVAO(){
+unsigned int Renderer::getVAO(){
 	return this->VAO;
 }
 
@@ -106,7 +103,7 @@ unsigned int ObjectRenderer::getVAO(){
  * 
  * @return a reference to the mesh for this renderer.
  */
-Mesh& ObjectRenderer::getMesh(){
+Mesh& Renderer::getMesh(){
 	return this->mesh;
 }
 
@@ -115,7 +112,7 @@ Mesh& ObjectRenderer::getMesh(){
  * 
  * @param mesh the new mesh to be used in this renderer.
  */
-void ObjectRenderer::setMesh(const Mesh &mesh){
+void Renderer::setMesh(const Mesh &mesh){
 	this->mesh = mesh;
 
 	this->materialIndices.clear();
@@ -129,7 +126,7 @@ void ObjectRenderer::setMesh(const Mesh &mesh){
  * 
  * @return a reference to the first material for this renderer.
  */
-Material& ObjectRenderer::getMaterial(){
+Material& Renderer::getMaterial(){
 	return materials[0];
 }
 
@@ -139,7 +136,7 @@ Material& ObjectRenderer::getMaterial(){
  * @param submeshIndex the index of the submesh to get the material for.
  * @return a reference to the material.
  */
-Material& ObjectRenderer::getMaterial(unsigned int submeshIndex){
+Material& Renderer::getMaterial(unsigned int submeshIndex){
 	return materials[materialIndices[submeshIndex]];
 }
 
@@ -148,7 +145,7 @@ Material& ObjectRenderer::getMaterial(unsigned int submeshIndex){
  * 
  * @param material the new material.
  */
-void ObjectRenderer::setMaterial(const Material &material){
+void Renderer::setMaterial(const Material &material){
 	this->materials.clear();
 	this->materials.push_back(material);
 
@@ -165,7 +162,7 @@ void ObjectRenderer::setMaterial(const Material &material){
  * @param submeshIndex the index of the submesh to set the material for.
  * @param material the new material.
  */
-void ObjectRenderer::setMaterial(unsigned int submeshIndex, const Material &material){
+void Renderer::setMaterial(unsigned int submeshIndex, const Material &material){
 	auto materialPosition = std::find(materials.begin(), materials.end(), material);
 	if(materialPosition == materials.end()){
 		materials.push_back(material);
@@ -180,7 +177,7 @@ void ObjectRenderer::setMaterial(unsigned int submeshIndex, const Material &mate
  * 
  * @param shader the new shader to use.
  */
-void ObjectRenderer::setShader(const Shader &shader){
+void Renderer::setShader(const Shader &shader){
 	this->shader = shader;
 }
 
@@ -189,7 +186,7 @@ void ObjectRenderer::setShader(const Shader &shader){
  * 
  * @param location a string for use in identifying where in the code the error occurs.
  */
-void ObjectRenderer::checkErrorAt(const char *location){
+void Renderer::checkErrorAt(const char *location){
 	GLenum err;
 	if((err = glGetError()) != GL_NO_ERROR){
 		std::cout << "Error at " << location << ": " << err << std::endl;

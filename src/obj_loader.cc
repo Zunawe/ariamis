@@ -8,27 +8,27 @@
 using namespace std;
 
 /**
- * Creates a new ObjectRenderer and loads a mesh and the corresponding materials
+ * Creates a new Renderer and loads a mesh and the corresponding materials
  * into it from a Wavefront OBJ file (and optional MTL file if the OBJ specifies one).
  * 
  * @param filepath the location of the file to read.
- * @return a newly constructed ObjectRenderer with a mesh and materials loaded from
+ * @return a newly constructed Renderer with a mesh and materials loaded from
  * the provided filepath.
  */
-ObjectRenderer loadObj(const char *filepath){
-	ObjectRenderer renderer;
+Renderer loadObj(const char *filepath){
+	Renderer renderer;
 	loadObj(filepath, renderer);
 	return renderer;
 }
 
 /**
- * Loads a mesh and corresponding materials into an existing ObjectRenderer from
+ * Loads a mesh and corresponding materials into an existing Renderer from
  * a Wavefront OBJ file (and optional MTL file if the OBJ specifies one).
  * 
  * @param filepath the location of the file to read.
  * @param renderer the renderer to load the mesh into.
  */
-void loadObj(const char *filepath, ObjectRenderer &renderer){
+void loadObj(const char *filepath, Renderer &renderer){
 	vector<Material> materials;
 	vector<unsigned int> materialIndices;
 	renderer.setMesh(loadMeshFromObj(filepath, materialIndices, materials));

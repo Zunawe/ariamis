@@ -8,7 +8,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "object.h"
-#include "object_renderer.h"
+#include "renderer.h"
 
 class Scene{
 	public:

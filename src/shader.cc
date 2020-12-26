@@ -3,14 +3,14 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
+#include <string.h>
 
 Shader Shader::DEFAULT_SHADER;
 
 /**
- * Loads the source code for the vertex shader and fragment shader, compiles them, and links them.
+ * Loads the source code for a shader
  * 
- * @param vertexShaderPath the path to the vertex shader.
- * @param fragmentShaderPath the path to the fragment shader.
+ * @param sourcePath the path to the shader.
  */
 void Shader::loadFile(const char *sourcePath, GLenum type){
 	// Read source code
@@ -28,8 +28,11 @@ void Shader::loadFile(const char *sourcePath, GLenum type){
 		fileStream.close();
 		source = ss.str();
 	}
-	catch(std::ifstream::failure e){
-		std::cout << "Failed to open file at " << sourcePath << std::endl;
+	catch(std::ifstream::failure &e){
+		char message[23 + strlen(sourcePath)];
+		strcpy(message, "Failed to open file at ");
+		strcat(message, sourcePath);
+		throw std::runtime_error(message);
 	}
 
 	loadSource(source.c_str(), type);
@@ -50,6 +53,10 @@ void Shader::link(){
 	}
 	glLinkProgram(this->id);
 	checkLinking();
+
+	for(auto it = shaders.begin(); it != shaders.end(); ++it){
+		glDeleteShader(*it);
+	}
 }
 
 /**
@@ -59,14 +66,14 @@ void Shader::link(){
  */
 void Shader::checkCompilation(unsigned int shaderID){
 	int success;
-	int logSize;
 	glGetShaderiv(shaderID, GL_COMPILE_STATUS, &success);
 
-	glGetShaderiv(shaderID, GL_INFO_LOG_LENGTH, &logSize);
-	char infoLog[logSize];
-	glGetShaderInfoLog(shaderID, logSize, &logSize, &infoLog[0]);
-
 	if(!success){
+		int logSize;
+		glGetShaderiv(shaderID, GL_INFO_LOG_LENGTH, &logSize);
+		char infoLog[logSize];
+		glGetShaderInfoLog(shaderID, logSize, &logSize, &infoLog[0]);
+
 		throw ShaderException(infoLog);
 	}
 }
@@ -76,14 +83,14 @@ void Shader::checkCompilation(unsigned int shaderID){
  */
 void Shader::checkLinking(){
 	int success;
-	int logSize;
 	glGetProgramiv(this->id, GL_LINK_STATUS, &success);
 
-	glGetProgramiv(this->id, GL_INFO_LOG_LENGTH, &logSize);
-	char infoLog[logSize];
-	glGetProgramInfoLog(this->id, logSize, &logSize, &infoLog[0]);
-
 	if(!success){
+		int logSize;
+		glGetProgramiv(this->id, GL_INFO_LOG_LENGTH, &logSize);
+		char infoLog[logSize];
+		glGetProgramInfoLog(this->id, logSize, &logSize, &infoLog[0]);
+
 		throw ShaderException(infoLog);
 	}
 }

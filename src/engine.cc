@@ -1,7 +1,6 @@
 #include "engine.h"
 
 #include <iostream>
-#include <random>
 
 #include "shader.h"
 #include "material.h"
@@ -13,13 +12,6 @@ unsigned int Engine::gAlbedoSpecular;
 unsigned int Engine::quadVAO;
 Shader Engine::lightingShader;
 Shader Engine::gBufferShader;
-
-unsigned int Engine::SSAOBuffer;
-unsigned int Engine::SSAOOutput;
-unsigned int Engine::SSAOIntermediate;
-unsigned int Engine::rotationNoiseSSAO;
-Shader Engine::SSAOShader;
-Shader Engine::SSAOBlurShader;
 
 std::map<int, std::vector<std::function<void(float)>>> Engine::keyCallbacks;
 std::vector<std::function<void(double, double)>> Engine::mouseMoveCallbacks;
@@ -50,26 +42,11 @@ void Engine::postContextCreation(){
 	gBufferShader.loadFile("data/shaders/gbuffer.fs", GL_FRAGMENT_SHADER);
 	gBufferShader.link();
 
-	SSAOShader.loadFile("data/shaders/quad.vs", GL_VERTEX_SHADER);
-	SSAOShader.loadFile("data/shaders/ssao.fs", GL_FRAGMENT_SHADER);
-	SSAOShader.link();
-
-	SSAOBlurShader.loadFile("data/shaders/quad.vs", GL_VERTEX_SHADER);
-	SSAOBlurShader.loadFile("data/shaders/ssao_blur.fs", GL_FRAGMENT_SHADER);
-	SSAOBlurShader.link();
-
 	Material::DEFAULT_MATERIAL = Material();
 
 	initializeGBuffer();
-	initializeSSAOBuffer();
 
 	glfwSwapInterval(0);
-
-	std::vector<glm::vec3> kernelSSAO = generateSampleKernelSSAO(NUM_KERNEL_SAMPLES);
-	for(unsigned int i = 0; i < NUM_KERNEL_SAMPLES; ++i){
-		SSAOShader.setUniform("samples[" + std::to_string(i) + "]", kernelSSAO[i]);
-	}
-	rotationNoiseSSAO = generateRotationNoiseTextureSSAO();
 }
 
 void Engine::initializeGBuffer(){
@@ -162,7 +139,6 @@ void Engine::playScene(Scene &scene){
 		float newTime = glfwGetTime();
 		deltaTime = newTime - lastTime;
 		lastTime = newTime;
-		std::cout << 1.0f / deltaTime << '\r' << std::flush;
 
 		glfwPollEvents();
 		processInputs();
@@ -186,44 +162,9 @@ void Engine::playScene(Scene &scene){
 		lightingShader.setUniform("gNormal", 1);
 		lightingShader.setUniform("gAlbedoSpecular", 2);
 
-		// SSAO
-		glBindFramebuffer(GL_FRAMEBUFFER, SSAOBuffer);
-			glViewport(0, 0, width / 2.0f, height / 2.0f);
-			glClear(GL_COLOR_BUFFER_BIT);
-
-			SSAOShader.use();
-			glActiveTexture(GL_TEXTURE2);
-			glBindTexture(GL_TEXTURE_2D, rotationNoiseSSAO);
-			SSAOShader.setUniform("gPosition", 0);
-			SSAOShader.setUniform("gNormal", 1);
-			SSAOShader.setUniform("rotationNoise", 2);
-			SSAOShader.setUniform("projection", scene.projection);
-			drawQuad();
-
-			SSAOBlurShader.use();
-			SSAOBlurShader.setUniform("source", 3);
-
-			glActiveTexture(GL_TEXTURE3);
-			glBindTexture(GL_TEXTURE_2D, SSAOOutput);
-			SSAOBlurShader.setUniform("axis", 0);
-			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, SSAOIntermediate, 0);
-			drawQuad();
-
-			glActiveTexture(GL_TEXTURE3);
-			glBindTexture(GL_TEXTURE_2D, SSAOIntermediate);
-			SSAOBlurShader.setUniform("axis", 1);
-			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, SSAOOutput, 0);
-			drawQuad();
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
 		// Lighting Pass
 		glViewport(0, 0, width, height);
 		lightingShader.use();
-		glActiveTexture(GL_TEXTURE3);
-		glBindTexture(GL_TEXTURE_2D, SSAOOutput);
-		glActiveTexture(GL_TEXTURE2);
-		glBindTexture(GL_TEXTURE_2D, gAlbedoSpecular);
-		lightingShader.setUniform("ambientOcclusion", 3);
 		lightingShader.setUniform("view", scene.cameras[0].getViewMatrix());
 
 		for(unsigned int i = 0; i < scene.lights.size(); ++i){
@@ -344,7 +285,6 @@ void Engine::resizeWindow(GLFWwindow * /*window*/, int newWidth, int newHeight){
 	height = newHeight;
 	glDeleteFramebuffers(1, &gBuffer);
 	initializeGBuffer();
-	initializeSSAOBuffer();
 }
 
 /**
@@ -355,74 +295,4 @@ void Engine::mouseMoveCallback(GLFWwindow * /*window*/, double x, double y){
 	for(auto it = mouseMoveCallbacks.begin(); it != mouseMoveCallbacks.end(); ++it){
 		(*it)(x, y);
 	}
-}
-
-std::vector<glm::vec3> Engine::generateSampleKernelSSAO(unsigned int numSamples){
-	std::default_random_engine generator;
-	std::uniform_real_distribution<float> unif(0.0f, 1.0f);
-	std::vector<glm::vec3> kernel;
-
-	for(unsigned int i = 0; i < numSamples; ++i){
-		glm::vec3 sample(
-			(unif(generator) * 2.0f) - 1.0f,
-			(unif(generator) * 2.0f) - 1.0f,
-			 unif(generator)
-		);
-		sample = glm::normalize(sample) * unif(generator);
-		float scale = (float)i / 64.0f;
-		scale = 0.1f + (scale * scale * 0.9f);
-		sample *= scale;
-		kernel.push_back(sample);
-	}
-
-	return kernel;
-}
-
-unsigned int Engine::generateRotationNoiseTextureSSAO(){
-	std::default_random_engine generator;
-	std::uniform_real_distribution<float> unif(0.0f, 1.0f);
-	float rotations[16 * 3];
-	for(unsigned int i = 0; i < 16 * 3; i += 3){
-		rotations[i + 0] = (unif(generator) * 2.0f) - 1.0f;
-		rotations[i + 1] = (unif(generator) * 2.0f) - 1.0f;
-		rotations[i + 2] = 0.0f;
-	}
-
-	unsigned int id;
-	glGenTextures(1, &id);
-	glBindTexture(GL_TEXTURE_2D, id);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, 4, 4, 0, GL_RGB, GL_FLOAT, rotations);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-
-	return id;
-}
-
-void Engine::initializeSSAOBuffer(){
-	glDeleteFramebuffers(1, &SSAOBuffer);
-
-	glGenFramebuffers(1, &SSAOBuffer);
-	glBindFramebuffer(GL_FRAMEBUFFER, SSAOBuffer);
-
-	glGenTextures(1, &SSAOOutput);
-	glBindTexture(GL_TEXTURE_2D, SSAOOutput);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, (float)width / 2.0f, (float)height / 2.0f, 0, GL_RGB, GL_FLOAT, NULL);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-	glGenTextures(1, &SSAOIntermediate);
-	glBindTexture(GL_TEXTURE_2D, SSAOIntermediate);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, (float)width / 2.0f, (float)height / 2.0f, 0, GL_RGB, GL_FLOAT, NULL);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, SSAOOutput, 0);
-
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }

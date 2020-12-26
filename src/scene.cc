@@ -1,11 +1,8 @@
 #include "scene.h"
-
-#include <iostream>
-
 #include "engine.h"
 
 Scene::Scene(){
-	projection =  glm::mat4(1);
+	projection = glm::mat4(1);
 	cameras.push_back(Camera());
 	cameras[0].setForward(glm::vec3(0, 0, 1));
 }

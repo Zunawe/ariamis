@@ -5,8 +5,6 @@
 #include <sstream>
 #include <string.h>
 
-Shader Shader::DEFAULT_SHADER;
-
 /**
  * Loads the source code for a shader
  * 

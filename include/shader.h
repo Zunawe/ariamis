@@ -10,8 +10,6 @@
 
 class Shader{
 	public:
-		static Shader DEFAULT_SHADER;
-
 		void loadFile(const GLchar *sourcePath, GLenum type);
 		void loadSource(const char *source, GLenum type);
 		void link();

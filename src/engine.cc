@@ -32,10 +32,6 @@ void Engine::postContextCreation(){
 
 	glEnable(GL_DEPTH_TEST);
 
-	Shader::DEFAULT_SHADER.loadFile("data/shaders/forward.vs", GL_VERTEX_SHADER);
-	Shader::DEFAULT_SHADER.loadFile("data/shaders/forward.fs", GL_FRAGMENT_SHADER);
-	Shader::DEFAULT_SHADER.link();
-
 	lightingShader.loadFile("data/shaders/quad.vs", GL_VERTEX_SHADER);
 	lightingShader.loadFile("data/shaders/lighting.fs", GL_FRAGMENT_SHADER);
 	lightingShader.link();

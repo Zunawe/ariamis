@@ -7,9 +7,9 @@ Material Material::DEFAULT_MATERIAL;
  * Diffuse and specular maps are set to the default texture on their construction.
  */
 Material::Material(){
-	ambient = glm::vec3(0.7f, 0.7f, 0.7f);
-	diffuse = glm::vec3(0.7f, 0.7f, 0.7f);
-	specular = glm::vec3(0.4f, 0.4f, 0.4f);
+	ambient = glm::vec3(1.0f, 1.0f, 1.0f);
+	diffuse = glm::vec3(1.0f, 1.0f, 1.0f);
+	specular = glm::vec3(1.0f, 1.0f, 1.0f);
 	shininess = 32.0f;
 
 	diffuseMap = &Texture::DEFAULT_TEXTURE;

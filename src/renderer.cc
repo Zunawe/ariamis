@@ -21,7 +21,6 @@ Renderer::Renderer(){
 		glEnableVertexAttribArray(3);
 	glBindVertexArray(0);
 
-	setShader(Shader::DEFAULT_SHADER);
 	setMaterial(Material::DEFAULT_MATERIAL);
 
 	checkErrorAt("Object Renderer Initialization");
@@ -53,9 +52,14 @@ void Renderer::draw(const glm::mat4 &model, const glm::mat4 &view, const glm::ma
 		for(unsigned int i = 0; i < submeshes.size(); ++i){
 			Material &material = materials[materialIndices[i]];
 
+			shader.setUniform("material.ambient", material.ambient);
+			shader.setUniform("material.diffuse", material.diffuse);
+
 			glActiveTexture(GL_TEXTURE0);
 			glBindTexture(GL_TEXTURE_2D, material.diffuseMap->getID());
 			shader.setUniform("material.diffuseMap", 0);
+
+			shader.setUniform("material.specular", material.specular);
 
 			glActiveTexture(GL_TEXTURE1);
 			glBindTexture(GL_TEXTURE_2D, material.specularMap->getID());
@@ -171,7 +175,7 @@ void Renderer::setMaterial(unsigned int submeshIndex, const Material &material){
 }
 
 /**
- * Sets the shader for this renderer. By default it is Shader::DEFAULT_SHADER.
+ * Sets the shader for this renderer.
  * 
  * @param shader the new shader to use.
  */

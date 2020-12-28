@@ -7,19 +7,19 @@ struct Material{
 
 layout(location = 0) out vec3 gPosition;
 layout(location = 1) out vec3 gNormal;
-layout(location = 2) out vec4 gColorSpec;
+layout(location = 2) out vec4 gAlbedoSpecular;
 
-in vec3 vertexNormal;
-in vec3 vertexColor;
-in vec2 vertexTextureCoordinates;
-in vec3 fragPos;
+in vec3 vNormal;
+in vec3 vColor;
+in vec2 vTextureCoordinates;
+in vec3 fPos;
 
 uniform Material material;
 uniform vec3 cameraPos;
 
 void main(){
-	gPosition = fragPos;
-	gNormal = normalize(vertexNormal);
-	gColorSpec.rgb = texture(material.diffuseMap, vertexTextureCoordinates).rgb;
-	gColorSpec.a = texture(material.specularMap, vertexTextureCoordinates).r;
+	gPosition = fPos;
+	gNormal = normalize(vNormal);
+	gAlbedoSpecular.rgb = texture(material.diffuseMap, vTextureCoordinates).rgb;
+	gAlbedoSpecular.a = texture(material.specularMap, vTextureCoordinates).r;
 }

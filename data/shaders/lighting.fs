@@ -16,27 +16,24 @@ struct Light{
 	float cosAngle;
 };
 
-in vec2 vertexTextureCoordinates;
+in vec2 vTextureCoordinates;
 
 uniform sampler2D gPosition;
 uniform sampler2D gNormal;
 uniform sampler2D gAlbedoSpecular;
-uniform sampler2D ambientOcclusion;
 
 uniform mat4 view;
 
 uniform Light lights[4];
 
-out vec4 fragmentColor;
+out vec4 fColor;
 
 void main(){
-	vec3 position = texture(gPosition, vertexTextureCoordinates).xyz;
-	vec3 normal = texture(gNormal, vertexTextureCoordinates).xyz;
-	vec4 albedoSpecular = texture(gAlbedoSpecular, vertexTextureCoordinates);
+	vec3 position = texture(gPosition, vTextureCoordinates).xyz;
+	vec3 normal = texture(gNormal, vTextureCoordinates).xyz;
+	vec4 albedoSpecular = texture(gAlbedoSpecular, vTextureCoordinates);
 	vec3 albedo = albedoSpecular.rgb;
 	vec3 spec = albedoSpecular.aaa;
-
-	float occlusion = texture(ambientOcclusion, vertexTextureCoordinates).r;
 
 	vec3 toCamera = normalize(-position);
 
@@ -69,7 +66,6 @@ void main(){
 		float shinyMultiplier = pow(max(dot(toCamera, reflected), 0), 32.0);
 		specular += spotlightMultiplier * attenuation * spec * light.specular * shinyMultiplier;
 	}
-	ambient *= occlusion;
 
-	fragmentColor = vec4(ambient + diffuse + specular, 1.0);
+	fColor = vec4(ambient + diffuse + specular, 1.0);
 }

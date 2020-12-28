@@ -11,16 +11,14 @@ Renderer::Renderer(){
 	glBindVertexArray(VAO);
 		glBindBuffer(GL_ARRAY_BUFFER, VBO);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, Mesh::VERTEX_SIZE, (void *)0);                     // Vertex
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, Mesh::VERTEX_SIZE, (void *)0);                     // Position
 		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, Mesh::VERTEX_SIZE, (void *)(3 * sizeof(float)));   // Normal
-		glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, Mesh::VERTEX_SIZE, (void *)(6 * sizeof(float)));   // Tangent
-		glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, Mesh::VERTEX_SIZE, (void *)(9 * sizeof(float)));   // Color
-		glVertexAttribPointer(4, 2, GL_FLOAT, GL_FALSE, Mesh::VERTEX_SIZE, (void *)(12 * sizeof(float)));  // Texture
+		glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, Mesh::VERTEX_SIZE, (void *)(6 * sizeof(float)));   // Color
+		glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, Mesh::VERTEX_SIZE, (void *)(9 * sizeof(float)));   // Texture
 		glEnableVertexAttribArray(0);
 		glEnableVertexAttribArray(1);
 		glEnableVertexAttribArray(2);
 		glEnableVertexAttribArray(3);
-		glEnableVertexAttribArray(4);
 	glBindVertexArray(0);
 
 	setShader(Shader::DEFAULT_SHADER);

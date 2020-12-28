@@ -1,11 +1,11 @@
 #version 330 core
 
-in vec2 vertexTextureCoordinates;
+in vec2 vTextureCoordinates;
 
 uniform sampler2D image;
 
-out vec4 fragmentColor;
+out vec4 fColor;
 
 void main(){
-	fragmentColor = texture(image, vertexTextureCoordinates);
+	fColor = texture(image, vTextureCoordinates);
 }

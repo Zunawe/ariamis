@@ -1,7 +1,5 @@
 #include <iostream>
 
-#define GL_GLEXT_PROTOTYPES
-#include <GLFW/glfw3.h>
 #include "glm/ext.hpp"
 
 #include "engine.h"
@@ -31,7 +29,7 @@ int main(){
 
 		plane->position = glm::vec3(0, 0, 0);
 		plane->position[i / 2] = ((2 * (i % 2)) - 1) * 10.0f;
-		plane->scale *= glm::vec3(10.0f, 10.0f, 10.0f);
+		plane->scales *= glm::vec3(10.0f, 10.0f, 10.0f);
 	}
 
 	// Lights

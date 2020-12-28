@@ -44,9 +44,13 @@ void Engine::postContextCreation(){
 	gBufferShader.loadFile("data/shaders/gbuffer.fs", GL_FRAGMENT_SHADER);
 	gBufferShader.link();
 
-	Material::DEFAULT_MATERIAL = Material();
-
 	initializeGBuffer();
+
+	unsigned char whitePixel[3] = {255, 255, 255};
+	Texture::DEFAULT_TEXTURE = Texture();
+	Texture::DEFAULT_TEXTURE.loadRaw(1, 1, whitePixel);
+
+	Material::DEFAULT_MATERIAL = Material();
 
 	glfwSwapInterval(0);
 }
@@ -170,7 +174,7 @@ void Engine::playScene(Scene &scene){
 		// Lighting Pass
 		glViewport(0, 0, width, height);
 		lightingShader.use();
-		lightingShader.setUniform("view", scene.cameras[0].getViewMatrix());
+		lightingShader.setUniform("view", scene.camera.getViewMatrix());
 
 		for(unsigned int i = 0; i < scene.lights.size(); ++i){
 			scene.lights[i]->setUniforms(lightingShader, "lights[" + std::to_string(i) + "]");

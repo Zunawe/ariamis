@@ -4,9 +4,9 @@
 #include <iostream>
 
 Renderer::Renderer(){
+	glGenVertexArrays(1, &VAO);
 	glGenBuffers(1, &VBO);
 	glGenBuffers(1, &EBO);
-	glGenVertexArrays(1, &VAO);
 
 	glBindVertexArray(VAO);
 		glBindBuffer(GL_ARRAY_BUFFER, VBO);
@@ -54,11 +54,11 @@ void Renderer::draw(const glm::mat4 &model, const glm::mat4 &view, const glm::ma
 			Material &material = materials[materialIndices[i]];
 
 			glActiveTexture(GL_TEXTURE0);
-			glBindTexture(GL_TEXTURE_2D, material.diffuseMap.getID());
+			glBindTexture(GL_TEXTURE_2D, material.diffuseMap->getID());
 			shader.setUniform("material.diffuseMap", 0);
 
 			glActiveTexture(GL_TEXTURE1);
-			glBindTexture(GL_TEXTURE_2D, material.specularMap.getID());
+			glBindTexture(GL_TEXTURE_2D, material.specularMap->getID());
 			shader.setUniform("material.specularMap", 1);
 
 			shader.setUniform("material.shininess", material.shininess);

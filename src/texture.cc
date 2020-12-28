@@ -5,19 +5,19 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
+Texture Texture::DEFAULT_TEXTURE;
+
 Texture::Texture(){
-	unsigned char whitePixel[3] = {255, 255, 255};
-	this->width = 1;
-	this->height = 1;
-	generateTexture(whitePixel);
+	glGenTextures(1, &this->id);
 }
 
 Texture::Texture(const char *filePath){
+	glGenTextures(1, &this->id);
 	load(filePath);
 }
 
 Texture::~Texture(){
-	// glDeleteTextures(1, &id);
+	glDeleteTextures(1, &id);
 }
 
 /**
@@ -29,9 +29,15 @@ void Texture::load(const char *filePath){
 	stbi_set_flip_vertically_on_load(true);
 	unsigned char *imageData = stbi_load(filePath, &width, &height, &numChannels, 3);
 
-	generateTexture(imageData);
+	loadToGPU(imageData);
 
 	delete imageData;
+}
+
+void Texture::loadRaw(unsigned int width, unsigned int height, unsigned char *data){
+	this->width = width;
+	this->height = height;
+	loadToGPU(data);
 }
 
 /**
@@ -39,9 +45,7 @@ void Texture::load(const char *filePath){
  * 
  * @param imageData raw pixel data.
  */
-void Texture::generateTexture(unsigned char *imageData){
-	glGenTextures(1, &this->id);
-
+void Texture::loadToGPU(unsigned char *imageData){
 	glBindTexture(GL_TEXTURE_2D, id);
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, imageData);
 		glGenerateMipmap(GL_TEXTURE_2D);

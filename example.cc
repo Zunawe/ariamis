@@ -12,13 +12,16 @@ int main(){
 
 	Scene s;
 
+	Texture *rockDiffuseMap = new Texture("data/textures/rock_diffuse.png");
+	Texture *rockSpecularMap = new Texture("data/textures/rock_specular.png");
+
 	// Objects
 	std::shared_ptr<Object> rock(new Object());
 	rock->renderer.setMesh(loadMeshFromObj("data/objects/rock.obj"));
-	rock->renderer.getMaterial().diffuseMap = Texture("data/textures/rock_diffuse.png");
-	rock->renderer.getMaterial().specularMap = Texture("data/textures/rock_specular.png");
+	rock->renderer.getMaterial().diffuseMap = rockDiffuseMap;
+	rock->renderer.getMaterial().specularMap = rockSpecularMap;
 
-	rock->position = glm::vec3(4, 4, 4);
+	rock->position = glm::vec3(3, 3, 3);
 
 	s.objects.push_back(rock);
 
@@ -27,9 +30,8 @@ int main(){
 		plane->renderer.setMesh(loadMeshFromObj("data/objects/cube.obj"));
 		s.objects.push_back(plane);
 
-		plane->position = glm::vec3(0, 0, 0);
 		plane->position[i / 2] = ((2 * (i % 2)) - 1) * 10.0f;
-		plane->scales *= glm::vec3(10.0f, 10.0f, 10.0f);
+		plane->scale(9.0f);
 	}
 
 	// Lights
@@ -54,7 +56,7 @@ int main(){
 
 	// Input
 	float speedMultiplier = 2.0f;
-	Camera &camera = s.cameras[0];
+	Camera &camera = s.camera;
 	Engine::registerKeyEvent(GLFW_KEY_ESCAPE, [](float /*dt*/){
 		Engine::quit();
 	});
@@ -105,4 +107,7 @@ int main(){
 	});
 
 	Engine::playScene(s);
+
+	delete rockDiffuseMap;
+	delete rockSpecularMap;
 }

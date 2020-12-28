@@ -13,9 +13,9 @@ class Material{
 
 		glm::vec3 ambient;
 		glm::vec3 diffuse;
-		Texture diffuseMap;
+		Texture *diffuseMap;
 		glm::vec3 specular;
-		Texture specularMap;
+		Texture *specularMap;
 		float shininess;
 };
 bool operator==(const Material &lhs, const Material &rhs);

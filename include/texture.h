@@ -3,14 +3,17 @@
 
 class Texture{
 	public:
+		static Texture DEFAULT_TEXTURE;
+
 		Texture();
-		~Texture();
 		Texture(const char *filePath);
-		void load(const char *filename);
+		~Texture();
+		void load(const char *filePath);
+		void loadRaw(unsigned int width, unsigned int height, unsigned char *data);
 		unsigned int getID() const;
 
 	private:
-		void generateTexture(unsigned char *imageData);
+		void loadToGPU(unsigned char *imageData);
 
 		unsigned int id;
 		int width, height;

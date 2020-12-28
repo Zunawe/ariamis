@@ -1,9 +1,11 @@
 #ifndef LIGHT_H
 #define LIGHT_H
 
+#include <string>
+
 #include <glm/glm.hpp>
 
-#include "shader.h"
+class Shader;
 
 class Light{
 	public:

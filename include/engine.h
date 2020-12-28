@@ -1,14 +1,15 @@
 #ifndef ENGINE_H
 #define ENGINE_H
 
+#include <functional>
 #include <map>
 #include <vector>
-#include <functional>
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#include "scene.h"
+class Scene;
+class Shader;
 
 class Engine{
 	public:

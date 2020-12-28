@@ -1,9 +1,10 @@
 #include "engine.h"
 
-#include <iostream>
+#include <stdexcept>
 
 #include "shader.h"
 #include "material.h"
+#include "scene.h"
 
 unsigned int Engine::gBuffer = 0;
 unsigned int Engine::gPosition = 0;

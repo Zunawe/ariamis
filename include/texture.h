@@ -1,8 +1,6 @@
 #ifndef TEXTURE_H
 #define TEXTURE_H
 
-#include <glm/glm.hpp>
-
 class Texture{
 	public:
 		Texture();

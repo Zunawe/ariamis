@@ -1,5 +1,7 @@
 #include "light.h"
 
+#include "shader.h"
+
 /**
  * Sets the values for a light struct in the provided shader.
  * 

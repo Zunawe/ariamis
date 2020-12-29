@@ -23,6 +23,157 @@ unsigned int Engine::width = 0;
 unsigned int Engine::height = 0;
 GLFWwindow *Engine::window;
 
+const char *gBufferVertexShaderSource = R"(
+#version 330 core
+
+layout(location = 0) in vec3 aPos;
+layout(location = 1) in vec3 aNormal;
+layout(location = 2) in vec3 aColor;
+layout(location = 3) in vec2 aTextureCoordinates;
+
+uniform mat4 model;
+uniform mat3 normalModel;
+uniform mat4 view;
+uniform mat4 projection;
+
+uniform mat4 modelViewProjection;
+
+out vec3 vNormal;
+out vec3 vColor;
+out vec2 vTextureCoordinates;
+out vec3 fPos;
+
+void main(){
+	gl_Position = modelViewProjection * vec4(aPos, 1.0);
+
+	vNormal = normalModel * aNormal;
+	vColor = aColor;
+	vTextureCoordinates = aTextureCoordinates;
+
+	fPos = vec3(view * model * vec4(aPos, 1.0));
+}
+)";
+
+const char *gBufferFragmentShaderSource = R"(
+#version 330 core
+
+struct Material{
+	vec3 ambient;
+	vec3 diffuse;
+	sampler2D diffuseMap;
+	vec3 specular;
+	sampler2D specularMap;
+	float shininess;
+};
+
+layout(location = 0) out vec3 gPosition;
+layout(location = 1) out vec3 gNormal;
+layout(location = 2) out vec4 gAlbedoSpecular;
+
+in vec3 vNormal;
+in vec3 vColor;
+in vec2 vTextureCoordinates;
+in vec3 fPos;
+
+uniform Material material;
+uniform vec3 cameraPos;
+
+void main(){
+	gPosition = fPos;
+	gNormal = normalize(vNormal);
+	gAlbedoSpecular.rgb = material.diffuse * texture(material.diffuseMap, vTextureCoordinates).rgb;
+	gAlbedoSpecular.a = material.specular.r * texture(material.specularMap, vTextureCoordinates).r;
+}
+)";
+
+const char *lightingVertexShaderSource = R"(
+#version 330 core
+
+layout(location = 0) in vec3 aPosition;
+layout(location = 1) in vec2 aTextureCoordinates;
+
+out vec2 vTextureCoordinates;
+
+void main(){
+	vTextureCoordinates = aTextureCoordinates;
+	gl_Position = vec4(aPosition, 1.0);
+}
+)";
+
+const char *lightingFragmentShaderSource = R"(
+#version 330 core
+
+struct Light{
+	vec4 position;
+	vec3 ambient;
+	vec3 diffuse;
+	vec3 specular;
+
+	// Point
+	float kc;
+	float kl;
+	float kq;
+
+	// Spot
+	vec3 direction;
+	float cosAngle;
+};
+
+in vec2 vTextureCoordinates;
+
+uniform sampler2D gPosition;
+uniform sampler2D gNormal;
+uniform sampler2D gAlbedoSpecular;
+
+uniform mat4 view;
+
+uniform Light lights[4];
+
+out vec4 fColor;
+
+void main(){
+	vec3 position = texture(gPosition, vTextureCoordinates).xyz;
+	vec3 normal = texture(gNormal, vTextureCoordinates).xyz;
+	vec4 albedoSpecular = texture(gAlbedoSpecular, vTextureCoordinates);
+	vec3 albedo = albedoSpecular.rgb;
+	vec3 spec = albedoSpecular.aaa;
+
+	vec3 toCamera = normalize(-position);
+
+	vec3 ambient, diffuse, specular;
+	for(int i = 0; i < 4; ++i){
+		Light light = lights[i];
+		light.position = view * light.position;
+		light.direction = (view * vec4(light.direction, 0.0)).xyz;
+
+		// Directional Light
+		vec3 toLight = normalize(light.position.w != 0.0 ? light.position.xyz - position : -light.position.xyz);
+
+		// Point Light
+		float lightDistance = length(light.position.xyz - position);
+		float denom = light.kc == 0.0 ? 1.0 : (light.kc + (light.kl * lightDistance) + (light.kq * lightDistance * lightDistance));
+		float attenuation = 1.0 / denom;
+
+		// Spotlight
+		float spotlightMultiplier = light.cosAngle == 0.0 ? 1.0 : step(light.cosAngle, dot(normalize(light.direction), -toLight));
+
+		// Ambient
+		ambient += attenuation * albedo * light.ambient;
+
+		// Diffuse
+		float multiplier = max(dot(normal, toLight), 0);
+		diffuse += spotlightMultiplier * attenuation * albedo * light.diffuse * multiplier;
+
+		// Specular
+		vec3 reflected = reflect(-toLight, normal);
+		float shinyMultiplier = pow(max(dot(toCamera, reflected), 0), 32.0);
+		specular += spotlightMultiplier * attenuation * spec * light.specular * shinyMultiplier;
+	}
+
+	fColor = vec4(ambient + diffuse + specular, 1.0);
+}
+)";
+
 /**
  * Initialization that should happen after a GL context has been created.
  */
@@ -32,12 +183,12 @@ void Engine::postContextCreation(){
 
 	glEnable(GL_DEPTH_TEST);
 
-	lightingShader.loadFile("data/shaders/quad.vs", GL_VERTEX_SHADER);
-	lightingShader.loadFile("data/shaders/lighting.fs", GL_FRAGMENT_SHADER);
+	lightingShader.loadSource(lightingVertexShaderSource, GL_VERTEX_SHADER);
+	lightingShader.loadSource(lightingFragmentShaderSource, GL_FRAGMENT_SHADER);
 	lightingShader.link();
 
-	gBufferShader.loadFile("data/shaders/gbuffer.vs", GL_VERTEX_SHADER);
-	gBufferShader.loadFile("data/shaders/gbuffer.fs", GL_FRAGMENT_SHADER);
+	gBufferShader.loadSource(gBufferVertexShaderSource, GL_VERTEX_SHADER);
+	gBufferShader.loadSource(gBufferFragmentShaderSource, GL_FRAGMENT_SHADER);
 	gBufferShader.link();
 
 	initializeGBuffer();

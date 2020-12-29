@@ -107,7 +107,7 @@ TEST(MeshTests, UniquifyVertices){
 	m.addTriangle(0, 1, 2);
 	m.addTriangle(0, 2, 3);
 
-	m.makeAllVerticesUnique();
+	m.uniquifyVertices();
 
 	ASSERT_EQ(m.getNumVertices(), 6);
 }

@@ -68,3 +68,9 @@ test: $(TEST_TARGETS)
 clean_gtest:
 	@rm -rf $(GTEST_BUILDDIR)
 	@rm -f $(GTEST_TARGET)
+
+get-deps:
+	sudo apt-get -qq update
+	sudo apt-get -qq install xorg-dev
+	git clone --depth=1 https://github.com/g-truc/glm.git && mkdir glm_build && cd glm_build && cmake ../glm && sudo make install
+	git clone --depth=1 https://github.com/glfw/glfw.git && mkdir glfw_build && cd glfw_build && cmake ../glfw && make -j4 && sudo make install

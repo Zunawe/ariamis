@@ -10,6 +10,8 @@ CFLAGS = -Wall -Wextra -std=c++11
 LIBS = -lglfw -lGL -ldl -L lib
 INCLUDE = -I include
 
+.PHONY: clean test clean_gtest
+
 $(TARGET): $(OBJECTS)
 	@mkdir -p lib
 	ar rcs $@ $^

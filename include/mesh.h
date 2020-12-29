@@ -60,7 +60,7 @@ class Mesh{
 		Mesh();
 		void uniquifyVertices();
 		void compress();
-		void calculateFaceNormals();
+		void calculateFaceNormals(bool saveToColor);
 
 		glm::vec3 getVertex(unsigned int i);
 		unsigned int addVertex(float x, float y, float z);

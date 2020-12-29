@@ -58,7 +58,7 @@ void Mesh::compress(){
  * many models that average vertices re-use existing vertices that have different
  * true normals, it's necessary to increase the number of vertices.
  */
-void Mesh::calculateFaceNormals(){
+void Mesh::calculateFaceNormals(bool saveToColor){
 	uniquifyVertices();
 	for(unsigned int i = 0; i < getNumTriangles(); ++i){
 		glm::vec3 vertex1 = getVertex(triangles[(i * 3) + 0]);
@@ -68,9 +68,16 @@ void Mesh::calculateFaceNormals(){
 		glm::vec3 edge2 = vertex3 - vertex1;
 		glm::vec3 faceNormal = glm::normalize(glm::cross(edge1, edge2));
 
-		setColor(triangles[(i * 3) + 0], faceNormal);
-		setColor(triangles[(i * 3) + 1], faceNormal);
-		setColor(triangles[(i * 3) + 2], faceNormal);
+		if(saveToColor){
+			setColor(triangles[(i * 3) + 0], faceNormal);
+			setColor(triangles[(i * 3) + 1], faceNormal);
+			setColor(triangles[(i * 3) + 2], faceNormal);
+		}
+		else{
+			setNormal(triangles[(i * 3) + 0], faceNormal);
+			setNormal(triangles[(i * 3) + 1], faceNormal);
+			setNormal(triangles[(i * 3) + 2], faceNormal);
+		}
 	}
 }
 

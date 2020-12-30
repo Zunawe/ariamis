@@ -13,7 +13,7 @@ Scene::Scene(){
  */
 void Scene::update(){
 	for(auto it = objects.begin(); it != objects.end(); ++it){
-		(*it)->update(*it);
+		(*it)->update();
 	}
 }
 

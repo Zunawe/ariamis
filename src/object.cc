@@ -6,10 +6,20 @@ Object::Object(){
     position = glm::vec3(0);
     scales = glm::vec3(1);
     rotation = glm::quat(1, 0, 0, 0);
+}
 
-	update = [](std::shared_ptr<Object> /*me*/){
-		// Empty
-	};
+void Object::update(){
+    for(auto it = behaviors.begin(); it != behaviors.end(); ++it){
+		(it->second)(this);
+	}
+}
+
+void Object::addBehavior(std::string name, std::function<void(Object*)> func){
+    behaviors[name] = func;
+}
+
+void Object::removeBehavior(std::string name){
+    behaviors.erase(name);
 }
 
 void Object::translate(glm::vec3 v){

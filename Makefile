@@ -6,7 +6,7 @@ TARGET = lib/libariamis.a
 SRCEXT := cc
 SOURCES = $(shell find $(SRCDIR) -type f -name "*.$(SRCEXT)")
 OBJECTS := $(patsubst $(SRCDIR)/%, $(BUILDDIR)/%, $(SOURCES:.$(SRCEXT)=.o))
-CFLAGS = -Wall -Wextra -std=c++11
+CFLAGS = -Wall -Wextra -std=c++11 -O3
 LIBS = -lglfw -lGL -ldl -L lib
 INCLUDE = -I include
 

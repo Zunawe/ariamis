@@ -46,9 +46,9 @@ void Object::rotate(float theta, glm::vec3 axis){
  * @return the model matrix corresponding to this object's transformation vectors.
  */
 glm::mat4 Object::getModel(){
-    glm::mat4 model = glm::mat4(1);
+    glm::mat4 model(1);
 	model = glm::translate(model, position);
 	model = glm::scale(model, scales);
-	model = ((glm::mat4)rotation) * model;
+	model = model * glm::mat4_cast(rotation);
     return model;
 }

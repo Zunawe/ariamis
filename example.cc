@@ -9,6 +9,7 @@
 
 int main(){
 	Engine::createWindow("Example", 1280, 720, false);
+	Engine::setTickRate(120.0f);
 
 	Scene s;
 

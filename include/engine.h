@@ -18,10 +18,13 @@ class Engine{
 		static void registerKeyEvent(int key, std::function<void(float)> func);
 		static void registerMouseMoveEvent(std::function<void(double, double)> func);
 		static void playScene(Scene &scene);
+		static void render(Scene &scene);
 		static int getWidth();
 		static int getHeight();
 		static float getTime();
 		static float getDeltaTime();
+		static float getTickRate();
+		static void setTickRate(float newTickRate);
 		static void cleanUp();
 		static void quit();
 
@@ -45,8 +48,9 @@ class Engine{
 
 		static std::map<int, std::vector<std::function<void(float)>>> keyCallbacks;
 		static std::vector<std::function<void(double, double)>> mouseMoveCallbacks;
-		static float lastTime;
-		static float deltaTime;
+		static float time;
+		static float dt;
+		static float tickRate;
 		static unsigned int width;
 		static unsigned int height;
 		static GLFWwindow *window;

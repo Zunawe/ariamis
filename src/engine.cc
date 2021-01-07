@@ -17,8 +17,9 @@ unsigned int Engine::quadVAO = 0;
 
 std::map<int, std::vector<std::function<void(float)>>> Engine::keyCallbacks;
 std::vector<std::function<void(double, double)>> Engine::mouseMoveCallbacks;
-float Engine::lastTime = 0.0f;
-float Engine::deltaTime = 0.0f;
+float Engine::time = 0.0f;
+float Engine::dt = 0.0f;
+float Engine::tickRate = 60.0f;
 unsigned int Engine::width = 0;
 unsigned int Engine::height = 0;
 GLFWwindow *Engine::window;
@@ -296,47 +297,52 @@ void Engine::playScene(Scene &scene){
 	}
 
 	while(!glfwWindowShouldClose(window)){
-		float newTime = glfwGetTime();
-		deltaTime = newTime - lastTime;
-		lastTime = newTime;
+		float now = glfwGetTime();
+		dt = now - time;
 
-		glfwPollEvents();
-		processInputs();
-
-		scene.update();
-
-		// G-Buffer Pass
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		glBindFramebuffer(GL_FRAMEBUFFER, gBuffer);
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-			scene.draw();
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, gPosition);
-		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, gNormal);
-		glActiveTexture(GL_TEXTURE2);
-		glBindTexture(GL_TEXTURE_2D, gAlbedoSpecular);
-		lightingShader.setUniform("gPosition", 0);
-		lightingShader.setUniform("gNormal", 1);
-		lightingShader.setUniform("gAlbedoSpecular", 2);
-
-		// Lighting Pass
-		glViewport(0, 0, width, height);
-		lightingShader.use();
-		lightingShader.setUniform("view", scene.camera.getViewMatrix());
-
-		for(unsigned int i = 0; i < scene.lights.size(); ++i){
-			scene.lights[i]->setUniforms(lightingShader, "lights[" + std::to_string(i) + "]");
+		if(dt >= 1.0f / tickRate){
+			time = now;
+			glfwPollEvents();
+			processInputs();
+			scene.update();
 		}
 
-		drawQuad();
-
-		glfwSwapBuffers(window);
+		render(scene);
 	}
 
 	glfwTerminate();
+}
+
+void Engine::render(Scene &scene){
+	// G-Buffer Pass
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glBindFramebuffer(GL_FRAMEBUFFER, gBuffer);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		scene.draw();
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, gPosition);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, gNormal);
+	glActiveTexture(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_2D, gAlbedoSpecular);
+	lightingShader.setUniform("gPosition", 0);
+	lightingShader.setUniform("gNormal", 1);
+	lightingShader.setUniform("gAlbedoSpecular", 2);
+
+	// Lighting Pass
+	glViewport(0, 0, width, height);
+	lightingShader.use();
+	lightingShader.setUniform("view", scene.camera.getViewMatrix());
+
+	for(unsigned int i = 0; i < scene.lights.size(); ++i){
+		scene.lights[i]->setUniforms(lightingShader, "lights[" + std::to_string(i) + "]");
+	}
+
+	drawQuad();
+
+	glfwSwapBuffers(window);
 }
 
 void Engine::drawQuad(){
@@ -374,7 +380,7 @@ void Engine::processInputs(){
 	for(auto it = keyCallbacks.begin(); it != keyCallbacks.end(); ++it){
 		if(glfwGetKey(window, it->first) == GLFW_PRESS){
 			for(auto fp = it->second.begin(); fp != it->second.end(); ++fp){
-				(*fp)(deltaTime);
+				(*fp)(dt);
 			}
 		}
 	}
@@ -428,11 +434,19 @@ int Engine::getHeight(){
 }
 
 float Engine::getDeltaTime(){
-	return deltaTime;
+	return dt;
 }
 
 float Engine::getTime(){
-	return lastTime;
+	return time;
+}
+
+float Engine::getTickRate(){
+	return tickRate;
+}
+
+void Engine::setTickRate(float newTickRate){
+	tickRate = newTickRate;
 }
 
 /**

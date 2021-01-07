@@ -255,7 +255,7 @@ void Engine::cleanUp(){
  * things that require said context. You should do this before creating any
  * other instances of anything from this library.
  */
-GLFWwindow* Engine::createWindow(const char *name){
+GLFWwindow* Engine::createWindow(const char *name, unsigned int width, unsigned int height, bool fullscreen){
 	glfwDestroyWindow(window);
 
 	if(!glfwInit()){
@@ -263,10 +263,14 @@ GLFWwindow* Engine::createWindow(const char *name){
 	}
 
 	const GLFWvidmode *mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
-	width = mode->width;
-	height = mode->height;
-
-	window = glfwCreateWindow(width, height, name, glfwGetPrimaryMonitor(), NULL);
+	if(fullscreen){
+		width = mode->width;
+		height = mode->height;
+		window = glfwCreateWindow(width, height, name, glfwGetPrimaryMonitor(), NULL);
+	}
+	else{
+		window = glfwCreateWindow(width, height, name, NULL, NULL);
+	}
 
 	glfwMakeContextCurrent(window);
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);

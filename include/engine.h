@@ -13,7 +13,7 @@ class Shader;
 
 class Engine{
 	public:
-		static GLFWwindow* createWindow(const char *name);
+		static GLFWwindow* createWindow(const char *name, unsigned int width, unsigned int height, bool fullscreen);
 		static GLFWwindow* getWindow();
 		static void registerKeyEvent(int key, std::function<void(float)> func);
 		static void registerMouseMoveEvent(std::function<void(double, double)> func);

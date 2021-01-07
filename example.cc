@@ -8,7 +8,7 @@
 #include "light.h"
 
 int main(){
-	Engine::createWindow("Example");
+	Engine::createWindow("Example", 1280, 720, false);
 
 	Scene s;
 

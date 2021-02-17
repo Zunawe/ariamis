@@ -1,4 +1,4 @@
-#include "material.h"
+#include <ariamis/material.h>
 
 Material Material::DEFAULT_MATERIAL;
 

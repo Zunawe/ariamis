@@ -1,4 +1,4 @@
-#include "obj_loader.h"
+#include <ariamis/obj_loader.h>
 
 #include <algorithm>
 #include <fstream>

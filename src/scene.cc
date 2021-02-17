@@ -1,8 +1,8 @@
-#include "scene.h"
+#include <ariamis/scene.h>
 
 #include <glm/glm.hpp>
 
-#include "engine.h"
+#include <ariamis/engine.h>
 
 Scene::Scene(){
 	camera.setForward(glm::vec3(0, 0, 1));

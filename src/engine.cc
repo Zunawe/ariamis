@@ -1,10 +1,10 @@
-#include "engine.h"
+#include <ariamis/engine.h>
 
 #include <stdexcept>
 
-#include "shader.h"
-#include "material.h"
-#include "scene.h"
+#include <ariamis/shader.h>
+#include <ariamis/material.h>
+#include <ariamis/scene.h>
 
 unsigned int Engine::gBuffer = 0;
 unsigned int Engine::gPosition = 0;

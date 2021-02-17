@@ -1,4 +1,4 @@
-#include "object.h"
+#include <ariamis/object.h>
 
 #include <glm/gtc/matrix_transform.hpp>
 

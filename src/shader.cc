@@ -1,4 +1,4 @@
-#include "shader.h"
+#include <ariamis/shader.h>
 
 #include <fstream>
 #include <iostream>

@@ -3,7 +3,7 @@
 
 #include <glm/glm.hpp>
 
-#include "texture.h"
+#include <ariamis/texture.h>
 
 class Material{
 	public:

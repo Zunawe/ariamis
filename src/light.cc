@@ -1,6 +1,6 @@
-#include "light.h"
+#include <ariamis/light.h>
 
-#include "shader.h"
+#include <ariamis/shader.h>
 
 /**
  * Sets the values for a light struct in the provided shader.

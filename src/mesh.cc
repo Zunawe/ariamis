@@ -1,6 +1,4 @@
-#include "mesh.h"
-
-#include <iostream>
+#include <ariamis/mesh.h>
 
 Mesh::Mesh(){
 	submeshBounds.push_back(0);

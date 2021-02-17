@@ -5,9 +5,9 @@
 #include <string>
 #include <vector>
 
-#include "material.h"
-#include "mesh.h"
-#include "renderer.h"
+#include <ariamis/material.h>
+#include <ariamis/mesh.h>
+#include <ariamis/renderer.h>
 
 Renderer loadObj(const char *filepath);
 void loadObj(const char *filepath, Renderer &renderer);

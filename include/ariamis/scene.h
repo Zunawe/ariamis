@@ -4,7 +4,7 @@
 #include <memory>
 #include <vector>
 
-#include "object.h"
+#include <ariamis/object.h>
 
 class Scene{
 	public:

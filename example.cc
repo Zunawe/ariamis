@@ -1,11 +1,11 @@
 #include <iostream>
 
-#include "glm/ext.hpp"
+#include <glm/ext.hpp>
 
-#include "engine.h"
-#include "scene.h"
-#include "obj_loader.h"
-#include "light.h"
+#include <ariamis/engine.h>
+#include <ariamis/scene.h>
+#include <ariamis/obj_loader.h>
+#include <ariamis/light.h>
 
 int main(){
 	Engine::createWindow("Example", 1280, 720, false);

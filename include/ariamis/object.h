@@ -7,7 +7,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
 
-#include "renderer.h"
+#include <ariamis/renderer.h>
 
 class Object{
 	public:

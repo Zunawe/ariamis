@@ -1,9 +1,9 @@
-#include "texture.h"
+#include <ariamis/texture.h>
 
 #define GL_GLEXT_PROTOTYPES
 #include <GLFW/glfw3.h>
 #define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
+#include <stb_image.h>
 
 Texture Texture::DEFAULT_TEXTURE;
 

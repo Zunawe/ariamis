@@ -5,11 +5,11 @@
 
 #include <glm/glm.hpp>
 
-#include "camera.h"
-#include "light.h"
-#include "material.h"
-#include "mesh.h"
-#include "shader.h"
+#include <ariamis/camera.h>
+#include <ariamis/light.h>
+#include <ariamis/material.h>
+#include <ariamis/mesh.h>
+#include <ariamis/shader.h>
 
 class Renderer{
 	public:

@@ -195,7 +195,6 @@ void Engine::postContextCreation(){
 	initializeGBuffer();
 
 	unsigned char whitePixel[3] = {255, 255, 255};
-	Texture::DEFAULT_TEXTURE = Texture();
 	Texture::DEFAULT_TEXTURE.loadRaw(1, 1, whitePixel);
 
 	Material::DEFAULT_MATERIAL = Material();
@@ -257,12 +256,14 @@ void Engine::cleanUp(){
  * other instances of anything from this library.
  */
 GLFWwindow* Engine::createWindow(const char *name, unsigned int width, unsigned int height, bool fullscreen){
-	glfwDestroyWindow(window);
-
 	if(!glfwInit()){
 		throw std::runtime_error("Failed to initialize GLFW");
 	}
 
+	glfwDestroyWindow(window);
+
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	const GLFWvidmode *mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
 	if(fullscreen){
 		width = mode->width;

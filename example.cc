@@ -7,6 +7,8 @@
 #include <ariamis/obj_loader.h>
 #include <ariamis/light.h>
 
+using namespace Ariamis;
+
 int main(){
 	Engine::createWindow("Example", 1280, 720, false);
 	Engine::setTickRate(120.0f);

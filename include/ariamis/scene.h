@@ -6,15 +6,17 @@
 
 #include <ariamis/object.h>
 
-class Scene{
-	public:
-		Scene();
-		void update();
-		void draw();
+namespace Ariamis {
+	class Scene{
+		public:
+			Scene();
+			void update();
+			void draw();
 
-		std::vector<std::shared_ptr<Object>> objects;
-		std::vector<std::shared_ptr<Light>> lights;
-		Camera camera;
-};
+			std::vector<std::shared_ptr<Object>> objects;
+			std::vector<std::shared_ptr<Light>> lights;
+			Camera camera;
+	};
+}
 
 #endif

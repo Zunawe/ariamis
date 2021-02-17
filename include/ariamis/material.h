@@ -5,19 +5,21 @@
 
 #include <ariamis/texture.h>
 
-class Material{
-	public:
-		static Material DEFAULT_MATERIAL;
+namespace Ariamis {
+	class Material{
+		public:
+			static Material DEFAULT_MATERIAL;
 
-		Material();
+			Material();
 
-		glm::vec3 ambient;
-		glm::vec3 diffuse;
-		Texture *diffuseMap;
-		glm::vec3 specular;
-		Texture *specularMap;
-		float shininess;
-};
-bool operator==(const Material &lhs, const Material &rhs);
+			glm::vec3 ambient;
+			glm::vec3 diffuse;
+			Texture *diffuseMap;
+			glm::vec3 specular;
+			Texture *specularMap;
+			float shininess;
+	};
+	bool operator==(const Material &lhs, const Material &rhs);
+}
 
 #endif

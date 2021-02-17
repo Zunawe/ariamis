@@ -3,194 +3,196 @@
 #include <algorithm>
 #include <iostream>
 
-Renderer::Renderer(){
-	glGenVertexArrays(1, &VAO);
-	glGenBuffers(1, &VBO);
-	glGenBuffers(1, &EBO);
+namespace Ariamis {
+	Renderer::Renderer(){
+		glGenVertexArrays(1, &VAO);
+		glGenBuffers(1, &VBO);
+		glGenBuffers(1, &EBO);
 
-	glBindVertexArray(VAO);
-		glBindBuffer(GL_ARRAY_BUFFER, VBO);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, Mesh::VERTEX_SIZE, (void *)0);                     // Position
-		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, Mesh::VERTEX_SIZE, (void *)(3 * sizeof(float)));   // Normal
-		glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, Mesh::VERTEX_SIZE, (void *)(6 * sizeof(float)));   // Color
-		glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, Mesh::VERTEX_SIZE, (void *)(9 * sizeof(float)));   // Texture
-		glEnableVertexAttribArray(0);
-		glEnableVertexAttribArray(1);
-		glEnableVertexAttribArray(2);
-		glEnableVertexAttribArray(3);
-	glBindVertexArray(0);
+		glBindVertexArray(VAO);
+			glBindBuffer(GL_ARRAY_BUFFER, VBO);
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, Mesh::VERTEX_SIZE, (void *)0);                     // Position
+			glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, Mesh::VERTEX_SIZE, (void *)(3 * sizeof(float)));   // Normal
+			glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, Mesh::VERTEX_SIZE, (void *)(6 * sizeof(float)));   // Color
+			glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, Mesh::VERTEX_SIZE, (void *)(9 * sizeof(float)));   // Texture
+			glEnableVertexAttribArray(0);
+			glEnableVertexAttribArray(1);
+			glEnableVertexAttribArray(2);
+			glEnableVertexAttribArray(3);
+		glBindVertexArray(0);
 
-	setMaterial(Material::DEFAULT_MATERIAL);
+		setMaterial(Material::DEFAULT_MATERIAL);
 
-	checkErrorAt("Object Renderer Initialization");
-}
+		checkErrorAt("Object Renderer Initialization");
+	}
 
-/**
- * Draws this object. Assumes it is only called within some sort of display function.
- * 
- * @param model the model matrix at the time of drawing the object.
- * @param view the view matrix at the time of drawing the object.
- * @param projection the projection matrix at the time of drawing the object.
- * @param camera the Camera the object is being viewed by.
- */
-void Renderer::draw(const glm::mat4 &model, const glm::mat4 &view, const glm::mat4 &projection){
-	shader.use();
+	/**
+	* Draws this object. Assumes it is only called within some sort of display function.
+	* 
+	* @param model the model matrix at the time of drawing the object.
+	* @param view the view matrix at the time of drawing the object.
+	* @param projection the projection matrix at the time of drawing the object.
+	* @param camera the Camera the object is being viewed by.
+	*/
+	void Renderer::draw(const glm::mat4 &model, const glm::mat4 &view, const glm::mat4 &projection){
+		shader.use();
 
-	glm::mat3 normalModel(glm::transpose(glm::inverse(view * model)));
-	shader.setUniform("model", model);
-	shader.setUniform("normalModel", normalModel);
-	shader.setUniform("view", view);
-	shader.setUniform("projection", projection);
+		glm::mat3 normalModel(glm::transpose(glm::inverse(view * model)));
+		shader.setUniform("model", model);
+		shader.setUniform("normalModel", normalModel);
+		shader.setUniform("view", view);
+		shader.setUniform("projection", projection);
 
-	glm::mat4 modelViewProjection = projection * view * model;
-	shader.setUniform("modelViewProjection", modelViewProjection);
+		glm::mat4 modelViewProjection = projection * view * model;
+		shader.setUniform("modelViewProjection", modelViewProjection);
 
-	std::vector<unsigned int> submeshes = mesh.getSubmeshBounds();
-	unsigned int submeshStart, submeshNumTriangles;
-	glBindVertexArray(VAO);
-		for(unsigned int i = 0; i < submeshes.size(); ++i){
-			Material &material = materials[materialIndices[i]];
+		std::vector<unsigned int> submeshes = mesh.getSubmeshBounds();
+		unsigned int submeshStart, submeshNumTriangles;
+		glBindVertexArray(VAO);
+			for(unsigned int i = 0; i < submeshes.size(); ++i){
+				Material &material = materials[materialIndices[i]];
 
-			shader.setUniform("material.ambient", material.ambient);
-			shader.setUniform("material.diffuse", material.diffuse);
+				shader.setUniform("material.ambient", material.ambient);
+				shader.setUniform("material.diffuse", material.diffuse);
 
-			glActiveTexture(GL_TEXTURE0);
-			glBindTexture(GL_TEXTURE_2D, material.diffuseMap->getID());
-			shader.setUniform("material.diffuseMap", 0);
+				glActiveTexture(GL_TEXTURE0);
+				glBindTexture(GL_TEXTURE_2D, material.diffuseMap->getID());
+				shader.setUniform("material.diffuseMap", 0);
 
-			shader.setUniform("material.specular", material.specular);
+				shader.setUniform("material.specular", material.specular);
 
-			glActiveTexture(GL_TEXTURE1);
-			glBindTexture(GL_TEXTURE_2D, material.specularMap->getID());
-			shader.setUniform("material.specularMap", 1);
+				glActiveTexture(GL_TEXTURE1);
+				glBindTexture(GL_TEXTURE_2D, material.specularMap->getID());
+				shader.setUniform("material.specularMap", 1);
 
-			shader.setUniform("material.shininess", material.shininess);
+				shader.setUniform("material.shininess", material.shininess);
 
-			submeshStart = submeshes[i];
-			submeshNumTriangles = (i + 1 < submeshes.size() ? submeshes[i + 1] : mesh.getNumTriangles()) - submeshStart;
-			glDrawElements(GL_TRIANGLES, submeshNumTriangles * 3, GL_UNSIGNED_INT, (GLvoid *)(submeshStart * 3 * sizeof(GLuint)));
+				submeshStart = submeshes[i];
+				submeshNumTriangles = (i + 1 < submeshes.size() ? submeshes[i + 1] : mesh.getNumTriangles()) - submeshStart;
+				glDrawElements(GL_TRIANGLES, submeshNumTriangles * 3, GL_UNSIGNED_INT, (GLvoid *)(submeshStart * 3 * sizeof(GLuint)));
+			}
+		glBindVertexArray(0);
+		glBindTexture(GL_TEXTURE_2D, 0);
+
+		checkErrorAt("Renderer draw");
+	}
+
+	/**
+	* Copies the current mesh into the buffer. If this object's currently set mesh object is changed after it is set,
+	* this function must be called before changes take effect. (Note: Using setMesh to set the mesh to a new Mesh object
+	* calls this method by default.)
+	*/
+	void Renderer::reloadMesh(){
+		glBindVertexArray(VAO);
+			glBufferData(GL_ARRAY_BUFFER, sizeof(float) * mesh.getNumVertices() * Mesh::VERTEX_SIZE, mesh.getVertexData(), GL_STATIC_DRAW);
+			glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * mesh.getNumTriangles() * 3, mesh.getIndexData(), GL_STATIC_DRAW);
+		glBindVertexArray(0);
+	}
+
+	/**
+	* Returns the OpenGL-provided ID of the VAO for this renderer.
+	* 
+	* @return the ID of the VAO for this renderer.
+	*/
+	unsigned int Renderer::getVAO(){
+		return this->VAO;
+	}
+
+	/**
+	* Returns a reference to the mesh for this renderer. If the mesh is modified,
+	* reloadMesh must be called before the modified data is copied back into the GPU's
+	* buffers.
+	* 
+	* @return a reference to the mesh for this renderer.
+	*/
+	Mesh& Renderer::getMesh(){
+		return this->mesh;
+	}
+
+	/**
+	* Sets the mesh of the object renderer and loads the data into the buffers.
+	* 
+	* @param mesh the new mesh to be used in this renderer.
+	*/
+	void Renderer::setMesh(const Mesh &mesh){
+		this->mesh = mesh;
+
+		this->materialIndices.clear();
+		this->materialIndices.resize(this->mesh.getNumSubmeshes());
+
+		reloadMesh();
+	}
+
+	/**
+	* Returns a reference to the first material for this renderer.
+	* 
+	* @return a reference to the first material for this renderer.
+	*/
+	Material& Renderer::getMaterial(){
+		return materials[0];
+	}
+
+	/**
+	* Returns a reference to the material for a specified submesh.
+	* 
+	* @param submeshIndex the index of the submesh to get the material for.
+	* @return a reference to the material.
+	*/
+	Material& Renderer::getMaterial(unsigned int submeshIndex){
+		return materials[materialIndices[submeshIndex]];
+	}
+
+	/**
+	* Sets the material for all submeshes in this renderer's mesh.
+	* 
+	* @param material the new material.
+	*/
+	void Renderer::setMaterial(const Material &material){
+		this->materials.clear();
+		this->materials.push_back(material);
+
+		this->materialIndices.clear();
+		this->materialIndices.resize(mesh.getNumSubmeshes());
+		for(unsigned int i = 0; i < this->mesh.getNumSubmeshes(); ++i){
+			materialIndices.push_back(0);
 		}
-	glBindVertexArray(0);
-	glBindTexture(GL_TEXTURE_2D, 0);
-
-	checkErrorAt("Renderer draw");
-}
-
-/**
- * Copies the current mesh into the buffer. If this object's currently set mesh object is changed after it is set,
- * this function must be called before changes take effect. (Note: Using setMesh to set the mesh to a new Mesh object
- * calls this method by default.)
- */
-void Renderer::reloadMesh(){
-	glBindVertexArray(VAO);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(float) * mesh.getNumVertices() * Mesh::VERTEX_SIZE, mesh.getVertexData(), GL_STATIC_DRAW);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * mesh.getNumTriangles() * 3, mesh.getIndexData(), GL_STATIC_DRAW);
-	glBindVertexArray(0);
-}
-
-/**
- * Returns the OpenGL-provided ID of the VAO for this renderer.
- * 
- * @return the ID of the VAO for this renderer.
- */
-unsigned int Renderer::getVAO(){
-	return this->VAO;
-}
-
-/**
- * Returns a reference to the mesh for this renderer. If the mesh is modified,
- * reloadMesh must be called before the modified data is copied back into the GPU's
- * buffers.
- * 
- * @return a reference to the mesh for this renderer.
- */
-Mesh& Renderer::getMesh(){
-	return this->mesh;
-}
-
-/**
- * Sets the mesh of the object renderer and loads the data into the buffers.
- * 
- * @param mesh the new mesh to be used in this renderer.
- */
-void Renderer::setMesh(const Mesh &mesh){
-	this->mesh = mesh;
-
-	this->materialIndices.clear();
-	this->materialIndices.resize(this->mesh.getNumSubmeshes());
-
-	reloadMesh();
-}
-
-/**
- * Returns a reference to the first material for this renderer.
- * 
- * @return a reference to the first material for this renderer.
- */
-Material& Renderer::getMaterial(){
-	return materials[0];
-}
-
-/**
- * Returns a reference to the material for a specified submesh.
- * 
- * @param submeshIndex the index of the submesh to get the material for.
- * @return a reference to the material.
- */
-Material& Renderer::getMaterial(unsigned int submeshIndex){
-	return materials[materialIndices[submeshIndex]];
-}
-
-/**
- * Sets the material for all submeshes in this renderer's mesh.
- * 
- * @param material the new material.
- */
-void Renderer::setMaterial(const Material &material){
-	this->materials.clear();
-	this->materials.push_back(material);
-
-	this->materialIndices.clear();
-	this->materialIndices.resize(mesh.getNumSubmeshes());
-	for(unsigned int i = 0; i < this->mesh.getNumSubmeshes(); ++i){
-		materialIndices.push_back(0);
-	}
-}
-
-/**
- * Sets the material for the specified submesh in this renderer's mesh.
- * 
- * @param submeshIndex the index of the submesh to set the material for.
- * @param material the new material.
- */
-void Renderer::setMaterial(unsigned int submeshIndex, const Material &material){
-	auto materialPosition = std::find(materials.begin(), materials.end(), material);
-	if(materialPosition == materials.end()){
-		materials.push_back(material);
-		materialPosition = materials.end() - 1;
 	}
 
-	materialIndices[submeshIndex] = std::distance(materials.begin(), materialPosition);
-}
+	/**
+	* Sets the material for the specified submesh in this renderer's mesh.
+	* 
+	* @param submeshIndex the index of the submesh to set the material for.
+	* @param material the new material.
+	*/
+	void Renderer::setMaterial(unsigned int submeshIndex, const Material &material){
+		auto materialPosition = std::find(materials.begin(), materials.end(), material);
+		if(materialPosition == materials.end()){
+			materials.push_back(material);
+			materialPosition = materials.end() - 1;
+		}
 
-/**
- * Sets the shader for this renderer.
- * 
- * @param shader the new shader to use.
- */
-void Renderer::setShader(const Shader &shader){
-	this->shader = shader;
-}
+		materialIndices[submeshIndex] = std::distance(materials.begin(), materialPosition);
+	}
 
-/**
- * Checks for an OpenGL error and prints the error code and location.
- * 
- * @param location a string for use in identifying where in the code the error occurs.
- */
-void Renderer::checkErrorAt(const char *location){
-	GLenum err;
-	if((err = glGetError()) != GL_NO_ERROR){
-		std::cout << "Error at " << location << ": " << err << std::endl;
+	/**
+	* Sets the shader for this renderer.
+	* 
+	* @param shader the new shader to use.
+	*/
+	void Renderer::setShader(const Shader &shader){
+		this->shader = shader;
+	}
+
+	/**
+	* Checks for an OpenGL error and prints the error code and location.
+	* 
+	* @param location a string for use in identifying where in the code the error occurs.
+	*/
+	void Renderer::checkErrorAt(const char *location){
+		GLenum err;
+		if((err = glGetError()) != GL_NO_ERROR){
+			std::cout << "Error at " << location << ": " << err << std::endl;
+		}
 	}
 }

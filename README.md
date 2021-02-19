@@ -2,13 +2,23 @@
 
 [![Build Status](https://travis-ci.org/Zunawe/ariamis.svg?branch=master)](https://travis-ci.org/Zunawe/ariamis)
 
-This started as just following a tutorial on OpenGL 3 and has grown as I've learned more things. At the moment, I use it as a base for homework in my graphics class, and it suits testing a new concept or shader pretty well.
+This started as just following a tutorial on OpenGL 3 and has grown into a sort of generic base for trying out graphics ideas or making 3D scenes. It's built with a game engine in mind, but I'm trying not to go too far down that road to keep the rendering separate from the rest of a hypothetical future game engine.
 
 There is an `example.cpp` which shows how to use it, which is how I test it, and I try to keep up on documentation comments, but that's all there is right now.
 
 ## Dependencies
 
-You'll need [glm](https://glm.g-truc.net/0.9.8/index.html) and [GLFW](http://www.glfw.org/). This was built on and for Ubuntu. The code should be portable, but the makefile isn't going to know what's going on on other platforms (probably).
+Depends on [glm](https://glm.g-truc.net/0.9.8/index.html) and [GLFW](http://www.glfw.org/). Recently switched to using conan.io and CMake, so those should be handled for you during the build process. Have only tested on my Arch Linux machine.
+
+## Building
+
+```
+$ mkdir build
+$ cd build
+$ conan install ..
+$ cmake ..
+$ make
+```
 
 ## Classes
 

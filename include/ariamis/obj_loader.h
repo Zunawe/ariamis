@@ -2,6 +2,7 @@
 #define OBJ_LOADER_H
 
 #include <map>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -14,8 +15,8 @@ namespace Ariamis {
   void loadObj(const char *filepath, Renderer &renderer);
   Mesh loadMeshFromObj(const char *filepath);
   Mesh loadMeshFromObj(const char *filepath, std::vector<unsigned int> &materialIndices);
-  Mesh loadMeshFromObj(const char *filepath, std::vector<unsigned int> &materialIndices, std::vector<Material> &materials);
-  std::map<std::string, Material> loadMaterialsFromMtl(const char *filepath);
+  Mesh loadMeshFromObj(const char *filepath, std::vector<unsigned int> &materialIndices, std::vector<std::shared_ptr<Material>> &materials);
+  std::map<std::string, std::shared_ptr<Material>> loadMaterialsFromMtl(const char *filepath);
 
   template<typename Out>
   void split(const std::string &s, char delim, Out result);

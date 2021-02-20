@@ -195,11 +195,6 @@ namespace Ariamis {
 
 		initializeGBuffer();
 
-		unsigned char whitePixel[3] = {255, 255, 255};
-		Texture::DEFAULT_TEXTURE.loadRaw(1, 1, whitePixel);
-
-		Material::DEFAULT_MATERIAL = Material();
-
 		glfwSwapInterval(0);
 	}
 

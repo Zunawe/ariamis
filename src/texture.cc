@@ -1,15 +1,16 @@
 #include <ariamis/texture.h>
 
-#define GL_GLEXT_PROTOTYPES
+#include <glad/glad.h>
 #include <GLFW/glfw3.h>
+
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
 namespace Ariamis {
-	Texture Texture::DEFAULT_TEXTURE;
-
 	Texture::Texture(){
 		glGenTextures(1, &this->id);
+		unsigned char whitePixel[3] = {255, 255, 255};
+		loadRaw(1, 1, whitePixel);
 	}
 
 	Texture::Texture(const char *filePath){
@@ -18,7 +19,8 @@ namespace Ariamis {
 	}
 
 	Texture::~Texture(){
-		glDeleteTextures(1, &id);
+		if(glfwGetCurrentContext() != NULL)
+			glDeleteTextures(1, &id);
 	}
 
 	/**

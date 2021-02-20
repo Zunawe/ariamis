@@ -4,8 +4,6 @@
 namespace Ariamis {
 	class Texture{
 		public:
-			static Texture DEFAULT_TEXTURE;
-
 			Texture();
 			Texture(const char *filePath);
 			~Texture();

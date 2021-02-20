@@ -30,7 +30,7 @@ namespace Ariamis {
 	* @param renderer the renderer to load the mesh into.
 	*/
 	void loadObj(const char *filepath, Renderer &renderer){
-		vector<Material> materials;
+		vector<std::shared_ptr<Material>> materials;
 		vector<unsigned int> materialIndices;
 		renderer.setMesh(loadMeshFromObj(filepath, materialIndices, materials));
 		for(unsigned int i = 0; i < materialIndices.size(); ++i){
@@ -47,7 +47,7 @@ namespace Ariamis {
 	*/
 	Mesh loadMeshFromObj(const char *filepath){
 		vector<unsigned int> throwaway;
-		vector<Material> throwaway2;
+		vector<std::shared_ptr<Material>> throwaway2;
 		return loadMeshFromObj(filepath, throwaway, throwaway2);
 	}
 
@@ -62,7 +62,7 @@ namespace Ariamis {
 	* @return a newly constructed Mesh object loaded from the provided filepath
 	*/
 	Mesh loadMeshFromObj(const char *filepath, vector<unsigned int> &materialIndices){
-		vector<Material> throwaway;
+		vector<std::shared_ptr<Material>> throwaway;
 		return loadMeshFromObj(filepath, materialIndices, throwaway);
 	}
 
@@ -79,7 +79,7 @@ namespace Ariamis {
 	* materials. The material indices refer to the order of this list.
 	* @return a newly constructed Mesh object loaded from the provided filepath
 	*/
-	Mesh loadMeshFromObj(const char *filepath, vector<unsigned int> &materialIndices, vector<Material> &materials){
+	Mesh loadMeshFromObj(const char *filepath, vector<unsigned int> &materialIndices, vector<std::shared_ptr<Material>> &materials){
 		ifstream file;
 		string line;
 
@@ -87,7 +87,7 @@ namespace Ariamis {
 		vector<glm::vec3> normals;
 		vector<glm::vec2> uv;
 		vector<string> materialNames;
-		map<string, Material> usedMaterials;
+		map<string, std::shared_ptr<Material>> usedMaterials;
 
 		Mesh mesh;
 		materialIndices.clear();
@@ -177,7 +177,7 @@ namespace Ariamis {
 						auto lastSlashPos = string(filepath).rfind('/');
 						string mtlPath = (lastSlashPos == string::npos ? "" : string(filepath, lastSlashPos + 1)) + string(mtlPathBuffer);
 
-						map<string, Material> newMaterials = loadMaterialsFromMtl(mtlPath.c_str());
+						map<string, std::shared_ptr<Material>> newMaterials = loadMaterialsFromMtl(mtlPath.c_str());
 						usedMaterials.insert(newMaterials.begin(), newMaterials.end());
 					}
 					break;
@@ -191,7 +191,7 @@ namespace Ariamis {
 			materials.push_back(usedMaterials[*it]);
 		}
 		if(materials.size() == 0){
-			materials.push_back(Material::DEFAULT_MATERIAL);
+			materials.push_back(std::shared_ptr<Material>(new Material()));
 		}
 		materialIndices.resize(mesh.getNumSubmeshes());
 
@@ -208,8 +208,8 @@ namespace Ariamis {
 	* @return the loaded materials. The key is the name specified in the MTL file
 	* and the value is the corresponding Material object.
 	*/
-	map<string, Material> loadMaterialsFromMtl(const char *filepath){
-		map<string, Material> materials;
+	map<string, std::shared_ptr<Material>> loadMaterialsFromMtl(const char *filepath){
+		map<string, std::shared_ptr<Material>> materials;
 
 		ifstream file;
 		string line;
@@ -231,7 +231,7 @@ namespace Ariamis {
 						sscanf(line.c_str(), "newmtl %s", mtlNameBuffer);
 
 						currentMaterialName = string(mtlNameBuffer);
-						materials.insert(pair<string, Material>(currentMaterialName, Material()));
+						materials.insert(pair<string, std::shared_ptr<Material>>(currentMaterialName, std::shared_ptr<Material>(new Material())));
 					}
 					break;
 				case 'K':
@@ -242,13 +242,13 @@ namespace Ariamis {
 
 						switch(line.c_str()[1]){
 							case 'a':
-								materials[currentMaterialName].ambient = color;
+								materials[currentMaterialName]->ambient = color;
 								break;
 							case 'd':
-								materials[currentMaterialName].diffuse = color;
+								materials[currentMaterialName]->diffuse = color;
 								break;
 							case 's':
-								materials[currentMaterialName].specular = color;
+								materials[currentMaterialName]->specular = color;
 								break;
 							default:
 								cout << "Encountered unsupported instruction \"" << line << "\"" << endl;
@@ -263,7 +263,7 @@ namespace Ariamis {
 
 						switch(line.c_str()[1]){
 							case 's':
-								materials[currentMaterialName].shininess = value;
+								materials[currentMaterialName]->shininess = value;
 								break;
 							default:
 								cout << "Encountered unsupported instruction \"" << line << "\"" << endl;

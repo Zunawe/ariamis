@@ -22,7 +22,7 @@ namespace Ariamis {
 			glEnableVertexAttribArray(3);
 		glBindVertexArray(0);
 
-		setMaterial(Material::DEFAULT_MATERIAL);
+		setMaterial(std::shared_ptr<Material>(new Material()));
 
 		checkErrorAt("Object Renderer Initialization");
 	}
@@ -51,22 +51,22 @@ namespace Ariamis {
 		unsigned int submeshStart, submeshNumTriangles;
 		glBindVertexArray(VAO);
 			for(unsigned int i = 0; i < submeshes.size(); ++i){
-				Material &material = materials[materialIndices[i]];
+				auto material = materials[materialIndices[i]];
 
-				shader.setUniform("material.ambient", material.ambient);
-				shader.setUniform("material.diffuse", material.diffuse);
+				shader.setUniform("material.ambient", material->ambient);
+				shader.setUniform("material.diffuse", material->diffuse);
 
 				glActiveTexture(GL_TEXTURE0);
-				glBindTexture(GL_TEXTURE_2D, material.diffuseMap->getID());
+				glBindTexture(GL_TEXTURE_2D, material->diffuseMap->getID());
 				shader.setUniform("material.diffuseMap", 0);
 
-				shader.setUniform("material.specular", material.specular);
+				shader.setUniform("material.specular", material->specular);
 
 				glActiveTexture(GL_TEXTURE1);
-				glBindTexture(GL_TEXTURE_2D, material.specularMap->getID());
+				glBindTexture(GL_TEXTURE_2D, material->specularMap->getID());
 				shader.setUniform("material.specularMap", 1);
 
-				shader.setUniform("material.shininess", material.shininess);
+				shader.setUniform("material.shininess", material->shininess);
 
 				submeshStart = submeshes[i];
 				submeshNumTriangles = (i + 1 < submeshes.size() ? submeshes[i + 1] : mesh.getNumTriangles()) - submeshStart;
@@ -129,8 +129,8 @@ namespace Ariamis {
 	* 
 	* @return a reference to the first material for this renderer.
 	*/
-	Material& Renderer::getMaterial(){
-		return materials[0];
+	Material* Renderer::getMaterial(){
+		return materials[0].get();
 	}
 
 	/**
@@ -139,8 +139,8 @@ namespace Ariamis {
 	* @param submeshIndex the index of the submesh to get the material for.
 	* @return a reference to the material.
 	*/
-	Material& Renderer::getMaterial(unsigned int submeshIndex){
-		return materials[materialIndices[submeshIndex]];
+	Material* Renderer::getMaterial(unsigned int submeshIndex){
+		return materials[materialIndices[submeshIndex]].get();
 	}
 
 	/**
@@ -148,7 +148,7 @@ namespace Ariamis {
 	* 
 	* @param material the new material.
 	*/
-	void Renderer::setMaterial(const Material &material){
+	void Renderer::setMaterial(std::shared_ptr<Material> material){
 		this->materials.clear();
 		this->materials.push_back(material);
 
@@ -165,7 +165,7 @@ namespace Ariamis {
 	* @param submeshIndex the index of the submesh to set the material for.
 	* @param material the new material.
 	*/
-	void Renderer::setMaterial(unsigned int submeshIndex, const Material &material){
+	void Renderer::setMaterial(unsigned int submeshIndex, std::shared_ptr<Material> material){
 		auto materialPosition = std::find(materials.begin(), materials.end(), material);
 		if(materialPosition == materials.end()){
 			materials.push_back(material);

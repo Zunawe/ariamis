@@ -1,4 +1,5 @@
 #include <iostream>
+#include <memory>
 
 #include <glm/ext.hpp>
 
@@ -15,26 +16,26 @@ int main(){
 
 	Scene s;
 
-	Texture *rockDiffuseMap = new Texture("data/textures/rock_diffuse.png");
-	Texture *rockSpecularMap = new Texture("data/textures/rock_specular.png");
+	std::shared_ptr<Texture> rockDiffuseMap(new Texture("data/textures/rock_diffuse.png"));
+	std::shared_ptr<Texture> rockSpecularMap(new Texture("data/textures/rock_specular.png"));
 
 	// Objects
 	std::shared_ptr<Object> rock(new Object());
 	rock->renderer.setMesh(loadMeshFromObj("data/objects/rock.obj"));
-	rock->renderer.getMaterial().diffuseMap = rockDiffuseMap;
-	rock->renderer.getMaterial().specularMap = rockSpecularMap;
+	rock->renderer.getMaterial()->setDiffuseMap(rockDiffuseMap);
+	rock->renderer.getMaterial()->setSpecularMap(rockSpecularMap);
 
 	rock->position = glm::vec3(3, 3, 3);
 
 	s.objects.push_back(rock);
 
 	for(int i = 0; i < 6; ++i){
-		std::shared_ptr<Object> plane(new Object());
-		plane->renderer.setMesh(loadMeshFromObj("data/objects/cube.obj"));
-		s.objects.push_back(plane);
+		std::shared_ptr<Object> box(new Object());
+		box->renderer.setMesh(loadMeshFromObj("data/objects/cube.obj"));
+		s.objects.push_back(box);
 
-		plane->position[i / 2] = ((2 * (i % 2)) - 1) * 10.0f;
-		plane->scale(9.0f);
+		box->position[i / 2] = ((2 * (i % 2)) - 1) * 10.0f;
+		box->scale(9.0f);
 	}
 
 	// Lights
@@ -110,7 +111,4 @@ int main(){
 	});
 
 	Engine::playScene(s);
-
-	delete rockDiffuseMap;
-	delete rockSpecularMap;
 }

@@ -19,17 +19,17 @@ namespace Ariamis {
 			unsigned int getVAO();
 			Mesh& getMesh();
 			void setMesh(const Mesh &mesh);
-			Material& getMaterial();
-			Material& getMaterial(unsigned int submeshIndex);
-			void setMaterial(const Material &material);
-			void setMaterial(unsigned int submeshIndex, const Material &material);
+			Material* getMaterial();
+			Material* getMaterial(unsigned int submeshIndex);
+			void setMaterial(std::shared_ptr<Material> material);
+			void setMaterial(unsigned int submeshIndex, std::shared_ptr<Material> material);
 			void setShader(const Shader &shader);
 			void reloadMesh();
 
 		private:
 			Mesh mesh;
 			std::vector<unsigned int> materialIndices;
-			std::vector<Material> materials;
+			std::vector<std::shared_ptr<Material>> materials;
 			Shader shader;
 			unsigned int VAO;
 			unsigned int VBO;
